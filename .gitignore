@@ -1,0 +1,12 @@
+# Data
+data/raw/
+data/processed/
+
+# Environment 
+.env
+__pycache__/
+*.pyc
+
+# Virtual Environments
+venv/
+.venv/
