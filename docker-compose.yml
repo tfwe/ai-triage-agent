@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  ai-triage:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      # Route traffic out of the container back to your host machine's Ollama
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434/v1
+      - MODEL_NAME=llama3.1:8b
+    extra_hosts:
+      # Required for Linux/WSL to resolve host.docker.internal
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # Mount the processed data folder so we don't have to rebuild the image if logs change
+      - ./data/processed:/app/data/processed

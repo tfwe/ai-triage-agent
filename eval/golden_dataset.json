@@ -1,0 +1,44 @@
+[
+  {
+    "id": "case_001_c2_beacon",
+    "description": "Host communicating with high-frequency outbound bursts to single external IP",
+    "input_context": {
+      "source_ip": "192.168.1.45",
+      "destinations": ["203.0.113.50"],
+      "ports_accessed": [443],
+      "total_bytes_sent": 5242880,
+      "total_bytes_received": 1024,
+      "connection_count": 1400
+    },
+    "expected_tool_call": "check_ip_reputation",
+    "expected_decision": "BLOCK_IP"
+  },
+  {
+    "id": "case_002_internal_scan",
+    "description": "Host scanning multiple internal subnets across management ports",
+    "input_context": {
+      "source_ip": "192.168.1.105",
+      "destinations": ["192.168.1.1", "192.168.1.2", "192.168.1.10", "192.168.1.20"],
+      "ports_accessed": [22, 445, 3389, 80],
+      "total_bytes_sent": 2048,
+      "total_bytes_received": 0,
+      "connection_count": 80
+    },
+    "expected_tool_call": null,
+    "expected_decision": "ISOLATE_HOST"
+  },
+  {
+    "id": "case_003_normal_browsing",
+    "description": "Standard outbound HTTPS traffic to common CDNs",
+    "input_context": {
+      "source_ip": "192.168.1.88",
+      "destinations": ["142.250.190.46", "151.101.1.69"],
+      "ports_accessed": [443],
+      "total_bytes_sent": 12000,
+      "total_bytes_received": 95000,
+      "connection_count": 12
+    },
+    "expected_tool_call": null,
+    "expected_decision": "IGNORE"
+  }
+]

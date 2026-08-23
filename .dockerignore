@@ -1,0 +1,22 @@
+# 1. Virtual Environments (Will break the Linux container if copied from Windows)
+venv/
+.venv/
+env/
+
+# 2. Raw Data (Too big, should be mounted via volumes if needed, never baked in)
+data/raw/
+
+# 3. Security (Never bake your API keys into the image layer)
+.env
+
+# 4. Python Cache (Useless bloat)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 5. Git and IDE stuff
+.git/
+.gitignore
+.vscode/
+.idea/
