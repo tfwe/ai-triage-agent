@@ -27,5 +27,10 @@ RUN chown -R agentuser:agentuser /app
 # Switch to the non-root user
 USER agentuser
 
+# Checks (and pulls, if needed) the Ollama model from config.py's settings
+# before handing off to CMD below
+ENTRYPOINT ["python", "docker-entrypoint.py"]
+
 # By default, run the evaluation harness to prove the system works
 CMD ["python", "-m", "eval.run_evals"]
+

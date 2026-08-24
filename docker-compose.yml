@@ -5,8 +5,13 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
+    env_file:
+      # Loads LLM_PROVIDER, OLLAMA_MODEL, OPENAI_API_KEY, etc. straight from
+      # the same .env file config.py reads
+      - .env
     environment:
-      # Route traffic out of the container back to your host machine's Ollama
+      # Overrides whatever OLLAMA_BASE_URL is in .env — "localhost" inside
+      # the container is NOT your host machine, host.docker.internal is
       - OLLAMA_BASE_URL=http://host.docker.internal:11434/v1
     extra_hosts:
       # Required for Linux/WSL to resolve host.docker.internal
@@ -14,3 +19,4 @@ services:
     volumes:
       # Mount the processed data folder so we don't have to rebuild the image if logs change
       - ./data/processed:/app/data/processed
+

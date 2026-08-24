@@ -17,11 +17,19 @@ def run_evaluation_suite(dataset_path: str):
     for case in cases:
         case_id = case["id"]
         expected_decision = case["expected_decision"]
-        context = case["input_context"]
+        
+        # We no longer pass a giant JSON block. We just pass the target IP or hostname.
+        target = case.get("target_identifier")
+        
+        if not target:
+            print(f"[ERROR] {case_id} is missing a 'target_identifier'.")
+            continue
 
         start_time = time.time()
         try:
-            result = run_triage_agent(context)
+            # The agent now takes the target and hunts through SQLite on its own
+            result = run_triage_agent(target)
+            
             latency = time.time() - start_time
             latencies.append(latency)
 
@@ -38,7 +46,7 @@ def run_evaluation_suite(dataset_path: str):
                 status = f"FAIL (Got {result.decision}, Expected {expected_decision})"
 
             print(f"[{status}] {case_id} ({latency:.2f}s) -> Decision: {result.decision}")
-
+            print(f"    Reasoning: {result.reasoning}") 
         except ValidationError as ve:
             print(f"[ERROR] {case_id} failed schema validation: {ve}")
         except Exception as e:

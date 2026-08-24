@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     # Ollama Config
     ollama_base_url: str = "http://localhost:11434/v1"
-    ollama_model: str = "llama3.1"
+    ollama_model: str = "devstral-small-2:24b"
 
     # Automatically load from the .env file in the root directory
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")

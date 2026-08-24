@@ -34,7 +34,8 @@ def parse_all_zeek_logs(base_dir: str, output_dir: str):
         "dns_queries": [],
         "http_requests": [],
         "ssl_handshakes": [],
-        "files_transferred": []
+        "files_transferred": [],
+        "dhcp_leases": [] # Add this line
     })
     
     with open(quarantine_path, 'w') as quarantine_file:
@@ -74,6 +75,10 @@ def parse_all_zeek_logs(base_dir: str, output_dir: str):
                                     for c_uid in validated_log.conn_uids:
                                         sessions[c_uid]["files_transferred"].append(validated_log.model_dump(mode='json'))
                                         
+                                # DHCP uses a list of 'uids'
+                                elif isinstance(validated_log, ZeekDHCP):
+                                    for c_uid in getattr(validated_log, 'uids', []):
+                                            sessions[c_uid]["dhcp_leases"].append(validated_log.model_dump(mode='json'))
                             except ValidationError as e:
                                 # Dead-letter queue: write bad logs to quarantine instead of dropping
                                 error_record = {

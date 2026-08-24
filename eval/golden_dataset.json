@@ -1,44 +1,44 @@
 [
   {
-    "id": "case_001_c2_beacon",
-    "description": "Host communicating with high-frequency outbound bursts to single external IP",
-    "input_context": {
-      "source_ip": "192.168.1.45",
-      "destinations": ["203.0.113.50"],
-      "ports_accessed": [443],
-      "total_bytes_sent": 5242880,
-      "total_bytes_received": 1024,
-      "connection_count": 1400
-    },
-    "expected_tool_call": "check_ip_reputation",
-    "expected_decision": "BLOCK_IP"
+    "id": "CASE-001-WEB-DMZ",
+    "target_identifier": "WEB-BO-01",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "Public web server that was scanned, compromised via SSH, and used to port scan the internal network."
   },
   {
-    "id": "case_002_internal_scan",
-    "description": "Host scanning multiple internal subnets across management ports",
-    "input_context": {
-      "source_ip": "192.168.1.105",
-      "destinations": ["192.168.1.1", "192.168.1.2", "192.168.1.10", "192.168.1.20"],
-      "ports_accessed": [22, 445, 3389, 80],
-      "total_bytes_sent": 2048,
-      "total_bytes_received": 0,
-      "connection_count": 80
-    },
-    "expected_tool_call": null,
-    "expected_decision": "ISOLATE_HOST"
+    "id": "CASE-002-FILE-SERVER",
+    "target_identifier": "FILE-BO-01",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "File server accessed via RDP using compromised admin credentials, followed by file enumeration and archiving."
   },
   {
-    "id": "case_003_normal_browsing",
-    "description": "Standard outbound HTTPS traffic to common CDNs",
-    "input_context": {
-      "source_ip": "192.168.1.88",
-      "destinations": ["142.250.190.46", "151.101.1.69"],
-      "ports_accessed": [443],
-      "total_bytes_sent": 12000,
-      "total_bytes_received": 95000,
-      "connection_count": 12
-    },
-    "expected_tool_call": null,
-    "expected_decision": "IGNORE"
+    "id": "CASE-003-ADMIN-WS",
+    "target_identifier": "WS-NKAPOOR-01",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "Admin workstation beaconing outbound to attacker infrastructure."
+  },
+  {
+    "id": "CASE-004-RED-HERRING",
+    "target_identifier": "WS-VHALE-01",
+    "expected_decision": "IGNORE",
+    "description": "Red herring: User mistyped password during VPN reconnect."
+  },
+  {
+    "id": "CASE-005-EXT-SCANNER",
+    "target_identifier": "45.83.220.5",
+    "expected_decision": "BLOCK_IP",
+    "description": "External IP running a Nikto vulnerability scan against the public claims portal."
+  },
+  {
+    "id": "CASE-006-EXT-C2",
+    "target_identifier": "45.83.221.30",
+    "expected_decision": "BLOCK_IP",
+    "description": "External attacker infrastructure receiving beacons."
+  },
+  {
+    "id": "CASE-007-EXT-VPN",
+    "target_identifier": "198.51.100.77",
+    "expected_decision": "IGNORE",
+    "description": "Source IP of the branch manager's benign failed VPN reconnect."
   }
 ]
