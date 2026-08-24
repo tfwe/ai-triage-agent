@@ -80,6 +80,7 @@ def run_triage_agent(host_context: dict) -> TriageAction:
                         "tool_call_id": tool_call.id,
                         "content": tool_result
                     })
+
             continue # Go back to the top of the loop so the model can read the tool result
 
         # If there are no tool calls, the model has output our final JSON
