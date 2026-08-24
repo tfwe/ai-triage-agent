@@ -1,5 +1,5 @@
 from pydantic import BaseModel, IPvAnyAddress, Field
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
 class ZeekConnection(BaseModel):
     timestamp: float = Field(alias="ts")
@@ -77,3 +77,61 @@ class ZeekOCSP(BaseModel):
     id: str
     certStatus: Optional[str] = None
     serialNumber: Optional[str] = None
+
+class EcarEvent(BaseModel):
+    timestamp_ms: int
+    id: str
+    hostname: str
+    object: str
+    action: str
+    actorID: Optional[str] = None
+    objectID: Optional[str] = None
+    pid: Optional[int] = None
+    ppid: Optional[int] = None
+    tid: Optional[int] = None
+    principal: Optional[str] = None
+    properties: Dict[str, Any] = Field(default_factory=dict)
+
+class WinEvent(BaseModel):
+    timestamp: str 
+    event_id: int
+    hostname: str
+    channel: str
+    event_data: Dict[str, Any] = Field(default_factory=dict)
+
+class SyslogEvent(BaseModel):
+    timestamp: str
+    hostname: str
+    process: str
+    message: str
+
+class WebAccessEvent(BaseModel):
+    source_ip: str
+    timestamp: str
+    method: str
+    path: str
+    status_code: int
+    user_agent: str
+
+class BashHistoryEvent(BaseModel):
+    hostname: str
+    username: str
+    command: str
+
+class AsaEvent(BaseModel):
+    timestamp: str
+    hostname: str
+    message_id: str
+    message: str
+
+class IdsEvent(BaseModel):
+    timestamp: str
+    sig_id: str
+    message: str
+    classification: Optional[str] = None
+    priority: Optional[int] = None
+    protocol: str
+    source_ip: str
+    source_port: Optional[int] = None
+    dest_ip: str
+    dest_port: Optional[int] = None
