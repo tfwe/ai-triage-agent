@@ -44,4 +44,5 @@ def init_db(db_path="data/processed/triage.db"):
     
     conn.commit()
     return conn, cursor
-
+if __name__ == "__main__":
+    init_db()

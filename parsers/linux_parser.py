@@ -49,13 +49,38 @@ def parse_linux_logs(base_dir: str, output_dir: str):
 
             # Bash history files usually don't have extensions, or are named after the user
             elif "bash_history" in root:
-                username = file # The filename is usually the username in these dumps
+                username = file
+                
+                # Filter out Alternate Data Streams and hidden files
+                if username.endswith(":Zone.Identifier") or username.startswith("."):
+                    continue
+
                 with open(file_path, 'r', errors='replace') as f:
+                    current_timestamp = None
                     for line in f:
-                        command = line.strip()
-                        if command:
-                            log = BashHistoryEvent(hostname=hostname, username=username, command=command)
-                            host_timelines[hostname]["bash_history"].append(log.model_dump(mode='json'))
+                        line = line.strip()
+                        if not line:
+                            continue
+                        
+                        # Catch epoch timestamps
+                        if line.startswith("#") and line[1:].isdigit():
+                            current_timestamp = line[1:]
+                        else:
+                            # It's a command, pair it with the stored timestamp
+                            log_data = {
+                                "hostname": hostname,
+                                "username": username,
+                                "command": line
+                            }
+                            if current_timestamp:
+                                log_data["timestamp"] = current_timestamp
+                                current_timestamp = None # Reset for the next command
+                                
+                            try:
+                                log = BashHistoryEvent(**log_data)
+                                host_timelines[hostname]["bash_history"].append(log.model_dump(mode='json'))
+                            except ValidationError:
+                                continue
 
     return host_timelines
 
