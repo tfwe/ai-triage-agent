@@ -117,6 +117,7 @@ class BashHistoryEvent(BaseModel):
     hostname: str
     username: str
     command: str
+    timestamp: Optional[str] = None
 
 class AsaEvent(BaseModel):
     timestamp: str

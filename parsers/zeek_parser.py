@@ -2,10 +2,16 @@ import os
 import json
 from pydantic import ValidationError
 from collections import defaultdict
-from schemas import (
-    ZeekConnection, ZeekDNS, ZeekHTTP, ZeekSSL, ZeekFiles,
-    ZeekDHCP, ZeekX509, ZeekPE, ZeekOCSP
-)
+try:  # imported as a package module
+    from .schemas import (
+        ZeekConnection, ZeekDNS, ZeekHTTP, ZeekSSL, ZeekFiles,
+        ZeekDHCP, ZeekX509, ZeekPE, ZeekOCSP
+    )
+except ImportError:  # executed as a plain script
+    from schemas import (
+        ZeekConnection, ZeekDNS, ZeekHTTP, ZeekSSL, ZeekFiles,
+        ZeekDHCP, ZeekX509, ZeekPE, ZeekOCSP
+    )
 
 # Map filenames to their respective schemas
 SCHEMA_MAP = {

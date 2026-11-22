@@ -2,7 +2,10 @@ import os
 import json
 from pydantic import ValidationError
 from collections import defaultdict
-from schemas import EcarEvent
+try:  # imported as a package module
+    from .schemas import EcarEvent
+except ImportError:  # executed as a plain script
+    from schemas import EcarEvent
 
 def parse_all_ecar_logs(base_dir: str, output_dir: str):
     if not os.path.exists(base_dir):
