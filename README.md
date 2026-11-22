@@ -252,20 +252,18 @@ limits). Cases are split `dev` / `holdout` by a hash of the address.
 
 Held-out split, 14 cases:
 
-| Metric | Rules | Local 35B | DeepSeek V4.1-Flash |
-|---|---|---|---|
-| Accuracy | 9/14 (64.3%) | 11/14 (78.6%) | 8/14 (57.1%) |
-| False positives | 5/5 | 3/5 | 3/5 |
-| Missed detections | 0/9 | 0/9 | 3/9 |
-| Latency p50 | 5.8 ms | 47.3 s | 33.1 s |
-| Mean tokens per alert | 0 | 27,616 | 37,299 |
-| Cost per 1,000 alerts | $0 | $0 | $2.51 |
+| Metric | Rules | Local 35B | DeepSeek V4.1-Flash | GPT-6-Luna |
+|---|---|---|---|---|
+| Accuracy | 9/14 (64.3%) | 11/14 (78.6%) | 9/14 (64.3%) | 8/14 (57.1%) |
+| False positives | 5/5 | 3/5 | 3/5 | 2/5 |
+| Missed detections | 0/9 | 0/9 | 2/9 | 3/9 |
+| Latency p50 | 5.8 ms | 47.3 s | 30.6 s | 10.0 s |
+| Mean tokens per alert | 0 | 27,616 | 37,299 | 16,158 |
+| Cost per 1,000 alerts | $0 | $0 | $2.48 | $2.31 |
 
-GPT-6-Luna ran on the dev split only: 4/14 (28.6%) at $2.20 per 1,000 alerts.
+Run-to-run noise is real at temperature 0.1 and is reported rather than smoothed: over the same cases and databases the local model scored 9/14 and 11/14, and DeepSeek scored 8/14 and 9/14. Read the table as one draw each, and the local lead as "level with or slightly ahead", not as a settled two-case margin.
 
-The local model ran the holdout twice over the same cases and databases; the runs scored 9/14 and 11/14. The table carries the second. Treat plus or minus two cases as run-to-run noise at temperature 0.1, and read the local row as "level with or slightly ahead of the tuned baseline", not as a stable two-case lead over the hosted model.
-
-Even so, the shape of the result is the point: on bare flows every approach lands in a narrow band, the hosted model costs $2.51 per 1,000 alerts for no accuracy gain over a model running locally for nothing, and the rule baseline fires on every benign case in the holdout. Evidence recall is 100% for all three models, so the failure is not that they did not look; the flow evidence under-determines the label. The synthetic set, where each case carries alerts, endpoint events and firewall records, is the setting where the agent reaches 90.3%.
+The shape of the result is what matters: on bare flows every approach lands in a narrow band, two hosted models cost $2.31 to $2.48 per 1,000 alerts for no accuracy gain over a model running locally for nothing, and the rule baseline fires on every benign case in the holdout. Evidence recall is 100% for all three models, so the failure is not that they did not look; the flow evidence under-determines the label. The synthetic set, where each case carries alerts, endpoint events and firewall records, is the setting where the agent reaches 90.3%.
 
 The system prompt gained a flow-evidence paragraph between the first synthetic
 run and these runs. The dev split absorbed that change; the holdout numbers
