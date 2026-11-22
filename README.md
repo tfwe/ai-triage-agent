@@ -16,20 +16,19 @@ Source: `eval/results/agent.txt` (agent and rules, same run) and `eval/results/r
 
 | Metric | Rules | Agent |
 |---|---|---|
-| Decision accuracy | 31/31 (100.0%) | 26/31 (83.9%) |
+| Decision accuracy | 31/31 (100.0%) | 28/31 (90.3%) |
 | False-positive rate | 0.0% (0/12) | 16.7% (2/12) |
 | Missed detections | 0/19 | 0/19 |
-| Latency p50 | 1.3 ms | 18.1 s |
-| Latency p95 | 2.3 ms | 29.4 s |
-| Mean tokens per alert | 0 | 14,627 |
+| Latency p50 | 1.3 ms | 28.7 s |
+| Latency p95 | 3.2 ms | 117.7 s |
+| Mean tokens per alert | 0 | 14,763 |
 | Evidence recall | n/a | 88.5% |
 | Crashed runs | 0 | 0 |
-| Mean tool calls per alert | n/a | 8.2 |
 
 Agent run:
 
 - Model: `ornith-1.5-35b-a3b-apex-i-nanoplus`, served by LM Studio on an RTX 5070 Ti.
-- Recorded 2026-11-22T08:57:25Z in `record` mode, at most 12 model turns per case.
+- Recorded 2026-11-22T11:44:00Z in `record` mode, at most 12 model turns per case.
 
 Definitions:
 
@@ -37,7 +36,7 @@ Definitions:
 - **Missed detection:** a malicious case where the agent returned `IGNORE` or no decision. A malicious case escalated with the wrong action (for example `ISOLATE_HOST` for an expected `BLOCK_IP`) is counted as detected, but not as correct.
 - **Evidence recall:** the share of each case's expected-evidence signatures that appear in the tool results the agent received.
 
-**Caveat on the rule baseline.** The rule marker list was written and tuned against this same synthetic corpus. Its 100% is an upper bound on this dataset, not an estimate of how rules perform on real alerts. The agent's 83.9% is measured on the same data.
+**Caveat on the rule baseline.** The rule marker list was written and tuned against this same synthetic corpus. Its 100% is an upper bound on this dataset, not an estimate of how rules perform on real alerts. The agent's 90.3% is measured on the same data.
 
 Rule latency varies between runs: the table uses the `agent.txt` run, and `rules-baseline.txt` (a separate rules-only run) reports 2.6 ms p50 and 11.7 ms p95. Treat rule latency as order-of-magnitude only. Replay latencies are not latency measurements (see below).
 
@@ -96,9 +95,9 @@ Replay the recorded agent run:
 python -m eval.run_evals --mode replay --label replay-check
 ```
 
-Each `run_evals` call writes `eval/results/<label>.json` and `.txt`. Always pass `--label`; without it the file is named after the recorded model. Replay should give the same 26/31 decisions and a mean of 14,626.8 tokens per alert as `agent.txt`. Replay does not call a model, so its latency is not a measurement.
+Each `run_evals` call writes `eval/results/<label>.json` and `.txt`. Always pass `--label`; without it the file is named after the recorded model. Replay should give the same 28/31 decisions and a mean of 14,763.2 tokens per alert as `agent.txt`. Replay does not call a model, so its latency is not a measurement.
 
-Run the test suite (44 tests):
+Run the test suite (53 tests):
 
 ```bash
 python -m pytest
@@ -234,9 +233,53 @@ The committed agent run has five wrong decisions out of 31. Two are false positi
 
 No malicious case was missed. All wrong decisions are over-escalations or wrong-action escalations.
 
+## Public datasets
+
+The golden set above is synthetic. `eval/datasets/public.json` is a second
+evaluation built from two published datasets, so the same harness can be
+pointed at data this repository had no hand in creating:
+
+| Source | Cases | Contributes |
+|---|---|---|
+| CIC-IDS2017 (Sharafaldin et al., 2018) | 18 | 5 host compromises, 1 external C2, 12 benign |
+| NF-BoT-IoT, NetFlow export of Bot-IoT (Koroniotis et al., 2019) | 10 | internal hosts running attacks, 1 benign |
+
+Labels come from each dataset's own per-flow columns, folded by a documented
+policy and stripped from the databases before the agent sees them. Both ship
+flows rather than alerts, so a deterministic flow detector supplies the alert
+context (`eval/datasets/README.md` has the policy, the mirrors and the known
+limits). Cases are split `dev` / `holdout` by a hash of the address.
+
+Held-out split, 14 cases:
+
+| Metric | Rules | Local 35B | DeepSeek V4.1-Flash |
+|---|---|---|---|
+| Accuracy | 9/14 (64.3%) | 9/14 (64.3%) | 8/14 (57.1%) |
+| False positives | 5/5 | 4/5 | 3/5 |
+| Missed detections | 0/9 | 1/9 | 3/9 |
+| Latency p50 | 4.8 ms | 37.6 s | 33.1 s |
+| Mean tokens per alert | 0 | 25,125 | 37,299 |
+| Cost per 1,000 alerts | $0 | $0 | $2.51 |
+
+GPT-6-Luna ran on the dev split only: 4/14 (28.6%) at $2.20 per 1,000 alerts.
+
+Read it as the honest limit of this design rather than a win. On bare flows,
+every approach lands between 57% and 64%: the local 35B matches the tuned
+baseline and the hosted model, the hosted model trades two more missed attacks
+for two fewer false positives, and the rule baseline fires on every benign case
+in the holdout. Evidence recall is 100% for all three models, so the failure is
+not that they did not look; the flow evidence under-determines the label. The
+synthetic set, where each case carries alerts, endpoint events and firewall
+records, is the setting where the agent reaches 90.3%.
+
+The system prompt gained a flow-evidence paragraph between the first synthetic
+run and these runs. The dev split absorbed that change; the holdout numbers
+above are the ones the prompt was not revised against.
+
 ## Limitations
 
 - The corpus is synthetic and small (31 cases), and the rule baseline was tuned on it. The results do not say how either approach performs on real alerts.
+- The public-dataset corpus is small too (28 cases), and CIC-IDS2017 rewrites the attacker's source address to the border gateway, so that half contributes a single `BLOCK_IP` case. NF-BoT-IoT is a laboratory capture with no timestamps in the export.
 - The agent's decisions are model output. Nothing here puts an analyst in the loop before an action is taken.
 - Each case has its own database rather than a shared store.
 - Timestamps are not normalised across vendors.
@@ -266,10 +309,13 @@ No malicious case was missed. All wrong decisions are over-escalations or wrong-
 | `eval/run_evals.py` | Scores rules and agent on the golden set; writes `eval/results/` |
 | `eval/corpus_build.py` | Renders the corpus, runs the parsers, builds the databases |
 | `eval/golden_dataset.json` | 31 cases with expected decisions and evidence |
+| `eval/datasets/` | Public-dataset label files, their README, and the merged case list |
+| `eval/load_cicids.py`, `eval/load_botiot.py` | Loaders, labelling policy and flow detector for the public datasets |
+| `eval/merge_datasets.py` | Concatenates loader output into one case list |
 | `eval/corpus/scenarios.json` | Synthetic vendor-shaped events per case |
-| `eval/recordings/agent.jsonl` | 127 recorded request/response exchanges |
+| `eval/recordings/agent.jsonl` | 132 recorded request/response exchanges |
 | `eval/results/` | `agent.txt`, `rules-baseline.txt` and their JSON versions |
-| `tests/` | 44 pytest tests; no network, model or API key needed |
+| `tests/` | 53 pytest tests; no network, model or API key needed |
 | `Dockerfile`, `docker-compose.yml`, `docker-entrypoint.py` | Container build, compose setup, pre-flight check |
 | `.env.example` | Every setting with placeholder values |
 | `.github/workflows/ci.yml` | Test job and offline replay job |

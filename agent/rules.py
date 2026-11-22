@@ -148,6 +148,77 @@ def _alert_rows_for_ip(target: str, db_path: str | None) -> list[dict]:
     )
 
 
+def _flow_rows(target: str, db_path: str | None) -> list[dict]:
+    return _rows(
+        "SELECT * FROM network_traffic WHERE src_ip = ? OR dest_ip = ?",
+        (target, target),
+        db_path,
+    )
+
+
+def _flow_signals(target: str, db_path: str | None) -> tuple[int, list[str]]:
+    """Score a target from flow behaviour alone, for datasets with no IDS.
+
+    Written for the public-dataset evaluation, where the only telemetry is
+    NetFlow-like: many short flows to many ports is a scan, many flows to one
+    port is a brute force, large uniform volume is a flood.
+    """
+    rows = _flow_rows(target, db_path)
+    if not rows:
+        return 0, []
+
+    as_source = [row for row in rows if row.get("src_ip") == target]
+    ports = {row.get("dest_port") for row in as_source if row.get("dest_port") is not None}
+    peers = {row.get("dest_ip") for row in as_source}
+    score = 0
+    evidence: list[str] = []
+
+    if len(as_source) >= 100 and len(ports) >= 25:
+        score += 55
+        evidence.append(f"{len(as_source)} outbound flows across {len(ports)} ports")
+    elif len(as_source) >= 50 and len(ports) >= 15:
+        score += 30
+        evidence.append(f"{len(as_source)} outbound flows across {len(ports)} ports")
+
+    # Brute force: a pile of flows to one port on one peer.
+    per_peer_port: dict[tuple, int] = {}
+    for row in as_source:
+        key = (row.get("dest_ip"), row.get("dest_port"))
+        per_peer_port[key] = per_peer_port.get(key, 0) + 1
+    if per_peer_port:
+        (peer, port), hits = max(per_peer_port.items(), key=lambda item: item[1])
+        if hits >= 50 and port in (21, 22, 23, 25, 80, 443, 445, 3389):
+            score += 45
+            evidence.append(f"{hits} flows to {peer}:{port}")
+
+    # Flood: many flows, tiny payloads.
+    sizes = []
+    for row in as_source:
+        payload = row.get("session_data")
+        if isinstance(payload, str):
+            try:
+                payload = json.loads(payload)
+            except json.JSONDecodeError:
+                payload = {}
+        sizes.append(int((payload or {}).get("fwd_bytes") or 0))
+    if sizes and len(sizes) >= 100:
+        average = sum(sizes) / len(sizes)
+        if average <= 400:
+            score += 35
+            evidence.append(f"{len(sizes)} flows averaging {average:.0f} bytes")
+
+    # Beacon: one peer, many small flows. Only meaningful for an internal target.
+    if not _is_external(target) and peers and len(as_source) >= 20:
+        top_peer_count = max(
+            sum(1 for row in as_source if row.get("dest_ip") == peer) for peer in peers
+        )
+        if top_peer_count >= 20 and len(peers) <= 3:
+            score += 40
+            evidence.append(f"{top_peer_count} flows to {len(peers)} peer(s)")
+
+    return score, evidence
+
+
 def _sessions_from_ip(target: str, db_path: str | None) -> list[dict]:
     return _rows(
         "SELECT * FROM network_traffic WHERE src_ip = ?",
@@ -201,17 +272,30 @@ def classify_ip(target: str, db_path: str | None = None) -> RuleVerdict:
     inbound = _sessions_to_ip(target, db_path)
     outbound = _sessions_from_ip(target, db_path)
 
-    if not _is_external(target):
-        return RuleVerdict(
-            decision="IGNORE",
-            confidence_score=45,
-            reasoning=f"{target} is an internal address; no external threat to block.",
-            score=0,
-        )
-
     alert_text = _text_of(alerts).lower()
     malicious_hits = [kw for kw in MALICIOUS_ALERT_KEYWORDS if kw in alert_text]
     evidence: list[str] = []
+
+    if not _is_external(target):
+        flow_score, flow_evidence = _flow_signals(target, db_path)
+        if malicious_hits or flow_score >= ISOLATE_THRESHOLD:
+            return RuleVerdict(
+                decision="ISOLATE_HOST",
+                confidence_score=min(90, 55 + flow_score // 3),
+                reasoning=(
+                    f"{target} is an internal address with hostile evidence: "
+                    + ("; ".join(flow_evidence[:3]) if flow_evidence else "alert signatures")
+                ),
+                score=max(flow_score, 45),
+                evidence=flow_evidence or [f"alert text: {', '.join(malicious_hits[:3])}"],
+            )
+        return RuleVerdict(
+            decision="IGNORE",
+            confidence_score=45,
+            reasoning=f"{target} is an internal address with no hostile evidence.",
+            score=flow_score,
+            evidence=flow_evidence,
+        )
 
     if malicious_hits:
         confidence = min(95, 55 + 8 * len(alerts))
@@ -264,6 +348,32 @@ def classify_ip(target: str, db_path: str | None = None) -> RuleVerdict:
             ),
             score=0,
             evidence=[f"benign alert text: {', '.join(benign[:3])}"],
+        )
+
+    # No alert at all: fall back to flow behaviour (the public datasets have no
+    # IDS, so this branch is the whole baseline there).
+    if not alerts:
+        flow_score, flow_evidence = _flow_signals(target, db_path)
+        if flow_score >= ISOLATE_THRESHOLD:
+            return RuleVerdict(
+                decision="BLOCK_IP",
+                confidence_score=min(90, 50 + flow_score // 3),
+                reasoning=(
+                    f"{target} raised no alert, but its flows look like an attack: "
+                    + "; ".join(flow_evidence[:3])
+                ),
+                score=flow_score,
+                evidence=flow_evidence,
+            )
+        return RuleVerdict(
+            decision="IGNORE",
+            confidence_score=50,
+            reasoning=(
+                f"No alert for {target} and no attack-shaped flow pattern "
+                f"(score {flow_score})."
+            ),
+            score=flow_score,
+            evidence=flow_evidence,
         )
 
     return RuleVerdict(

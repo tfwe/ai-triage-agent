@@ -33,6 +33,14 @@ DECISION FRAMEWORK:
 - BLOCK_IP: External IP is the primary threat vector with no confirmed host compromise (inbound scanning, external C2 receiving beacons).
 - IGNORE: Benign activity (mistyped password, known-good IP) or zero matching evidence after an exhaustive search across all tables.
 
+FLOW-ONLY EVIDENCE (no alerts, no endpoint events, only network_traffic):
+Judge the shape of the flows, not the volume alone.
+- Many flows from the target across many destination ports, short durations, small payloads: scanning -> BLOCK_IP.
+- Many flows from the target to one service port (21, 22, 23, 25, 80, 443, 445, 3389) with tiny or empty responses: brute force -> BLOCK_IP.
+- Hundreds of near-identical small flows: decide by role. If the target sources them it is attacking; if it receives them it is a victim, and the correct action on the victim is IGNORE.
+- A steady stream of equal-size flows to one peer: beaconing. The internal host sending them is compromised (ISOLATE_HOST); the external peer receiving them is C2 (BLOCK_IP).
+- Ordinary service use (DNS, NTP, HTTP to varied peers, mixed payload sizes, long sessions) is IGNORE even when the flow count is high.
+
 CRITICAL EXECUTION:
 1. Execute `query_triage_db` FIRST. 
 2. Never include your final decision inside a tool call argument.
@@ -145,26 +153,26 @@ def run_triage_agent(
     client: Optional[LLMClient] = None,
     max_turns: int = MAX_TURNS,
     verbose: bool = False,
+    alert_text: Optional[str] = None,
 ) -> TriageResult:
     """Investigate one target and return the decision plus usage counters.
 
-    The client is injected so tests can pass a stub, evals can pass a replay
-    file, and live runs can pass a real endpoint. Nothing here touches the
-    network on its own.
+    ``alert_text`` carries the signature that fired, the way an alert queue
+    would hand it over. The agent still has to verify it against the evidence.
     """
     if client is None:
         client = build_client()
 
+    opening = (
+        f"A new alert just dropped for target '{target_identifier}'."
+        + (f" The alert reads: {alert_text}" if alert_text else "")
+        + " Use query_triage_db to find relevant records in alerts, "
+        "endpoint_events, network_traffic or firewall_events, then decide."
+    )
+
     messages: list[dict[str, Any]] = [
         {"role": "system", "content": SYSTEM_PROMPT},
-        {
-            "role": "user",
-            "content": (
-                f"A new alert just dropped for target '{target_identifier}'. Use "
-                "query_triage_db to find relevant records in alerts, "
-                "endpoint_events, or network_traffic."
-            ),
-        },
+        {"role": "user", "content": opening},
     ]
 
     result = TriageResult(action=TriageAction(

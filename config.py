@@ -14,6 +14,7 @@ class Settings(BaseSettings):
 
     # OpenAI Config
     openai_api_key: Optional[str] = None
+    openai_base_url: Optional[str] = None
     openai_model: str = "gpt-5.6-luna"
 
     abuseipdb_api_key: Optional[str] = None

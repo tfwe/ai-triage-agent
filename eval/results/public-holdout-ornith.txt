@@ -1,0 +1,16 @@
+mode=record model=ornith-1.5-35b-a3b-apex-i-nanoplus cases=14 split=holdout dataset=1a55263e23499af0 at 2026-11-22T11:11:02Z
+
+  metric                             rules           agent
+  ------------------------------------------------------
+  Decision accuracy                   9/14            9/14
+  Accuracy                           64.3%           64.3%
+  False-positive rate               100.0%           80.0%
+  False positives                      5/5             4/5
+  Missed detections                    0/9             1/9
+  Latency p50                       4.8 ms      37625.4 ms
+  Latency p95                      62.9 ms      86449.3 ms
+  Mean tokens / alert                  n/a         25125.0
+  Evidence recall                      n/a          100.0%
+  Crashed runs                           0               0
+  Cost (run)                       $0.0000         $0.0000
+  Cost / 1,000 alerts                $0.00           $0.00

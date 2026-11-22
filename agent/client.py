@@ -270,6 +270,7 @@ def build_client(
         inner = OpenAIClient(
             model=settings.openai_model,
             api_key=settings.openai_api_key,
+            base_url=settings.openai_base_url,
         )
     if mode == "record":
         return RecordingClient(inner, record_path or settings.record_path)

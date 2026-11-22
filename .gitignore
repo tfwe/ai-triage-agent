@@ -2,6 +2,11 @@
 data/raw/
 data/processed/
 data/cases/
+data/public/
+
+# Public-dataset recordings: only replayable alongside the source archives,
+# which are not committed. See eval/datasets/README.md.
+eval/recordings/public-*.jsonl
 
 # Environment 
 .env

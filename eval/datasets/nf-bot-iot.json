@@ -1,0 +1,142 @@
+[
+  {
+    "id": "BOTIOT-192-168-100-147",
+    "target_identifier": "192.168.100.147",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 145998 attack-labelled flows (100% of its 145998 flows): a compromised machine inside the perimeter",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.147' OR dest_ip = '192.168.100.147'",
+        "signature": "192.168.100.147"
+      }
+    ]
+  },
+  {
+    "id": "BOTIOT-192-168-100-148",
+    "target_identifier": "192.168.100.148",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 171096 attack-labelled flows (100% of its 171096 flows): a compromised machine inside the perimeter",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.148' OR dest_ip = '192.168.100.148'",
+        "signature": "192.168.100.148"
+      }
+    ]
+  },
+  {
+    "id": "BOTIOT-192-168-100-149",
+    "target_identifier": "192.168.100.149",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 151784 attack-labelled flows (100% of its 151784 flows): a compromised machine inside the perimeter",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.149' OR dest_ip = '192.168.100.149'",
+        "signature": "192.168.100.149"
+      }
+    ]
+  },
+  {
+    "id": "BOTIOT-192-168-100-150",
+    "target_identifier": "192.168.100.150",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 118985 attack-labelled flows (100% of its 118985 flows): a compromised machine inside the perimeter",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.150' OR dest_ip = '192.168.100.150'",
+        "signature": "192.168.100.150"
+      }
+    ]
+  },
+  {
+    "id": "BOTIOT-192-168-100-3",
+    "target_identifier": "192.168.100.3",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 5471 attack-labelled flows (100% of its 5471 flows): a compromised machine inside the perimeter",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.3' OR dest_ip = '192.168.100.3'",
+        "signature": "192.168.100.3"
+      }
+    ]
+  },
+  {
+    "id": "BOTIOT-192-168-100-46",
+    "target_identifier": "192.168.100.46",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 764 attack-labelled flows (100% of its 764 flows): a compromised machine inside the perimeter",
+    "split": "dev",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.46' OR dest_ip = '192.168.100.46'",
+        "signature": "192.168.100.46"
+      }
+    ]
+  },
+  {
+    "id": "BOTIOT-192-168-100-5",
+    "target_identifier": "192.168.100.5",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 978 attack-labelled flows (100% of its 978 flows): a compromised machine inside the perimeter",
+    "split": "dev",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.5' OR dest_ip = '192.168.100.5'",
+        "signature": "192.168.100.5"
+      }
+    ]
+  },
+  {
+    "id": "BOTIOT-192-168-100-55",
+    "target_identifier": "192.168.100.55",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 59 attack-labelled flows (100% of its 59 flows): a compromised machine inside the perimeter",
+    "split": "dev",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.55' OR dest_ip = '192.168.100.55'",
+        "signature": "192.168.100.55"
+      }
+    ]
+  },
+  {
+    "id": "BOTIOT-192-168-100-6",
+    "target_identifier": "192.168.100.6",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 844 attack-labelled flows (100% of its 844 flows): a compromised machine inside the perimeter",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.6' OR dest_ip = '192.168.100.6'",
+        "signature": "192.168.100.6"
+      }
+    ]
+  },
+  {
+    "id": "BOTIOT-192-168-100-7",
+    "target_identifier": "192.168.100.7",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 4043 attack-labelled flows (100% of its 4043 flows): a compromised machine inside the perimeter",
+    "split": "dev",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.7' OR dest_ip = '192.168.100.7'",
+        "signature": "192.168.100.7"
+      }
+    ]
+  }
+]

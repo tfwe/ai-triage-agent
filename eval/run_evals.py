@@ -49,9 +49,9 @@ def load_dataset(path: str = GOLDEN_PATH) -> list[dict]:
         return json.load(handle)
 
 
-def dataset_digest() -> str:
+def dataset_digest(paths: list[str] | None = None) -> str:
     digest = hashlib.sha256()
-    for path in (GOLDEN_PATH, SCENARIOS_PATH):
+    for path in paths or [GOLDEN_PATH, SCENARIOS_PATH]:
         with open(path, "rb") as handle:
             digest.update(handle.read())
     return digest.hexdigest()[:16]
@@ -83,6 +83,27 @@ def evidence_recall(case: dict, tool_log: list[dict]) -> tuple[int, int]:
     return found, len(case.get("expected_evidence", []))
 
 
+def case_alert_text(db_path: str, target: str) -> str | None:
+    """First alert on record for this target, as an alert queue would show it."""
+    try:
+        rows = database.query(
+            "SELECT alert_data FROM alerts WHERE src_ip = ? OR dest_ip = ? LIMIT 3",
+            (target, target),
+            db_path=db_path,
+        )
+    except FileNotFoundError:
+        return None
+    messages = []
+    for row in rows:
+        try:
+            payload = json.loads(row["alert_data"])
+        except (TypeError, json.JSONDecodeError):
+            continue
+        if payload.get("message"):
+            messages.append(f"{payload.get('sig_id', 'ALERT')}: {payload['message']}")
+    return " | ".join(messages) if messages else None
+
+
 def evaluate_rules(case: dict, db_path: str) -> dict:
     started = time.perf_counter()
     verdict = classify(case["target_identifier"], db_path=db_path)
@@ -102,13 +123,29 @@ def evaluate_rules(case: dict, db_path: str) -> dict:
     }
 
 
-def evaluate_agent(case: dict, db_path: str, client: LLMClient, max_turns: int = EVAL_MAX_TURNS) -> dict:
+def evaluate_agent(
+    case: dict,
+    db_path: str,
+    client: LLMClient,
+    max_turns: int = EVAL_MAX_TURNS,
+    price_in: float = 0.0,
+    price_out: float = 0.0,
+) -> dict:
     settings.triage_db_path = db_path
     started = time.perf_counter()
     try:
-        result = run_triage_agent(case["target_identifier"], client=client, max_turns=max_turns)
+        result = run_triage_agent(
+            case["target_identifier"],
+            client=client,
+            max_turns=max_turns,
+            alert_text=case_alert_text(db_path, case["target_identifier"]),
+        )
         latency_ms = (time.perf_counter() - started) * 1000
         found, total = evidence_recall(case, result.tool_log)
+        cost = (
+            result.prompt_tokens / 1_000_000 * price_in
+            + result.completion_tokens / 1_000_000 * price_out
+        )
         return {
             "decision": result.action.decision,
             "confidence": result.action.confidence_score,
@@ -116,6 +153,7 @@ def evaluate_agent(case: dict, db_path: str, client: LLMClient, max_turns: int =
             "playbook": result.action.recommended_playbook,
             "latency_ms": latency_ms,
             "tokens": result.total_tokens,
+            "cost_usd": round(cost, 6),
             "prompt_tokens": result.prompt_tokens,
             "completion_tokens": result.completion_tokens,
             "tool_calls": result.tool_calls,
@@ -158,6 +196,8 @@ def summarise(rows: list[dict], dataset: list[dict] | list) -> dict:
         sum(found for found, _ in evidence) / sum(total_ for _, total_ in evidence)
         if evidence else None
     )
+    costs = [row.get("cost_usd") or 0.0 for row in rows if row["error"] is None]
+    cost_total = sum(costs)
 
     return {
         "cases": total,
@@ -174,6 +214,8 @@ def summarise(rows: list[dict], dataset: list[dict] | list) -> dict:
         "latency_p95_ms": statistic_round(percentile(latencies, 0.95)),
         "mean_tokens_per_alert": round(statistics.fmean(tokens), 1) if tokens else 0.0,
         "evidence_recall": round(evidence_ratio, 3) if evidence_ratio is not None else None,
+        "cost_usd_total": round(cost_total, 4),
+        "cost_usd_per_1000_alerts": round(cost_total / total * 1000, 2) if total else 0.0,
         "cases_in_dataset": len(dataset),
     }
 
@@ -211,22 +253,36 @@ def format_table(rules: dict, agent: dict | None) -> str:
         line("Mean tokens / alert", num(round(rules["mean_tokens_per_alert"], 1) if rules["mean_tokens_per_alert"] else None, ""), num(round(agent["mean_tokens_per_alert"], 1) if agent["mean_tokens_per_alert"] else None, "")),
         line("Evidence recall", pct(rules["evidence_recall"]), pct(agent["evidence_recall"])),
         line("Crashed runs", str(rules["errors"]), str(agent["errors"])),
+        line("Cost (run)", f"${rules.get('cost_usd_total', 0):.4f}", f"${agent.get('cost_usd_total', 0):.4f}"),
+        line("Cost / 1,000 alerts", f"${rules.get('cost_usd_per_1000_alerts', 0):.2f}", f"${agent.get('cost_usd_per_1000_alerts', 0):.2f}"),
     ]
     header = f"  {'metric':<26}{'rules':>14}{'agent':>16}"
     return "\n".join([header, "  " + "-" * 54] + rows)
 
 
-def run_suite(mode: str, client: LLMClient | None, dataset: list[dict], db_override: str | None, max_turns: int = EVAL_MAX_TURNS) -> dict:
+def run_suite(
+    mode: str,
+    client: LLMClient | None,
+    dataset: list[dict],
+    db_override: str | None,
+    max_turns: int = EVAL_MAX_TURNS,
+    cases_root: str = CASES_ROOT,
+    price_in: float = 0.0,
+    price_out: float = 0.0,
+) -> dict:
     rules_rows: list[dict] = []
     agent_rows: list[dict] = []
 
     for case in dataset:
-        db_path = db_override or case_db(case["id"])
+        db_path = db_override or case_db(case["id"], cases_root=cases_root)
         rule_result = evaluate_rules(case, db_path)
         rules_rows.append({"id": case["id"], "expected": case["expected_decision"], **rule_result})
 
         if client is not None:
-            agent_result = evaluate_agent(case, db_path, client, max_turns=max_turns)
+            agent_result = evaluate_agent(
+                case, db_path, client, max_turns=max_turns,
+                price_in=price_in, price_out=price_out,
+            )
             agent_rows.append({"id": case["id"], "expected": case["expected_decision"], **agent_result})
             mark = "ok " if agent_result["decision"] == case["expected_decision"] else "MISS"
             print(
@@ -254,15 +310,36 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--max-turns", type=int, default=EVAL_MAX_TURNS,
                         help="max model turns per case before the run is recorded as a crash")
     parser.add_argument("--no-build", action="store_true", help="use existing case databases")
+    parser.add_argument("--dataset", default=GOLDEN_PATH, help="case list to score")
+    parser.add_argument("--cases-dir", default=CASES_ROOT, help="directory holding <case>/triage.db")
+    parser.add_argument("--split", default=None, choices=["dev", "holdout"],
+                        help="score only the cases marked with this split")
+    parser.add_argument("--price-in", type=float, default=0.0,
+                        help="USD per 1M input tokens, for the cost column")
+    parser.add_argument("--price-out", type=float, default=0.0,
+                        help="USD per 1M output tokens, for the cost column")
     args = parser.parse_args(argv)
 
-    dataset = load_dataset()
-    if not args.no_build:
-        ensure_corpus()
+    digest_paths = [args.dataset]
+    if args.dataset == GOLDEN_PATH:
+        digest_paths.append(SCENARIOS_PATH)
+
+    dataset = load_dataset(args.dataset)
+    if args.split:
+        dataset = [case for case in dataset if case.get("split") in (None, args.split)]
+        if not dataset:
+            print(f"no cases marked {args.split!r} in {args.dataset}", file=sys.stderr)
+            return 2
+
+    if not args.no_build and args.dataset == GOLDEN_PATH:
+        ensure_corpus(args.cases_dir)
     else:
-        missing = [case["id"] for case in dataset if not os.path.exists(case_db(case["id"]))]
+        missing = [
+            case["id"] for case in dataset
+            if not os.path.exists(case_db(case["id"], cases_root=args.cases_dir))
+        ]
         if missing:
-            print(f"missing case databases: {missing}", file=sys.stderr)
+            print(f"missing case databases: {missing[:8]}", file=sys.stderr)
             return 2
 
     client = None
@@ -272,8 +349,14 @@ def main(argv: list[str] | None = None) -> int:
         model = client.model
 
     print(f"[eval] mode={args.mode} model={model} cases={len(dataset)} "
-          f"dataset={dataset_digest()}")
-    outcome = run_suite(args.mode, client, dataset, args.db, max_turns=args.max_turns)
+          f"split={args.split or 'all'} dataset={dataset_digest(digest_paths)}")
+    outcome = run_suite(
+        args.mode, client, dataset, args.db,
+        max_turns=args.max_turns,
+        cases_root=args.cases_dir,
+        price_in=args.price_in,
+        price_out=args.price_out,
+    )
 
     table = format_table(
         outcome["rules"]["summary"],
@@ -288,8 +371,12 @@ def main(argv: list[str] | None = None) -> int:
         "mode": args.mode,
         "model": model,
         "max_turns": args.max_turns,
+        "dataset": args.dataset,
+        "split": args.split,
+        "price_in_per_mtok": args.price_in,
+        "price_out_per_mtok": args.price_out,
         "recorded_at": stamp,
-        "dataset_sha256": dataset_digest(),
+        "dataset_sha256": dataset_digest(digest_paths),
         "host": {
             "python": platform.python_version(),
             "platform": platform.platform(),
@@ -309,7 +396,7 @@ def main(argv: list[str] | None = None) -> int:
     text_path = os.path.join(RESULTS_DIR, f"{label}.txt")
     with open(text_path, "w", encoding="utf-8") as handle:
         handle.write(f"mode={args.mode} model={model} cases={len(dataset)} "
-                     f"dataset={dataset_digest()} at {stamp}\n\n{table}\n")
+                     f"split={args.split or 'all'} dataset={dataset_digest(digest_paths)} at {stamp}\n\n{table}\n")
     print(f"wrote {json_path} and {text_path}")
     return 0
 

@@ -1,0 +1,16 @@
+mode=record model=deepseek/deepseek-v4.1-flash cases=14 split=dev dataset=1a55263e23499af0 at 2026-11-22T10:54:33Z
+
+  metric                             rules           agent
+  ------------------------------------------------------
+  Decision accuracy                   8/14            5/14
+  Accuracy                           57.1%           35.7%
+  False-positive rate                85.7%           71.4%
+  False positives                      6/7             5/7
+  Missed detections                    0/7             4/7
+  Latency p50                      52.1 ms      27961.8 ms
+  Latency p95                     628.7 ms      45403.4 ms
+  Mean tokens / alert                  n/a         30473.6
+  Evidence recall                      n/a          100.0%
+  Crashed runs                           0               0
+  Cost (run)                       $0.0000         $0.0306
+  Cost / 1,000 alerts                $0.00           $2.18

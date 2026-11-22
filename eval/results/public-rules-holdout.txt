@@ -1,0 +1,16 @@
+mode=replay model=rules-only cases=14 split=holdout dataset=1a55263e23499af0 at 2026-11-22T10:46:42Z
+
+  metric                             rules           agent
+  ------------------------------------------------------
+  Decision accuracy                   9/14             0/0
+  Accuracy                           64.3%             n/a
+  False-positive rate               100.0%             n/a
+  False positives                      5/5             0/0
+  Missed detections                    0/9             0/0
+  Latency p50                      43.4 ms             n/a
+  Latency p95                     693.3 ms             n/a
+  Mean tokens / alert                  n/a             n/a
+  Evidence recall                      n/a             n/a
+  Crashed runs                           0               -
+  Cost (run)                       $0.0000         $0.0000
+  Cost / 1,000 alerts                $0.00           $0.00

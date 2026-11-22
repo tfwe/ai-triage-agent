@@ -1,0 +1,16 @@
+mode=record model=openai/gpt-6-luna cases=14 split=dev dataset=1a55263e23499af0 at 2026-11-22T11:01:53Z
+
+  metric                             rules           agent
+  ------------------------------------------------------
+  Decision accuracy                   8/14            4/14
+  Accuracy                           57.1%           28.6%
+  False-positive rate                85.7%           57.1%
+  False positives                      6/7             4/7
+  Missed detections                    0/7             6/7
+  Latency p50                      54.8 ms       9480.9 ms
+  Latency p95                     652.2 ms      15563.8 ms
+  Mean tokens / alert                  n/a         15137.0
+  Evidence recall                      n/a          100.0%
+  Crashed runs                           0               0
+  Cost (run)                       $0.0000         $0.0308
+  Cost / 1,000 alerts                $0.00           $2.20

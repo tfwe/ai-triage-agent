@@ -1,0 +1,422 @@
+[
+  {
+    "id": "BOTIOT-192-168-100-147",
+    "target_identifier": "192.168.100.147",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 145998 attack-labelled flows (100% of its 145998 flows): a compromised machine inside the perimeter",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.147' OR dest_ip = '192.168.100.147'",
+        "signature": "192.168.100.147"
+      }
+    ],
+    "source_dataset": "nf-bot-iot"
+  },
+  {
+    "id": "BOTIOT-192-168-100-148",
+    "target_identifier": "192.168.100.148",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 171096 attack-labelled flows (100% of its 171096 flows): a compromised machine inside the perimeter",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.148' OR dest_ip = '192.168.100.148'",
+        "signature": "192.168.100.148"
+      }
+    ],
+    "source_dataset": "nf-bot-iot"
+  },
+  {
+    "id": "BOTIOT-192-168-100-149",
+    "target_identifier": "192.168.100.149",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 151784 attack-labelled flows (100% of its 151784 flows): a compromised machine inside the perimeter",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.149' OR dest_ip = '192.168.100.149'",
+        "signature": "192.168.100.149"
+      }
+    ],
+    "source_dataset": "nf-bot-iot"
+  },
+  {
+    "id": "BOTIOT-192-168-100-150",
+    "target_identifier": "192.168.100.150",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 118985 attack-labelled flows (100% of its 118985 flows): a compromised machine inside the perimeter",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.150' OR dest_ip = '192.168.100.150'",
+        "signature": "192.168.100.150"
+      }
+    ],
+    "source_dataset": "nf-bot-iot"
+  },
+  {
+    "id": "BOTIOT-192-168-100-3",
+    "target_identifier": "192.168.100.3",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 5471 attack-labelled flows (100% of its 5471 flows): a compromised machine inside the perimeter",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.3' OR dest_ip = '192.168.100.3'",
+        "signature": "192.168.100.3"
+      }
+    ],
+    "source_dataset": "nf-bot-iot"
+  },
+  {
+    "id": "BOTIOT-192-168-100-46",
+    "target_identifier": "192.168.100.46",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 764 attack-labelled flows (100% of its 764 flows): a compromised machine inside the perimeter",
+    "split": "dev",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.46' OR dest_ip = '192.168.100.46'",
+        "signature": "192.168.100.46"
+      }
+    ],
+    "source_dataset": "nf-bot-iot"
+  },
+  {
+    "id": "BOTIOT-192-168-100-5",
+    "target_identifier": "192.168.100.5",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 978 attack-labelled flows (100% of its 978 flows): a compromised machine inside the perimeter",
+    "split": "dev",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.5' OR dest_ip = '192.168.100.5'",
+        "signature": "192.168.100.5"
+      }
+    ],
+    "source_dataset": "nf-bot-iot"
+  },
+  {
+    "id": "BOTIOT-192-168-100-55",
+    "target_identifier": "192.168.100.55",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 59 attack-labelled flows (100% of its 59 flows): a compromised machine inside the perimeter",
+    "split": "dev",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.55' OR dest_ip = '192.168.100.55'",
+        "signature": "192.168.100.55"
+      }
+    ],
+    "source_dataset": "nf-bot-iot"
+  },
+  {
+    "id": "BOTIOT-192-168-100-6",
+    "target_identifier": "192.168.100.6",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 844 attack-labelled flows (100% of its 844 flows): a compromised machine inside the perimeter",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.6' OR dest_ip = '192.168.100.6'",
+        "signature": "192.168.100.6"
+      }
+    ],
+    "source_dataset": "nf-bot-iot"
+  },
+  {
+    "id": "BOTIOT-192-168-100-7",
+    "target_identifier": "192.168.100.7",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host that sources 4043 attack-labelled flows (100% of its 4043 flows): a compromised machine inside the perimeter",
+    "split": "dev",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.100.7' OR dest_ip = '192.168.100.7'",
+        "signature": "192.168.100.7"
+      }
+    ],
+    "source_dataset": "nf-bot-iot"
+  },
+  {
+    "id": "CIC-162-208-20-178",
+    "target_identifier": "162.208.20.178",
+    "expected_decision": "IGNORE",
+    "description": "address that appears only in BENIGN flows (8091 flows)",
+    "split": "dev",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '162.208.20.178' OR dest_ip = '162.208.20.178'",
+        "signature": "162.208.20.178"
+      }
+    ],
+    "source_dataset": "cicids2017"
+  },
+  {
+    "id": "CIC-162-208-22-34",
+    "target_identifier": "162.208.22.34",
+    "expected_decision": "IGNORE",
+    "description": "address that appears only in BENIGN flows (3676 flows)",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '162.208.22.34' OR dest_ip = '162.208.22.34'",
+        "signature": "162.208.22.34"
+      }
+    ],
+    "source_dataset": "cicids2017"
+  },
+  {
+    "id": "CIC-178-255-83-1",
+    "target_identifier": "178.255.83.1",
+    "expected_decision": "IGNORE",
+    "description": "address that appears only in BENIGN flows (10146 flows)",
+    "split": "dev",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '178.255.83.1' OR dest_ip = '178.255.83.1'",
+        "signature": "178.255.83.1"
+      }
+    ],
+    "source_dataset": "cicids2017"
+  },
+  {
+    "id": "CIC-192-168-10-1",
+    "target_identifier": "192.168.10.1",
+    "expected_decision": "IGNORE",
+    "description": "address that appears only in BENIGN flows (294091 flows)",
+    "split": "dev",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.10.1' OR dest_ip = '192.168.10.1'",
+        "signature": "192.168.10.1"
+      }
+    ],
+    "source_dataset": "cicids2017"
+  },
+  {
+    "id": "CIC-192-168-10-14",
+    "target_identifier": "192.168.10.14",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host whose outbound flows are labelled BOTNET (720 flows): a bot infection on the host",
+    "split": "dev",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.10.14' OR dest_ip = '192.168.10.14'",
+        "signature": "192.168.10.14"
+      }
+    ],
+    "source_dataset": "cicids2017"
+  },
+  {
+    "id": "CIC-192-168-10-15",
+    "target_identifier": "192.168.10.15",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host whose outbound flows are labelled BOTNET (1382 flows): a bot infection on the host",
+    "split": "dev",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.10.15' OR dest_ip = '192.168.10.15'",
+        "signature": "192.168.10.15"
+      }
+    ],
+    "source_dataset": "cicids2017"
+  },
+  {
+    "id": "CIC-192-168-10-255",
+    "target_identifier": "192.168.10.255",
+    "expected_decision": "IGNORE",
+    "description": "address that appears only in BENIGN flows (5651 flows)",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.10.255' OR dest_ip = '192.168.10.255'",
+        "signature": "192.168.10.255"
+      }
+    ],
+    "source_dataset": "cicids2017"
+  },
+  {
+    "id": "CIC-192-168-10-3",
+    "target_identifier": "192.168.10.3",
+    "expected_decision": "IGNORE",
+    "description": "address that appears only in BENIGN flows (977355 flows)",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.10.3' OR dest_ip = '192.168.10.3'",
+        "signature": "192.168.10.3"
+      }
+    ],
+    "source_dataset": "cicids2017"
+  },
+  {
+    "id": "CIC-192-168-10-5",
+    "target_identifier": "192.168.10.5",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host whose outbound flows are labelled BOTNET (690 flows): a bot infection on the host",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.10.5' OR dest_ip = '192.168.10.5'",
+        "signature": "192.168.10.5"
+      }
+    ],
+    "source_dataset": "cicids2017"
+  },
+  {
+    "id": "CIC-192-168-10-8",
+    "target_identifier": "192.168.10.8",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host whose outbound flows are labelled BOTNET (1279 flows): a bot infection on the host",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.10.8' OR dest_ip = '192.168.10.8'",
+        "signature": "192.168.10.8"
+      }
+    ],
+    "source_dataset": "cicids2017"
+  },
+  {
+    "id": "CIC-192-168-10-9",
+    "target_identifier": "192.168.10.9",
+    "expected_decision": "ISOLATE_HOST",
+    "description": "internal host whose outbound flows are labelled BOTNET (732 flows): a bot infection on the host",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '192.168.10.9' OR dest_ip = '192.168.10.9'",
+        "signature": "192.168.10.9"
+      }
+    ],
+    "source_dataset": "cicids2017"
+  },
+  {
+    "id": "CIC-205-174-165-73",
+    "target_identifier": "205.174.165.73",
+    "expected_decision": "BLOCK_IP",
+    "description": "external address that receives 4803 bot flows from internal hosts: C2 infrastructure",
+    "split": "dev",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '205.174.165.73' OR dest_ip = '205.174.165.73'",
+        "signature": "205.174.165.73"
+      }
+    ],
+    "source_dataset": "cicids2017"
+  },
+  {
+    "id": "CIC-23-50-75-27",
+    "target_identifier": "23.50.75.27",
+    "expected_decision": "IGNORE",
+    "description": "address that appears only in BENIGN flows (7669 flows)",
+    "split": "dev",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '23.50.75.27' OR dest_ip = '23.50.75.27'",
+        "signature": "23.50.75.27"
+      }
+    ],
+    "source_dataset": "cicids2017"
+  },
+  {
+    "id": "CIC-23-60-139-27",
+    "target_identifier": "23.60.139.27",
+    "expected_decision": "IGNORE",
+    "description": "address that appears only in BENIGN flows (4136 flows)",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '23.60.139.27' OR dest_ip = '23.60.139.27'",
+        "signature": "23.60.139.27"
+      }
+    ],
+    "source_dataset": "cicids2017"
+  },
+  {
+    "id": "CIC-23-61-187-27",
+    "target_identifier": "23.61.187.27",
+    "expected_decision": "IGNORE",
+    "description": "address that appears only in BENIGN flows (4572 flows)",
+    "split": "dev",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '23.61.187.27' OR dest_ip = '23.61.187.27'",
+        "signature": "23.61.187.27"
+      }
+    ],
+    "source_dataset": "cicids2017"
+  },
+  {
+    "id": "CIC-50-63-243-230",
+    "target_identifier": "50.63.243.230",
+    "expected_decision": "IGNORE",
+    "description": "address that appears only in BENIGN flows (4797 flows)",
+    "split": "holdout",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '50.63.243.230' OR dest_ip = '50.63.243.230'",
+        "signature": "50.63.243.230"
+      }
+    ],
+    "source_dataset": "cicids2017"
+  },
+  {
+    "id": "CIC-72-167-239-239",
+    "target_identifier": "72.167.239.239",
+    "expected_decision": "IGNORE",
+    "description": "address that appears only in BENIGN flows (3343 flows)",
+    "split": "dev",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '72.167.239.239' OR dest_ip = '72.167.239.239'",
+        "signature": "72.167.239.239"
+      }
+    ],
+    "source_dataset": "cicids2017"
+  },
+  {
+    "id": "CIC-72-21-91-29",
+    "target_identifier": "72.21.91.29",
+    "expected_decision": "IGNORE",
+    "description": "address that appears only in BENIGN flows (10029 flows)",
+    "split": "dev",
+    "expected_evidence": [
+      {
+        "table": "network_traffic",
+        "where": "src_ip = '72.21.91.29' OR dest_ip = '72.21.91.29'",
+        "signature": "72.21.91.29"
+      }
+    ],
+    "source_dataset": "cicids2017"
+  }
+]
