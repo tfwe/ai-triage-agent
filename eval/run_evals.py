@@ -25,7 +25,7 @@ from datetime import datetime, timezone
 
 import database
 from agent.client import LLMClient, build_client
-from agent.core import AgentLoopError, run_triage_agent
+from agent.core import run_triage_agent
 from agent.rules import classify
 from config import settings
 from eval.corpus_build import CASES_ROOT, build as build_corpus
@@ -33,6 +33,11 @@ from eval.corpus_build import CASES_ROOT, build as build_corpus
 GOLDEN_PATH = "eval/golden_dataset.json"
 SCENARIOS_PATH = "eval/corpus/scenarios.json"
 RESULTS_DIR = "eval/results"
+
+# An eval run stops a triage after this many model turns. A case needing more
+# is looping; the run is recorded as a crash rather than allowed to burn the
+# whole context window.
+EVAL_MAX_TURNS = 12
 
 
 def case_db(case_id: str, cases_root: str = CASES_ROOT) -> str:
@@ -97,11 +102,11 @@ def evaluate_rules(case: dict, db_path: str) -> dict:
     }
 
 
-def evaluate_agent(case: dict, db_path: str, client: LLMClient) -> dict:
+def evaluate_agent(case: dict, db_path: str, client: LLMClient, max_turns: int = EVAL_MAX_TURNS) -> dict:
     settings.triage_db_path = db_path
     started = time.perf_counter()
     try:
-        result = run_triage_agent(case["target_identifier"], client=client)
+        result = run_triage_agent(case["target_identifier"], client=client, max_turns=max_turns)
         latency_ms = (time.perf_counter() - started) * 1000
         found, total = evidence_recall(case, result.tool_log)
         return {
@@ -119,7 +124,7 @@ def evaluate_agent(case: dict, db_path: str, client: LLMClient) -> dict:
             "evidence_total": total,
             "error": None,
         }
-    except (AgentLoopError, Exception) as exc:  # noqa: BLE001 - record, do not crash the suite
+    except Exception as exc:  # noqa: BLE001 - record, do not crash the suite
         latency_ms = (time.perf_counter() - started) * 1000
         return {
             "decision": None,
@@ -211,7 +216,7 @@ def format_table(rules: dict, agent: dict | None) -> str:
     return "\n".join([header, "  " + "-" * 54] + rows)
 
 
-def run_suite(mode: str, client: LLMClient | None, dataset: list[dict], db_override: str | None) -> dict:
+def run_suite(mode: str, client: LLMClient | None, dataset: list[dict], db_override: str | None, max_turns: int = EVAL_MAX_TURNS) -> dict:
     rules_rows: list[dict] = []
     agent_rows: list[dict] = []
 
@@ -221,7 +226,7 @@ def run_suite(mode: str, client: LLMClient | None, dataset: list[dict], db_overr
         rules_rows.append({"id": case["id"], "expected": case["expected_decision"], **rule_result})
 
         if client is not None:
-            agent_result = evaluate_agent(case, db_path, client)
+            agent_result = evaluate_agent(case, db_path, client, max_turns=max_turns)
             agent_rows.append({"id": case["id"], "expected": case["expected_decision"], **agent_result})
             mark = "ok " if agent_result["decision"] == case["expected_decision"] else "MISS"
             print(
@@ -246,6 +251,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--label", default=None, help="results file stem (default: mode + model)")
     parser.add_argument("--rules-only", action="store_true", help="skip the model entirely")
     parser.add_argument("--db", default=None, help="evaluate every case against one combined database")
+    parser.add_argument("--max-turns", type=int, default=EVAL_MAX_TURNS,
+                        help="max model turns per case before the run is recorded as a crash")
     parser.add_argument("--no-build", action="store_true", help="use existing case databases")
     args = parser.parse_args(argv)
 
@@ -266,7 +273,7 @@ def main(argv: list[str] | None = None) -> int:
 
     print(f"[eval] mode={args.mode} model={model} cases={len(dataset)} "
           f"dataset={dataset_digest()}")
-    outcome = run_suite(args.mode, client, dataset, args.db)
+    outcome = run_suite(args.mode, client, dataset, args.db, max_turns=args.max_turns)
 
     table = format_table(
         outcome["rules"]["summary"],
@@ -280,6 +287,7 @@ def main(argv: list[str] | None = None) -> int:
     payload = {
         "mode": args.mode,
         "model": model,
+        "max_turns": args.max_turns,
         "recorded_at": stamp,
         "dataset_sha256": dataset_digest(),
         "host": {

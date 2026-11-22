@@ -284,7 +284,7 @@ def _host_events(target: str, db_path: str | None) -> list[dict]:
     )
 
 
-def _host_ip_candidates(events: list[dict], target: str) -> list[str]:
+def _host_ip_candidates(events: list[dict]) -> list[str]:
     """Pull internal addresses out of a host's own telemetry."""
     found: set[str] = set()
     for row in events:
@@ -334,7 +334,7 @@ def classify_host(target: str, db_path: str | None = None) -> RuleVerdict:
         evidence.append("bulk outbound SMTP relay")
 
     # An external address inside the host's own telemetry is context, not proof.
-    for candidate in _host_ip_candidates(events, target):
+    for candidate in _host_ip_candidates(events):
         if _is_external(candidate):
             score += 5
             evidence.append(f"external peer {candidate}")
@@ -346,7 +346,7 @@ def classify_host(target: str, db_path: str | None = None) -> RuleVerdict:
             evidence.append(f"marker: {marker}")
 
     # Outbound beacons belonging to this host's addresses.
-    for candidate in _host_ip_candidates(events, target):
+    for candidate in _host_ip_candidates(events):
         sessions = _sessions_from_ip(candidate, db_path)
         if sessions and _beacon_like(sessions):
             score += 30

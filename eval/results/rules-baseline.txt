@@ -1,4 +1,4 @@
-mode=replay model=rules-only cases=31 dataset=2a6921379ee5370b at 2026-11-22T08:35:26Z
+mode=replay model=rules-only cases=31 dataset=2a6921379ee5370b at 2026-11-22T09:01:27Z
 
   metric                             rules           agent
   ------------------------------------------------------
@@ -8,7 +8,7 @@ mode=replay model=rules-only cases=31 dataset=2a6921379ee5370b at 2026-11-22T08:
   False positives                     0/12             0/0
   Missed detections                   0/19             0/0
   Latency p50                       2.6 ms             n/a
-  Latency p95                      11.3 ms             n/a
+  Latency p95                      11.7 ms             n/a
   Mean tokens / alert                  n/a             n/a
   Evidence recall                      n/a             n/a
   Crashed runs                           0               -
