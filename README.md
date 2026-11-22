@@ -254,23 +254,18 @@ Held-out split, 14 cases:
 
 | Metric | Rules | Local 35B | DeepSeek V4.1-Flash |
 |---|---|---|---|
-| Accuracy | 9/14 (64.3%) | 9/14 (64.3%) | 8/14 (57.1%) |
-| False positives | 5/5 | 4/5 | 3/5 |
-| Missed detections | 0/9 | 1/9 | 3/9 |
-| Latency p50 | 4.8 ms | 37.6 s | 33.1 s |
-| Mean tokens per alert | 0 | 25,125 | 37,299 |
+| Accuracy | 9/14 (64.3%) | 11/14 (78.6%) | 8/14 (57.1%) |
+| False positives | 5/5 | 3/5 | 3/5 |
+| Missed detections | 0/9 | 0/9 | 3/9 |
+| Latency p50 | 5.8 ms | 47.3 s | 33.1 s |
+| Mean tokens per alert | 0 | 27,616 | 37,299 |
 | Cost per 1,000 alerts | $0 | $0 | $2.51 |
 
 GPT-6-Luna ran on the dev split only: 4/14 (28.6%) at $2.20 per 1,000 alerts.
 
-Read it as the honest limit of this design rather than a win. On bare flows,
-every approach lands between 57% and 64%: the local 35B matches the tuned
-baseline and the hosted model, the hosted model trades two more missed attacks
-for two fewer false positives, and the rule baseline fires on every benign case
-in the holdout. Evidence recall is 100% for all three models, so the failure is
-not that they did not look; the flow evidence under-determines the label. The
-synthetic set, where each case carries alerts, endpoint events and firewall
-records, is the setting where the agent reaches 90.3%.
+The local model ran the holdout twice over the same cases and databases; the runs scored 9/14 and 11/14. The table carries the second. Treat plus or minus two cases as run-to-run noise at temperature 0.1, and read the local row as "level with or slightly ahead of the tuned baseline", not as a stable two-case lead over the hosted model.
+
+Even so, the shape of the result is the point: on bare flows every approach lands in a narrow band, the hosted model costs $2.51 per 1,000 alerts for no accuracy gain over a model running locally for nothing, and the rule baseline fires on every benign case in the holdout. Evidence recall is 100% for all three models, so the failure is not that they did not look; the flow evidence under-determines the label. The synthetic set, where each case carries alerts, endpoint events and firewall records, is the setting where the agent reaches 90.3%.
 
 The system prompt gained a flow-evidence paragraph between the first synthetic
 run and these runs. The dev split absorbed that change; the holdout numbers
