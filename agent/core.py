@@ -1,85 +1,29 @@
-import re
 import json
-from openai import OpenAI
-from pydantic import BaseModel
+import re
+from dataclasses import dataclass, field
+from typing import Any, Optional
+
+from pydantic import BaseModel, Field
 from typing import Literal
+
+from agent.client import AssistantMessage, LLMClient, build_client
 from agent.tools import check_ip_reputation, query_triage_db
 
-from config import settings 
+MAX_TURNS = 25
 
-# Configure the client dynamically using the settings object
-if settings.llm_provider == "ollama":
-    client = OpenAI(
-        base_url=settings.ollama_base_url,
-        api_key="ollama" 
-    )
-    TARGET_MODEL = settings.ollama_model
-    print(f"🧠 Booting Agent with local Ollama ({TARGET_MODEL})...")
-else:
-    if not settings.openai_api_key:
-        raise ValueError("OPENAI_API_KEY is missing from .env but provider is set to openai.")
-        
-    client = OpenAI(
-        api_key=settings.openai_api_key
-    )
-    TARGET_MODEL = settings.openai_model
-    print(f"☁️ Booting Agent with OpenAI ({TARGET_MODEL})...")
-
-class TriageAction(BaseModel):
-    decision: Literal["BLOCK_IP", "ISOLATE_HOST", "IGNORE"]
-    confidence_score: int
-    reasoning: str
-    recommended_playbook: str
-
-def run_triage_agent(target_identifier: str) -> TriageAction:
-    # 1. Define the tool schema for the LLM
-    tools = [
-        {
-            "type": "function",
-            "function": {
-                "name": "check_ip_reputation",
-                "description": "Check if an IP address is malicious.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "ip_address": {"type": "string", "description": "The IP address to check"}
-                    },
-                    "required": ["ip_address"]
-                }
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "query_triage_db",
-                "description": "Query the local SQLite database containing host telemetry. Use standard SQL. The database has three tables: endpoint_events, network_traffic, and alerts.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "sql_query": {"type": "string", "description": "The exact SQL SELECT query to execute."}
-                    },
-                    "required": ["sql_query"]
-                }
-            }
-        }
-    ]
-
-    # 2. Setup the initial conversation state
-    messages = [
-        {
-            "role": "system", 
-            "content": """You are an autonomous Tier 2 SOC Analyst triage agent. You investigate alerts using the `query_triage_db` tool.
+SYSTEM_PROMPT = """You are an autonomous Tier 2 SOC Analyst triage agent. You investigate alerts using the `query_triage_db` tool.
 
 DATABASE SCHEMA:
 1. `alerts` (id INTEGER, timestamp TEXT, sensor TEXT, src_ip TEXT, dest_ip TEXT, alert_data JSON)
 2. `network_traffic` (uid TEXT, timestamp REAL, src_ip TEXT, dest_ip TEXT, dest_port INTEGER, protocol TEXT, session_data JSON)
 3. `endpoint_events` (id INTEGER, timestamp TEXT, hostname TEXT, source TEXT, event_data JSON)
+4. `firewall_events` (id INTEGER, timestamp TEXT, hostname TEXT, message_id TEXT, message TEXT)
 *Note: This is static historical data. Never filter using relative time (e.g., datetime('now')).
 
 INVESTIGATION & SQL RULES:
-- Query all three tables for the target identifier. Check both indexed columns (e.g., src_ip, hostname) AND JSON payload columns (LIKE '%target%').
+- Query all four tables for the target identifier. Check both indexed columns (e.g., src_ip, hostname) AND JSON payload columns (LIKE '%target%').
 - Schema strictness: NEVER search for string hostnames in `src_ip` or `dest_ip` columns. IP columns strictly contain IP addresses. Queries like `src_ip = 'WEB-BO-01'` are invalid and strictly forbidden.
-- Ban on manual limits: DO NOT use `LIMIT` in your queries. The database tool automatically restricts output to 50 rows. 
+- Ban on manual limits: DO NOT use `LIMIT` in your queries. The database tool automatically restricts output to 15 rows. 
 - Chronological sorting: You MUST append `ORDER BY timestamp DESC` to your queries so you see the most recent activity first.
 - Output limits: If the tool warns you that the output was truncated, you must tighten your `WHERE` clauses (e.g., filter by specific destination ports, protocols, or exact IPs).
 - Adapt on failure: If a query returns an error or 0 rows, do not repeat the exact same query. Adjust your logic.
@@ -99,107 +43,221 @@ CRITICAL EXECUTION:
   "reasoning": "<string detailing the evidence>",
   "recommended_playbook": "<string>"
 }"""
+
+TOOLS: list[dict[str, Any]] = [
+    {
+        "type": "function",
+        "function": {
+            "name": "check_ip_reputation",
+            "description": "Check if an IP address is malicious.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "ip_address": {
+                        "type": "string",
+                        "description": "The IP address to check",
+                    }
+                },
+                "required": ["ip_address"],
+            },
         },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "query_triage_db",
+            "description": (
+                "Query the local SQLite database containing host telemetry. Use "
+                "standard SQL. The database has four tables: endpoint_events, "
+                "network_traffic, alerts, and firewall_events."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "sql_query": {
+                        "type": "string",
+                        "description": "The exact SQL SELECT query to execute.",
+                    }
+                },
+                "required": ["sql_query"],
+            },
+        },
+    },
+]
+
+
+class TriageAction(BaseModel):
+    decision: Literal["BLOCK_IP", "ISOLATE_HOST", "IGNORE"]
+    confidence_score: int = Field(ge=1, le=100)
+    reasoning: str
+    recommended_playbook: str
+
+
+@dataclass
+class TriageResult:
+    """A decision plus the operational numbers an eval needs."""
+
+    action: TriageAction
+    turns: int = 0
+    tool_calls: int = 0
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
+    tool_log: list[dict[str, Any]] = field(default_factory=list)
+
+    @property
+    def total_tokens(self) -> int:
+        return self.prompt_tokens + self.completion_tokens
+
+
+class AgentLoopError(RuntimeError):
+    """Raised when the agent never produces a valid decision."""
+
+
+def _execute_tool(name: str, arguments: str) -> str:
+    try:
+        args = json.loads(arguments)
+    except json.JSONDecodeError:
+        args = {}
+
+    if name == "check_ip_reputation":
+        ip = args.get("ip_address")
+        if not ip:
+            return (
+                "ERROR: Missing 'ip_address' argument. DO NOT include your final "
+                "decision or reasoning in tool arguments. Only pass the requested IP."
+            )
+        return check_ip_reputation(ip)
+
+    if name == "query_triage_db":
+        sql_query = args.get("sql_query")
+        if not sql_query:
+            return (
+                "ERROR: Missing 'sql_query' argument. DO NOT output your final JSON "
+                "decision here. Only output the SQL query."
+            )
+        return query_triage_db(sql_query)
+
+    return f"ERROR: unknown tool '{name}'. Available tools: check_ip_reputation, query_triage_db."
+
+
+def run_triage_agent(
+    target_identifier: str,
+    client: Optional[LLMClient] = None,
+    max_turns: int = MAX_TURNS,
+    verbose: bool = False,
+) -> TriageResult:
+    """Investigate one target and return the decision plus usage counters.
+
+    The client is injected so tests can pass a stub, evals can pass a replay
+    file, and live runs can pass a real endpoint. Nothing here touches the
+    network on its own.
+    """
+    if client is None:
+        client = build_client()
+
+    messages: list[dict[str, Any]] = [
+        {"role": "system", "content": SYSTEM_PROMPT},
         {
-            "role": "user", 
-            "content": f"A new alert just dropped for target '{target_identifier}'. Use query_triage_db to find relevant records in alerts, endpoint_events, or network_traffic." 
-        }
+            "role": "user",
+            "content": (
+                f"A new alert just dropped for target '{target_identifier}'. Use "
+                "query_triage_db to find relevant records in alerts, "
+                "endpoint_events, or network_traffic."
+            ),
+        },
     ]
 
+    result = TriageResult(action=TriageAction(
+        decision="IGNORE",
+        confidence_score=1,
+        reasoning="uninitialised",
+        recommended_playbook="none",
+    ))
 
-    # 3. The Agent Loop (max 10 iterations to prevent infinite looping)
-    for _ in range(25):
-        response = client.chat.completions.create(
-            model=TARGET_MODEL,
-            messages=messages,
-            tools=tools,
-            temperature=0.1
-        )
-        message = response.choices[0].message
-        
-        # If the model wants to call a tool, execute it
-        if message.tool_calls:
-            messages.append(message) # Append the model's request to call the tool
-            
-            for tool_call in message.tool_calls:
-                print(f"\n  [TOOL EXECUTION] {tool_call.function.name}")
-                print(f"  [ARGS] {tool_call.function.arguments}\n")
-                
-                try:
-                    args = json.loads(tool_call.function.arguments)
-                except json.JSONDecodeError:
-                    args = {}
+    for turn in range(max_turns):
+        result.turns = turn + 1
+        response: AssistantMessage = client.complete(messages, TOOLS)
+        result.prompt_tokens += response.prompt_tokens
+        result.completion_tokens += response.completion_tokens
 
-                if tool_call.function.name == "check_ip_reputation":
-                    ip = args.get("ip_address")
-                    if not ip:
-                        tool_result = "ERROR: Missing 'ip_address' argument. DO NOT include your final decision or reasoning in tool arguments. Only pass the requested IP."
-                    else:
-                        tool_result = check_ip_reputation(ip)
-                        
-                    messages.append({
+        if response.tool_calls:
+            messages.append(response.to_message())
+            for call in response.tool_calls:
+                result.tool_calls += 1
+                if verbose:
+                    print(f"\n  [TOOL EXECUTION] {call.name}")
+                    print(f"  [ARGS] {call.arguments}\n")
+                tool_result = _execute_tool(call.name, call.arguments)
+                result.tool_log.append(
+                    {"name": call.name, "arguments": call.arguments, "result": tool_result}
+                )
+                messages.append(
+                    {
                         "role": "tool",
-                        "tool_call_id": tool_call.id,
-                        "content": tool_result
-                    })
-                    
-                elif tool_call.function.name == "query_triage_db":
-                    query = args.get("sql_query")
-                    
-                    # If it hallucinates the schema again, smack it with an error
-                    if not query:
-                        tool_result = "ERROR: Missing 'sql_query' argument. DO NOT output your final JSON decision here. Only output the SQL query."
-                    else:
-                        from agent.tools import query_triage_db
-                        tool_result = query_triage_db(query)
-                        
-                    messages.append({
-                        "role": "tool",
-                        "tool_call_id": tool_call.id,
-                        "content": tool_result
-                    })
+                        "tool_call_id": call.id,
+                        "content": tool_result,
+                    }
+                )
+            continue
 
-            continue # Go back to the top of the loop so the model can read the tool result
-        
-        # If there are no tool calls, the model should have output our final JSON
-        raw_output = message.content.strip()
-        
-        # 1. Try to extract the JSON block if it included conversational filler
-        import re
-        match = re.search(r'\{.*\}', raw_output, re.DOTALL)
-        
+        raw_output = (response.content or "").strip()
+
+        match = re.search(r"\{.*\}", raw_output, re.DOTALL)
         if match:
-            json_candidate = match.group(0)
             try:
-                # If it's valid, we're done. Return it and exit the loop.
-                return TriageAction.model_validate_json(json_candidate)
+                result.action = TriageAction.model_validate_json(match.group(0))
+                return result
             except Exception:
-                # If it's a JSON block but fails the schema, let it fall into the trap below
-                pass 
-                
-        # 2. The Yap Trap: The model didn't call a tool and didn't output valid JSON.
-        messages.append(message)
-        messages.append({
-            "role": "user",
-            "content": "SYSTEM ERROR: You stopped using tools but did not output the valid final JSON schema. If your query failed, call the tool again with a different SQL statement. If you are done investigating, output ONLY the valid JSON schema. No conversational text."
-        })
-        
-        # Loop continues, forcing the LLM to try again
-        continue
+                pass
 
-    raise Exception("Agent got stuck in a loop and failed to reach a decision.")
+        # The model stopped calling tools without producing a valid decision.
+        messages.append(response.to_message())
+        messages.append(
+            {
+                "role": "user",
+                "content": (
+                    "SYSTEM ERROR: You stopped using tools but did not output the "
+                    "valid final JSON schema. If your query failed, call the tool "
+                    "again with a different SQL statement. If you are done "
+                    "investigating, output ONLY the valid JSON schema. No "
+                    "conversational text."
+                ),
+            }
+        )
+
+    raise AgentLoopError(
+        f"agent did not reach a decision for {target_identifier!r} in {max_turns} turns"
+    )
+
+
+def triage(target_identifier: str, **kwargs) -> TriageAction:
+    """Convenience wrapper returning just the decision."""
+    return run_triage_agent(target_identifier, **kwargs).action
+
+
+def main(argv: list[str] | None = None) -> int:
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Triage one host or IP.")
+    parser.add_argument("target", help="hostname or IP address to investigate")
+    parser.add_argument(
+        "--mode",
+        default=None,
+        choices=["live", "record", "replay"],
+        help="override LLM_MODE from config",
+    )
+    args = parser.parse_args(argv)
+
+    client = build_client(mode=args.mode)
+    result = run_triage_agent(args.target, client=client, verbose=True)
+    print("\n--- FINAL AGENT DECISION ---")
+    print(result.action.model_dump_json(indent=4))
+    print(
+        f"turns={result.turns} tool_calls={result.tool_calls} "
+        f"tokens={result.total_tokens}"
+    )
+    return 0
+
 
 if __name__ == "__main__":
-    # Load the compressed context we built earlier
-    with open("data/processed/host_activity_context.json", "r") as f:
-        all_hosts = json.load(f)
-    
-    # Grab just the first host to test the agent
-    first_host_ip = list(all_hosts.keys())[0]
-    first_host_data = all_hosts[first_host_ip]
-    
-    print(f"Running agent on host: {first_host_ip}")
-    decision = run_triage_agent(first_host_data)
-    
-    print("\n--- FINAL AGENT DECISION ---")
-    print(decision.model_dump_json(indent=4))
+    raise SystemExit(main())

@@ -3,7 +3,10 @@ import re
 import json
 from collections import defaultdict
 from pydantic import ValidationError
-from schemas import IdsEvent
+try:  # imported as a package module
+    from .schemas import IdsEvent
+except ImportError:  # executed as a plain script
+    from schemas import IdsEvent
 
 # Regex for standard Snort/Suricata fast logs
 IDS_REGEX = re.compile(

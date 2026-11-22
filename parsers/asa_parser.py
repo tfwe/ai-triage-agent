@@ -3,7 +3,10 @@ import re
 import json
 from collections import defaultdict
 from pydantic import ValidationError
-from schemas import AsaEvent
+try:  # imported as a package module
+    from .schemas import AsaEvent
+except ImportError:  # executed as a plain script
+    from schemas import AsaEvent
 
 # Matches: <166>May 14 12:00:13 FW-BO-EDGE %ASA-6-302013: Built inbound TCP connection...
 ASA_REGEX = re.compile(r"^<\d+>(?P<timestamp>[A-Z][a-z]{2}\s+\d+\s\d{2}:\d{2}:\d{2})\s+(?P<hostname>\S+)\s+%ASA-\d-(?P<message_id>\d+):\s+(?P<message>.*)$")

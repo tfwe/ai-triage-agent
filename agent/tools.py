@@ -8,7 +8,10 @@ from config import settings
 
 def check_ip_reputation(ip_address: str) -> str:
     if not settings.abuseipdb_api_key:
-        raise ValueError("ABUSEIPDB_API_KEY environment variable is missing.")
+        return (
+            "ERROR: threat-intelligence lookup is unavailable because "
+            "ABUSEIPDB_API_KEY is not configured. Decide from local telemetry only."
+        )
 
     url = "https://api.abuseipdb.com/api/v2/check"
     headers = {
@@ -44,7 +47,7 @@ def query_triage_db(sql_query: str) -> str:
     if re.search(r'(src_ip|dest_ip)\s*=\s*\'[a-zA-Z]', sql_query):
         return "ERROR: Schema violation. You attempted to search for a string hostname in an IP address column (src_ip or dest_ip). Rewrite your query to search the 'hostname' or payload columns instead."
         
-    db_path = os.path.abspath("data/processed/triage.db")
+    db_path = os.path.abspath(settings.triage_db_path)
     
     if not os.path.exists(db_path):
         return "ERROR: Database file not found."

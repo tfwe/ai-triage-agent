@@ -3,22 +3,32 @@ import re
 import json
 from collections import defaultdict
 from pydantic import ValidationError
-from schemas import SyslogEvent, WebAccessEvent, BashHistoryEvent
+try:  # imported as a package module
+    from .schemas import SyslogEvent, WebAccessEvent, BashHistoryEvent
+except ImportError:  # executed as a plain script
+    from schemas import SyslogEvent, WebAccessEvent, BashHistoryEvent
 
 # Standard BSD syslog format: "May 10 14:02:01 WEB-BO-01 sshd[1234]: Failed password..."
 SYSLOG_REGEX = re.compile(r"^(?P<timestamp>[A-Z][a-z]{2}\s+\d+\s\d{2}:\d{2}:\d{2})\s+(?P<hostname>\S+)\s+(?P<process>[^:]+):\s+(?P<message>.*)$")
 
-# Standard Combined Log Format for Apache/Nginx
-WEB_REGEX = re.compile(r"^(?P<source_ip>\S+).*?\[(?P<timestamp>[^\]]+)\].*?\"(?P<method>\w+)\s+(?P<path>\S+).*?\"\s+(?P<status_code>\d{3})\s+.*?(?P<user_agent>\"[^\"]*\")")
+# Standard Combined Log Format for Apache/Nginx:
+# 1.2.3.4 - - [10/May/2026:13:58:31 -0400] "GET /path HTTP/1.1" 404 233 "-" "UA/1.0"
+# The user agent is the LAST quoted field, not the first one after the status.
+WEB_REGEX = re.compile(
+    r'^(?P<source_ip>\S+) \S+ \S+ \[(?P<timestamp>[^\]]+)\] '
+    r'"(?P<method>[A-Z]+) (?P<path>\S+) [^"]*" '
+    r'(?P<status_code>\d{3}) \S+ "[^"]*" "(?P<user_agent>[^"]*)"\s*$'
+)
 
 def parse_linux_logs(base_dir: str, output_dir: str):
     os.makedirs(output_dir, exist_ok=True)
     host_timelines = defaultdict(lambda: {"syslog": [], "web_access": [], "bash_history": []})
 
     for root, dirs, files in os.walk(base_dir):
-        # Extract hostname from the top-level directory name (e.g., WEB-BO-01.northstar-branch.local)
-        path_parts = os.path.normpath(root).split(os.sep)
-        hostname = path_parts[2] if len(path_parts) > 2 else "Unknown"
+        # Hostname is the first path component under the dump root
+        # (e.g. data/raw/WEB-BO-01/syslog.log -> WEB-BO-01)
+        relative = os.path.relpath(root, base_dir)
+        hostname = "Unknown" if relative == os.curdir else relative.split(os.sep)[0]
 
         for file in files:
             file_path = os.path.join(root, file)

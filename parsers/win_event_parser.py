@@ -3,7 +3,10 @@ import json
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 from pydantic import ValidationError
-from schemas import WinEvent
+try:  # imported as a package module
+    from .schemas import WinEvent
+except ImportError:  # executed as a plain script
+    from schemas import WinEvent
 
 def strip_namespace(tag):
     # Windows XML tags look like {http://schemas.microsoft.com/...}Event

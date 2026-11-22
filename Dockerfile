@@ -15,11 +15,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application
-COPY data/ ./data/
-COPY parsers/ ./parsers/
-COPY agent/ ./agent/
-COPY eval/ ./eval/
-COPY . . 
+COPY . .
+
+# Build the evidence corpus inside the image: no network, no model, deterministic
+RUN python -m eval.corpus_build
 
 # Ensure the non-root user owns the files
 RUN chown -R agentuser:agentuser /app
@@ -31,6 +30,6 @@ USER agentuser
 # before handing off to CMD below
 ENTRYPOINT ["python", "docker-entrypoint.py"]
 
-# By default, run the evaluation harness to prove the system works
-CMD ["python", "-m", "eval.run_evals"]
+# By default, replay the recorded eval run: no model and no network required
+CMD ["python", "-m", "eval.run_evals", "--mode", "replay"]
 

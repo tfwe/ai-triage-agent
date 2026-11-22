@@ -1,6 +1,7 @@
-# Data
+# Data (rebuilt from eval/corpus/scenarios.json by `python -m eval.corpus_build`)
 data/raw/
 data/processed/
+data/cases/
 
 # Environment 
 .env

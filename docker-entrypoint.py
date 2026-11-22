@@ -24,6 +24,18 @@ def wait_for_ollama() -> None:
         print(f"[entrypoint] llm_provider={settings.llm_provider!r} -> skipping Ollama check")
         return
 
+    args = sys.argv[1:]
+    mode_arg = args[args.index("--mode") + 1] if "--mode" in args else None
+    replay_run = (
+        settings.llm_mode == "replay"
+        or "--rules-only" in args
+        or mode_arg == "replay"
+    )
+    if replay_run:
+        # Replay and rules-only runs never call a model: do not block on one.
+        print("[entrypoint] replay/rules-only run -> skipping Ollama check")
+        return
+
     # Ollama's management API (tags/pull) lives at the root, not under /v1
     host = settings.ollama_base_url.rsplit("/v1", 1)[0].rstrip("/")
     model = settings.ollama_model
