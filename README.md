@@ -221,15 +221,13 @@ The corpus is `eval/corpus/scenarios.json`: vendor-shaped events per case, writt
 
 ## Where it fails
 
-The committed agent run has five wrong decisions out of 31. Two are false positives. Three are malicious cases escalated with the wrong action.
+The committed agent run (`eval/results/agent.json`) has three wrong decisions out of 31. Two are false positives. One is a malicious case escalated with the wrong action.
 
 | Case | Target | Expected | Agent | Kind |
 |---|---|---|---|---|
-| `CASE-031-BENIGN-PASSWORD-TYPO` | `WS-KORAM-01` | `IGNORE` | `ISOLATE_HOST` | False positive. Three failed console logons followed by one success were read as a brute-force compromise. |
-| `CASE-007-EXT-VPN` | `198.51.100.77` | `IGNORE` | `BLOCK_IP` | False positive. |
-| `CASE-006-EXT-C2` | `45.83.221.30` | `BLOCK_IP` | `ISOLATE_HOST` | Wrong action. An external C2 address was escalated to host isolation instead of blocking the IP. |
-| `CASE-017-EXT-WEBSHELL` | `194.26.29.88` | `BLOCK_IP` | `ISOLATE_HOST` | Wrong action. |
-| `CASE-019-EXT-MALWARE-CDN` | `193.32.162.44` | `BLOCK_IP` | `ISOLATE_HOST` | Wrong action. |
+| `CASE-007-EXT-VPN` | `198.51.100.77` | `IGNORE` | `BLOCK_IP` | False positive. A benign failed VPN reconnect by the branch manager was read as hostile. |
+| `CASE-023-BENIGN-BACKUP-INTERNAL` | `10.20.4.15` | `IGNORE` | `ISOLATE_HOST` | False positive. A scheduled internal backup push over SMB was read as host compromise. |
+| `CASE-019-EXT-MALWARE-CDN` | `193.32.162.44` | `BLOCK_IP` | `ISOLATE_HOST` | Wrong action. An Emotet loader C2 address was escalated to host isolation instead of blocking the IP. |
 
 No malicious case was missed. All wrong decisions are over-escalations or wrong-action escalations.
 
@@ -254,16 +252,16 @@ Held-out split, 14 cases:
 
 | Metric | Rules | Local 35B | DeepSeek V4.1-Flash | GPT-6-Luna |
 |---|---|---|---|---|
-| Accuracy | 9/14 (64.3%) | 11/14 (78.6%) | 9/14 (64.3%) | 8/14 (57.1%) |
+| Accuracy | 9/14 (64.3%) | 11/14 (78.6%) | 8/14 (57.1%) | 8/14 (57.1%) |
 | False positives | 5/5 | 3/5 | 3/5 | 2/5 |
-| Missed detections | 0/9 | 0/9 | 2/9 | 3/9 |
+| Missed detections | 0/9 | 0/9 | 3/9 | 3/9 |
 | Latency p50 | 5.8 ms | 47.3 s | 30.6 s | 10.0 s |
 | Mean tokens per alert | 0 | 27,616 | 37,299 | 16,158 |
-| Cost per 1,000 alerts | $0 | $0 | $2.48 | $2.31 |
+| Cost per 1,000 alerts | $0 | $0 | $2.51 | $2.31 |
 
 Run-to-run noise is real at temperature 0.1 and is reported rather than smoothed: over the same cases and databases the local model scored 9/14 and 11/14, and DeepSeek scored 8/14 and 9/14. Read the table as one draw each, and the local lead as "level with or slightly ahead", not as a settled two-case margin.
 
-The shape of the result is what matters: on bare flows every approach lands in a narrow band, two hosted models cost $2.31 to $2.48 per 1,000 alerts for no accuracy gain over a model running locally for nothing, and the rule baseline fires on every benign case in the holdout. Evidence recall is 100% for all three models, so the failure is not that they did not look; the flow evidence under-determines the label. The synthetic set, where each case carries alerts, endpoint events and firewall records, is the setting where the agent reaches 90.3%.
+The shape of the result is what matters: on bare flows every approach lands in a narrow band, two hosted models cost $2.31 to $2.51 per 1,000 alerts for no accuracy gain over a model running locally for nothing, and the rule baseline fires on every benign case in the holdout. Evidence recall is 100% for all three models, so the failure is not that they did not look; the flow evidence under-determines the label. The synthetic set, where each case carries alerts, endpoint events and firewall records, is the setting where the agent reaches 90.3%.
 
 The system prompt gained a flow-evidence paragraph between the first synthetic
 run and these runs. The dev split absorbed that change; the holdout numbers
