@@ -1,7 +1,7 @@
 """CIC-IDS2017 labelling policy: decisions are derived from labels, not hand-set."""
 from __future__ import annotations
 
-from eval.load_cicids import Target, build_cases, classify_target
+from eval.load_cicids import Target, build_cases, classify_target, detector_alerts
 
 
 def target(src_labels=None, dst_labels=None, count=100):
@@ -83,3 +83,32 @@ def test_thin_targets_are_skipped():
     targets = {"205.174.165.73": target({"PortScan": 3}, count=3)}
 
     assert build_cases(targets) == []
+
+
+def _flow(src="172.16.0.5", dst="172.16.0.1", dport=80, fwd_bytes=100):
+    return {"src": src, "dst": dst, "dport": dport, "fwd_bytes": fwd_bytes}
+
+
+def test_detector_flags_repeated_connections_to_one_service():
+    """FLOW-002 fires when one peer/port pair takes >= 50 flows."""
+    flows = [_flow(dst="172.16.0.1", dport=80) for _ in range(60)]
+
+    sigs = {alert["sig_id"] for alert in detector_alerts("172.16.0.5", flows)}
+
+    assert sigs == {"FLOW-002"}
+
+
+def test_detector_flags_inbound_flood_not_beacon_at_high_volume():
+    """FLOW-004 and FLOW-005 share the as-dest channel; only one may fire."""
+    flows = [_flow(src=f"172.16.0.{i % 40}") for i in range(220)]
+
+    sigs = {alert["sig_id"] for alert in detector_alerts("172.16.0.1", flows)}
+
+    assert "FLOW-004" in sigs
+    assert "FLOW-005" not in sigs
+
+
+def test_detector_stays_quiet_on_benign_volume():
+    flows = [_flow(dst=f"172.16.0.{i % 50}.254", dport=i % 90, fwd_bytes=2000) for i in range(40)]
+
+    assert detector_alerts("172.16.0.5", flows) == []

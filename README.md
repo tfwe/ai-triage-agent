@@ -255,17 +255,65 @@ Held-out split, 14 cases:
 | Accuracy | 9/14 (64.3%) | 11/14 (78.6%) | 8/14 (57.1%) | 8/14 (57.1%) |
 | False positives | 5/5 | 3/5 | 3/5 | 2/5 |
 | Missed detections | 0/9 | 0/9 | 3/9 | 3/9 |
-| Latency p50 | 5.8 ms | 47.3 s | 30.6 s | 10.0 s |
+| Latency p50 | 43.4 ms | 47.3 s | 33.1 s | 10.0 s |
 | Mean tokens per alert | 0 | 27,616 | 37,299 | 16,158 |
 | Cost per 1,000 alerts | $0 | $0 | $2.51 | $2.31 |
 
-Run-to-run noise is real at temperature 0.1 and is reported rather than smoothed: over the same cases and databases the local model scored 9/14 and 11/14, and DeepSeek scored 8/14 and 9/14. Read the table as one draw each, and the local lead as "level with or slightly ahead", not as a settled two-case margin.
+Every figure above is quoted from a committed file: the three model columns
+from `eval/results/public-holdout-ornith-final.txt` (Local 35B),
+`public-holdout-deepseek.txt` and `public-holdout-gpt6luna.txt`, the rules
+column from `public-rules-holdout.txt`. The rules latency is model-independent,
+so the table takes it from the dedicated rules run rather than re-quoting it
+from inside each model run, where cold-start noise moved it between 4.8 and
+46.7 ms.
+
+Run-to-run noise is real at temperature 0.1 and is reported rather than
+smoothed: over the same holdout cases and databases the local model scored
+9/14 and then 11/14, and both runs are committed
+(`public-holdout-ornith.txt` and `public-holdout-ornith-final.txt`). Read the
+table as one draw each, and the local lead as "level with or slightly ahead",
+not as a settled two-case margin. DeepSeek's second holdout run (9/14) was
+never committed, so only its single 8/14 draw is on file; the noise claim
+therefore rests on the local model's two runs.
 
 The shape of the result is what matters: on bare flows every approach lands in a narrow band, two hosted models cost $2.31 to $2.51 per 1,000 alerts for no accuracy gain over a model running locally for nothing, and the rule baseline fires on every benign case in the holdout. Evidence recall is 100% for all three models, so the failure is not that they did not look; the flow evidence under-determines the label. The synthetic set, where each case carries alerts, endpoint events and firewall records, is the setting where the agent reaches 90.3%.
 
 The system prompt gained a flow-evidence paragraph between the first synthetic
 run and these runs. The dev split absorbed that change; the holdout numbers
 above are the ones the prompt was not revised against.
+
+### Reproducing the numbers offline
+
+Replay answers every request from a recorded JSONL: no model, no GPU, no
+network, no API key. It regenerates the decisions, the token counts and the
+cost column exactly. It does not reproduce the latency column, which is a
+wall-clock measurement of the original live runs.
+
+```bash
+# one-time: build the case databases from the source archives (both gitignored;
+# download instructions and mirrors are in eval/datasets/README.md)
+python -m eval.load_cicids --src ~/data/cicids2017 --cases-root data/public/cases
+python -m eval.load_botiot  --src ~/data/nf-unsw/NF-UNSW-NB15/data
+python -m eval.merge_datasets eval/datasets/cicids2017.json eval/datasets/nf-bot-iot.json
+
+# replay the recorded GPT-6-Luna holdout run
+REPLAY_PATH=eval/recordings/public-gpt6luna-holdout.jsonl \
+  .venv/bin/python -m eval.run_evals --mode replay \
+  --dataset eval/datasets/public.json --split holdout \
+  --cases-dir data/public/cases --no-build \
+  --price-in 0.10 --price-out 0.50 --label check-gpt6luna
+```
+
+Swap `REPLAY_PATH` for any `eval/recordings/public-<model>-<split>.jsonl`:
+DeepSeek replay adds `--price-in 0.05 --price-out 0.199`, and the rules
+baseline runs with `--rules-only` and no recording
+(`.venv/bin/python -m eval.run_evals --mode replay --rules-only ...`). The
+per-model recordings are not committed; `.gitignore` keeps them out because
+they replay only alongside the source archives. Two caveats: the first local
+holdout run recorded requests under an earlier opening message and replays
+only against that prompt revision, and the second local holdout run's
+recording was not kept, so its 11/14 rests on the per-case rows in
+`eval/results/public-holdout-ornith-final.json`.
 
 ## Limitations
 
