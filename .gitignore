@@ -2,13 +2,34 @@
 data/raw/
 data/processed/
 data/cases/
-data/public/
+data/public/*
+# Handover 11: the replayable holdout recording ships with the 14 holdout case
+# databases it replays against (the source archives are not redistributable,
+# so the databases are committed instead; see eval/datasets/README.md).
+!data/public/cases/
+data/public/cases/*
+!data/public/cases/BOTIOT-192-168-100-147/
+!data/public/cases/BOTIOT-192-168-100-148/
+!data/public/cases/BOTIOT-192-168-100-149/
+!data/public/cases/BOTIOT-192-168-100-150/
+!data/public/cases/BOTIOT-192-168-100-3/
+!data/public/cases/BOTIOT-192-168-100-6/
+!data/public/cases/CIC-162-208-22-34/
+!data/public/cases/CIC-192-168-10-255/
+!data/public/cases/CIC-192-168-10-3/
+!data/public/cases/CIC-192-168-10-5/
+!data/public/cases/CIC-192-168-10-8/
+!data/public/cases/CIC-192-168-10-9/
+!data/public/cases/CIC-23-60-139-27/
+!data/public/cases/CIC-50-63-243-230/
 
 # Public-dataset recordings: only replayable alongside the source archives,
-# which are not committed. See eval/datasets/README.md.
+# which are not committed. See eval/datasets/README.md. Exception: the
+# committed holdout recording replays against the committed holdout databases.
 eval/recordings/public-*.jsonl
+!eval/recordings/public-ornith-r3-holdout.jsonl
 
-# Environment 
+# Environment
 .env
 __pycache__/
 *.pyc
