@@ -269,12 +269,39 @@ from inside each model run, where cold-start noise moved it between 4.8 and
 
 Run-to-run noise is real at temperature 0.1 and is reported rather than
 smoothed: over the same holdout cases and databases the local model scored
-9/14 and then 11/14, and both runs are committed
-(`public-holdout-ornith.txt` and `public-holdout-ornith-final.txt`). Read the
+9/14 and then 11/14, and then 8/14 in a third draw recorded 2026-11-26; all
+three runs are committed (`public-holdout-ornith.txt`,
+`public-holdout-ornith-final.txt`, `public-holdout-ornith-r3.txt`). Read the
 table as one draw each, and the local lead as "level with or slightly ahead",
 not as a settled two-case margin. DeepSeek's second holdout run (9/14) was
 never committed, so only its single 8/14 draw is on file; the noise claim
-therefore rests on the local model's two runs.
+therefore rests on the local model's three runs.
+
+The third draw is also the first whose behaviour can be reproduced exactly.
+The client passes seed 7 and temperature 0.1, and the three draws taken on
+2026-11-26 produced identical decisions and token counts. The two draws on
+2026-11-22, 9/14 at 11:11Z and 11/14 at 11:40Z, 29 minutes apart, differed,
+so the serving stack of that day did not reproduce seeded trajectories; the
+current one does. The earlier r3 attempts were also affected by a serving
+problem, now diagnosed and fixed. Two holdout cases,
+BOTIOT-192-168-100-148 and BOTIOT-192-168-100-6, deterministically loop to
+context exhaustion when the server's prefix cache is warm: a logging proxy
+measured 90,884 completion tokens for each of two identical runs, where a
+cold server answers the same prompt in about 580 tokens. The uncapped client
+timed out three times at 180s per request, and each abandoned attempt left
+the server generating a 27 to 39-minute zombie that queued every later case,
+so one looping case knocked out the whole suite (6/14 with crashes in the
+uncapped draws). The eval client now sends max_tokens 8192, max_retries 0
+and a 300s timeout. Healthy turns run 385 to 5,351 completion tokens, so
+the cap does not touch them. Under the cap the two looping cases truncate,
+receive the harness's "output only the valid JSON schema" nudge, recover,
+and answer ISOLATE_HOST correctly, at 53,428 and 36,408 tokens per case.
+The 8/14 draw therefore has zero crashed runs, and the crashes in the
+earlier draws came from the client and server handling of looping turns,
+not from the decisions the model made on the other cases. The holdout
+contains victim-mislabelled cases (see `eval/datasets/README.md`), so
+"level with or slightly ahead" still describes the local model across three
+draws at 8/14, 9/14 and 11/14 against rules at 9/14.
 
 The shape of the result is what matters: on bare flows every approach lands in a narrow band, two hosted models cost $2.31 to $2.51 per 1,000 alerts for no accuracy gain over a model running locally for nothing, and the rule baseline fires on every benign case in the holdout. Evidence recall is 100% for all three models, so the failure is not that they did not look; the flow evidence under-determines the label. The synthetic set, where each case carries alerts, endpoint events and firewall records, is the setting where the agent reaches 90.3%.
 
@@ -308,12 +335,21 @@ Swap `REPLAY_PATH` for any `eval/recordings/public-<model>-<split>.jsonl`:
 DeepSeek replay adds `--price-in 0.05 --price-out 0.199`, and the rules
 baseline runs with `--rules-only` and no recording
 (`.venv/bin/python -m eval.run_evals --mode replay --rules-only ...`). The
-per-model recordings are not committed; `.gitignore` keeps them out because
-they replay only alongside the source archives. Two caveats: the first local
+recordings for the hosted runs are not committed; `.gitignore` keeps them
+out because they replay only alongside the source archives. The first local
 holdout run recorded requests under an earlier opening message and replays
-only against that prompt revision, and the second local holdout run's
-recording was not kept, so its 11/14 rests on the per-case rows in
-`eval/results/public-holdout-ornith-final.json`.
+only against that prompt revision. The third local holdout run's recording
+is committed as `eval/recordings/public-ornith-r3-holdout.jsonl`, together
+with the 14 holdout case databases under `data/public/cases/`, so it
+replays standalone; CI replays it with 0 mismatches against the results
+JSON, latency fields excluded:
+
+```bash
+LLM_MODE=replay REPLAY_PATH=eval/recordings/public-ornith-r3-holdout.jsonl \
+  .venv/bin/python -m eval.run_evals --mode replay \
+  --dataset eval/datasets/public.json --split holdout \
+  --cases-dir data/public/cases --no-build --label ci-replay-ornith-r3
+```
 
 ## Limitations
 

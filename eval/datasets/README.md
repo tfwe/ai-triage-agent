@@ -74,3 +74,14 @@ revised once on the dev split; the holdout numbers are the reported ones.
   timestamps in the NetFlow export, so `timestamp` is NULL in those databases.
 - The case counts are small (28 in total). These numbers are indicative, not a
   benchmark.
+- Bot-IoT victim mislabelling: the fold policy's source-first rule, together
+  with NetFlow reverse and response flows that carry attack labels, marks
+  receiving victims as compromised. Holdout victims include 192.168.100.3,
+  192.168.100.6 and 192.168.100.148. A model that correctly treats a victim
+  as benign scores wrong under the current labels, while a model that follows
+  the label scores as correct even though it misreads the victim. Every
+  committed holdout score was produced against these labels.
+- The system prompt's receiver-is-victim IGNORE rule contradicts its
+  BLOCK_IP flow rule for internal scanners. The two holdout cases that loop
+  to context exhaustion, BOTIOT-192-168-100-148 and BOTIOT-192-168-100-6,
+  are both victim-labelled cases where these two rules collide.
