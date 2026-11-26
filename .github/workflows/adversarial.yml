@@ -1,0 +1,57 @@
+name: adversarial
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+# Replay-first design. The job never calls a model. It rebuilds the synthetic
+# case databases from eval/corpus/scenarios.json (eval/corpus_build.py renders
+# them through the real parsers, deterministically, with no network), then
+# replays the committed recording eval/recordings/agent.jsonl through
+# eval/run_evals.py. The check script blocks sockets and strips OPENAI_* /
+# OLLAMA_* / LLM_* from the environment for that subprocess, so a network
+# attempt or a missing recording fails the run instead of passing silently.
+#
+# Public-table numbers are corroborated, not re-executed. The holdout table in
+# the README is built from CIC-IDS2017 and NF-UNSW-NB15 case databases. Those
+# source archives are not redistributable and are not present in CI, so the
+# script cannot rebuild those databases. It checks the README cells against the
+# committed eval/results/*.json instead. Latency is excluded everywhere: it is
+# wall-clock time from the original live runs and cannot be reproduced.
+#
+# Re-check after changing the prompt, tools, parsers or corpus: a recording is
+# only valid for the prompt, tool schemas, database contents and model it was
+# made with. The section 2 replay will then report ReplayMiss or wrong
+# decisions, and that failure is intended.
+
+jobs:
+  adversarial:
+    runs-on: ubuntu-latest
+    env:
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install harness requirements
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Rebuild synthetic case databases (deterministic, model-free)
+        # Writes data/cases/<id>/triage.db (gitignored). No network, no model,
+        # no API key.
+        run: python -m eval.corpus_build
+
+      - name: Adversarial contract check
+        # Four sections: data invariants, offline replay of the synthetic golden
+        # set, README-vs-result corroboration, self-aliveness. Exits non-zero on
+        # any FAIL. Its temp files live under the runner's temp dir and are
+        # removed at the end.
+        run: python scripts/adversarial_check.py --harness-root .
