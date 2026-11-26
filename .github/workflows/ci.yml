@@ -45,3 +45,16 @@ jobs:
         # Replays eval/recordings/agent.jsonl from the last live run and fails
         # if the numbers drift from eval/results/agent.json.
         run: python -m eval.run_evals --mode replay --label ci-replay
+
+      - name: Replay the committed holdout recording
+        # Replays eval/recordings/public-ornith-r3-holdout.jsonl against the
+        # 14 holdout case databases committed under data/public/cases. Offline,
+        # no model, no API key. Label is distinct from the synthetic replay.
+        env:
+          LLM_MODE: replay
+          REPLAY_PATH: eval/recordings/public-ornith-r3-holdout.jsonl
+        run: >-
+          python -m eval.run_evals --mode replay
+          --dataset eval/datasets/public.json --split holdout
+          --cases-dir data/public/cases --no-build
+          --label ci-replay-ornith-r3

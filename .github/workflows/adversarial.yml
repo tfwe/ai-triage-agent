@@ -15,10 +15,15 @@ on:
 #
 # Public-table numbers are corroborated, not re-executed. The holdout table in
 # the README is built from CIC-IDS2017 and NF-UNSW-NB15 case databases. Those
-# source archives are not redistributable and are not present in CI, so the
-# script cannot rebuild those databases. It checks the README cells against the
-# committed eval/results/*.json instead. Latency is excluded everywhere: it is
-# wall-clock time from the original live runs and cannot be reproduced.
+# source archives are not redistributable, so the script cannot rebuild most of
+# those databases. It checks the README cells against the committed
+# eval/results/*.json instead. The one exception is the ornith-r3 holdout run:
+# its 14 holdout case databases are committed under data/public/cases, so
+# section 5 re-executes eval/recordings/public-ornith-r3-holdout.jsonl offline
+# and asserts zero mismatches against eval/results/public-holdout-ornith-r3.json
+# (per-case decisions and tokens, agent summary counts). Latency is excluded
+# everywhere: it is wall-clock time from the original live runs and cannot be
+# reproduced.
 #
 # Re-check after changing the prompt, tools, parsers or corpus: a recording is
 # only valid for the prompt, tool schemas, database contents and model it was
@@ -50,8 +55,9 @@ jobs:
         run: python -m eval.corpus_build
 
       - name: Adversarial contract check
-        # Four sections: data invariants, offline replay of the synthetic golden
-        # set, README-vs-result corroboration, self-aliveness. Exits non-zero on
-        # any FAIL. Its temp files live under the runner's temp dir and are
-        # removed at the end.
+        # Five sections: data invariants, offline replay of the synthetic golden
+        # set, README-vs-result corroboration, self-aliveness, offline replay of
+        # the committed ornith-r3 holdout recording against its result JSON.
+        # Exits non-zero on any FAIL. Its temp files live under the runner's temp
+        # dir and are removed at the end.
         run: python scripts/adversarial_check.py --harness-root .

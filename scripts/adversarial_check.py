@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Adversarial contract check for the ai-triage-agent harness (stdlib only).
 
-Four sections, one SECTION line each, exit 1 if any section FAILs:
+Five sections, one SECTION line each, exit 1 if any section FAILs:
 
   1. DATA INVARIANTS   golden set ids unique; public.json dev/holdout split
                        non-empty and disjoint; every decision label legal;
@@ -16,9 +16,19 @@ Four sections, one SECTION line each, exit 1 if any section FAILs:
                        Latency rows are excluded (wall-clock, see README).
   4. SELF-ALIVENESS    the toy run scored > 0 cases and the corpus build
                        produced > 0 case databases.
+  5. HOLDOUT REPLAY    replays the committed ornith-r3 holdout recording
+                       (eval/recordings/public-ornith-r3-holdout.jsonl) through
+                       eval.run_evals against the 14 holdout case databases
+                       committed under data/public/cases, with the network
+                       blocked. Asserts zero mismatches against
+                       eval/results/public-holdout-ornith-r3.json: per-case
+                       decision and token count, and agent summary counts
+                       (cases, correct, false_positives, missed,
+                       mean_tokens_per_alert, evidence_recall). Latency fields
+                       are excluded.
 
-Nothing is written to the harness tree. The toy run happens in a temp copy,
-which is removed at the end.
+Nothing is written to the harness tree. The toy run and the holdout replay
+happen in temp copies, which are removed at the end.
 
 Schema facts this script relies on (verified against the repo):
   * Decision labels: agent/core.py TriageAction.decision is
@@ -49,7 +59,9 @@ Section 3 pins the README value (31/31) and catches it.
 Why section 3 corroborates instead of re-executes the public tables: the
 CICIDS2017 and NF-UNSW-NB15 source archives are not redistributable and are
 not available in CI. Their case databases cannot be rebuilt, so the public
-numbers can only be checked against the committed result JSONs.
+numbers can only be checked against the committed result JSONs. The one
+exception is the ornith-r3 holdout run: its 14 case databases are committed,
+so section 5 re-executes that recording instead.
 """
 from __future__ import annotations
 
@@ -446,6 +458,96 @@ def section_alive(toy: dict) -> tuple[list[str], list[str]]:
     return problems, notes
 
 
+# ---------------------------------------------------------------- section 5
+HOLDOUT_RECORDING = "eval/recordings/public-ornith-r3-holdout.jsonl"
+HOLDOUT_RESULT = "eval/results/public-holdout-ornith-r3.json"
+HOLDOUT_CASES = "data/public/cases"
+HOLDOUT_LABEL = "adversarial-holdout-r3"
+HOLDOUT_SUMMARY_KEYS = ("cases", "correct", "false_positives", "missed",
+                        "mean_tokens_per_alert", "evidence_recall")
+HOLDOUT_CASE_KEYS = ("decision", "tokens")  # latency_ms is excluded
+
+
+def section_holdout(h: str, tmp: str) -> tuple[list[str], list[str]]:
+    """Replay the committed ornith-r3 holdout recording and recount against its JSON."""
+    problems: list[str] = []
+    notes: list[str] = []
+    work = os.path.join(tmp, "holdout")
+    harness_abs = os.path.abspath(h)
+    keep = {os.path.basename(HOLDOUT_RECORDING)}
+
+    def ignore(directory, names):
+        skip = {n for n in names if n == "__pycache__" or n.endswith(".pyc")
+                or (n.startswith("public-") and n.endswith(".jsonl") and n not in keep)}
+        if os.path.abspath(directory) == harness_abs:
+            skip |= {".git", ".venv", "venv", "data", ".env", ".pytest_cache"}
+        return skip
+
+    shutil.copytree(harness_abs, work, ignore=ignore)
+    cases_src = os.path.join(harness_abs, HOLDOUT_CASES)
+    cases_dst = os.path.join(work, HOLDOUT_CASES)
+    if not os.path.isdir(cases_src):
+        problems.append(f"holdout case databases missing: {HOLDOUT_CASES}")
+        return problems, notes
+    shutil.copytree(cases_src, cases_dst)
+
+    public = load(os.path.join(h, PUBLIC))
+    hold_ids = sorted(c["id"] for c in public if c.get("split") == "holdout")
+    dbs = [i for i in hold_ids if os.path.exists(os.path.join(cases_dst, i, "triage.db"))]
+    if len(dbs) != len(hold_ids):
+        problems.append(f"holdout case DBs present {len(dbs)}/{len(hold_ids)}")
+        return problems, notes
+
+    # sanitized_env() pins REPLAY_PATH to the golden recording, so override it
+    # after the call to point at the r3 holdout recording.
+    env = sanitized_env()
+    env["REPLAY_PATH"] = HOLDOUT_RECORDING
+    argv = ["--mode", "replay", "--dataset", PUBLIC, "--split", "holdout",
+            "--cases-dir", cases_dst, "--no-build", "--label", HOLDOUT_LABEL]
+    started = time.monotonic()
+    run = subprocess.run([sys.executable, "-c", GUARD, *argv], cwd=work, env=env,
+                         capture_output=True, text=True, timeout=300)
+    notes.append(f"holdout replay subprocess: exit {run.returncode} in {time.monotonic() - started:.1f}s")
+    if run.returncode != 0:
+        problems.append(f"holdout replay exit {run.returncode}: {(run.stderr or run.stdout)[-400:]}")
+        return problems, notes
+    if "network access attempted" in run.stdout + run.stderr:
+        problems.append("network access attempted during holdout replay")
+
+    out_path = os.path.join(work, "eval", "results", f"{HOLDOUT_LABEL}.json")
+    if not os.path.exists(out_path):
+        problems.append("holdout replay did not write its results JSON")
+        return problems, notes
+    got = load(out_path)
+    want = load(os.path.join(h, HOLDOUT_RESULT))
+
+    got_cases = {c["id"]: c for c in got.get("per_case") or []}
+    want_cases = {c["id"]: c for c in want.get("per_case") or []}
+    if set(got_cases) != set(want_cases):
+        problems.append(f"holdout case ids differ: missing {sorted(set(want_cases) - set(got_cases))[:5]}, "
+                        f"extra {sorted(set(got_cases) - set(want_cases))[:5]}")
+    case_mismatch = []
+    for cid in sorted(set(got_cases) & set(want_cases)):
+        for key in HOLDOUT_CASE_KEYS:
+            if got_cases[cid].get(key) != want_cases[cid].get(key):
+                case_mismatch.append(f"{cid}.{key}: got {got_cases[cid].get(key)!r} want {want_cases[cid].get(key)!r}")
+    if case_mismatch:
+        problems.append(f"{len(case_mismatch)} per-case mismatches: {case_mismatch[:5]}")
+
+    got_agent = got.get("agent") or {}
+    want_agent = want.get("agent") or {}
+    summary_mismatch = [f"{k}: got {got_agent.get(k)!r} want {want_agent.get(k)!r}"
+                        for k in HOLDOUT_SUMMARY_KEYS if got_agent.get(k) != want_agent.get(k)]
+    if summary_mismatch:
+        problems.append(f"agent summary mismatches: {summary_mismatch}")
+
+    if not problems:
+        notes.append(f"holdout replay == {HOLDOUT_RESULT}: {len(want_cases)} cases "
+                     f"(decision + tokens), agent summary {', '.join(HOLDOUT_SUMMARY_KEYS)}; 0 mismatches")
+    notes.append(f"latency fields excluded (wall-clock of the original run; README)")
+    return problems, notes
+
+
 # ---------------------------------------------------------------- driver
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
@@ -472,6 +574,9 @@ def main(argv: list[str] | None = None) -> int:
 
         p4, n4 = section_alive(toy)
         sections.append(("4 SELF-ALIVENESS", p4, n4))
+
+        p5, n5 = section_holdout(h, tmp)
+        sections.append(("5 HOLDOUT REPLAY (ornith-r3 recording vs committed result JSON)", p5, n5))
 
         for title, problems, notes in sections:
             for note in notes:
