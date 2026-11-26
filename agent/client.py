@@ -91,14 +91,23 @@ class OpenAIClient:
         api_key: str | None = None,
         temperature: float = 0.1,
         seed: int = 7,
-        timeout: float = 180.0,
+        timeout: float = 300.0,
+        max_tokens: int = 8192,
+        max_retries: int = 0,
     ) -> None:
         from openai import OpenAI
 
         self.model = model
         self.temperature = temperature
         self.seed = seed
-        kwargs: dict[str, Any] = {"timeout": timeout}
+        self.max_tokens = max_tokens
+        # max_tokens caps runaway generation: at seed 7 with a warm prefix
+        # cache, two holdout cases (BOTIOT .148/.6) deterministically loop to
+        # ~91k tokens (context exhaustion) and the uncapped client times out
+        # 3x180s, poisoning the server queue with zombie generations. Healthy
+        # turns are 385-5351 completion tokens, so the cap only bites loops.
+        # max_retries=0 for the same reason: each retry spawns another zombie.
+        kwargs: dict[str, Any] = {"timeout": timeout, "max_retries": max_retries}
         if base_url:
             kwargs["base_url"] = base_url.rstrip("/")
         if api_key:
@@ -115,6 +124,7 @@ class OpenAIClient:
             "tools": list(tools),
             "temperature": self.temperature,
             "seed": self.seed,
+            "max_tokens": self.max_tokens,
         }
         try:
             response = self._client.chat.completions.create(**request)
