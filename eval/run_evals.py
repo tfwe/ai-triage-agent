@@ -661,12 +661,21 @@ def write_v2_result(args, dataset, client, model, label) -> int:
         price_out=args.price_out,
     )
     summary = outcome["summary"]
-    judge_model = outcome["judge"]
+    # Unwrap recording/replay wrappers for sampling parameters: the inner
+    # OpenAIClient carries temperature/seed/max_tokens.
+    inner = client
+    while inner is not None and not hasattr(inner, "temperature"):
+        inner = getattr(inner, "client", None) or getattr(inner, "inner", None)
+    judge_calls = [j for row in outcome["rows"] for j in row["absence_judge"]]
+    judge_model = (judge_calls[0]["judge_model"] if judge_calls
+                   else outcome["judge"])
     pinned = {
         "model": model,
-        "temperature": getattr(client, "temperature", None),
-        "seed": getattr(client, "seed", None),
-        "max_tokens": getattr(client, "max_tokens", None),
+        # No numeric fallbacks: a missing inner client must not silently
+        # fabricate plausible-looking sampling parameters in the pinned block.
+        "temperature": getattr(inner, "temperature", None) if client else None,
+        "seed": getattr(inner, "seed", None) if client else None,
+        "max_tokens": getattr(inner, "max_tokens", None) if client else None,
         "max_turns": args.max_turns,
         "judge_model": judge_model,
         "judge_temperature": JUDGE_TEMPERATURE if judge_model else None,

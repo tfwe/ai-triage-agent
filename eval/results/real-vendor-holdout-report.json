@@ -1,0 +1,456 @@
+{
+  "protocol": "consult-2b approved: per-draw scores r1/r2/r3, 3-draw mean, min-max spread, unanimous pass@all3, macro-averaged family accuracy. No best-draw headline.",
+  "model": "ornith-1.5-35b-a3b-apex-i-nanoplus",
+  "temperature": 0.1,
+  "seed": 7,
+  "max_tokens": 5500,
+  "max_turns": 12,
+  "judge_model": "ornith-1.5-35b-a3b-apex-i-nanoplus",
+  "judge_temperature": 0.0,
+  "db": "data/processed-real/real-vendor.db",
+  "params_provenance": "temperature/seed/max_tokens are the draw client's OpenAIClient configuration (agent/client.py: defaults temperature=0.1, seed=7, max_tokens=5500), sent as fields on every wire request. The .jsonl recordings and .reqlog files store request keys (model+messages+tools hash), messages and responses but NOT sampling parameters, so these values cannot be cross-checked from the logs alone.",
+  "dataset": "eval/datasets/real-vendor-holdout.json (37 cases: 17 attack / 20 benign)",
+  "draw0_rules_baseline": {
+    "model": "rules-baseline",
+    "db": "data/processed-real/real-vendor.db",
+    "dataset_sha256": "61d32dc2cac1f99d",
+    "metrics": {
+      "decision_accuracy": 0.4865,
+      "decision_ok": 18,
+      "cases": 37,
+      "case_pass_rate": 0.2973,
+      "case_pass": 11,
+      "false_positives": 3,
+      "assertion_recall": {
+        "attribution": {
+          "graded": 26,
+          "met": 0,
+          "recall": 0.0
+        },
+        "action": {
+          "graded": 25,
+          "met": 0,
+          "recall": 0.0
+        },
+        "restraint": {
+          "graded": 28,
+          "met": 28,
+          "recall": 1.0
+        },
+        "absence": {
+          "graded": 0,
+          "met": 0,
+          "recall": null
+        },
+        "evidence": {
+          "graded": 0,
+          "met": 0,
+          "recall": null
+        }
+      },
+      "family_accuracy": {
+        "external-c2": 0.0,
+        "brute-force-external-success": 0.0,
+        "brute-force-external": 0.0,
+        "kerberos-external": 0.0,
+        "c2-beacon": 0.0,
+        "lateral-movement-rdp": 0.0,
+        "zerologon": 0.0,
+        "smb-dll-lateral": 0.0,
+        "malformed-tls": 0.0,
+        "port-scan": 0.0,
+        "web-shell-discovery": 0.0,
+        "privesc-unquoted-path": 0.0,
+        "netgear-exploit-victim": 0.0,
+        "smb-lateral-victim": 0.0,
+        "malformed-tls-victim": 0.0,
+        "mysql-scan-victim": 0.0,
+        "dcerpc-scan-victim": 0.0,
+        "rdp-tunnel-victim": 0.0,
+        "dns-resolver-hard-negative": 0.0,
+        "dhcp-service": 1.0,
+        "mdns-noise": 1.0,
+        "llmnr-noise": 1.0,
+        "ssdp-noise": 1.0,
+        "llmnr-noise-ipv6": 1.0,
+        "mdns-noise-ipv6": 1.0,
+        "dhcpv6-noise-ipv6": 1.0,
+        "brute-forced-host-no-compromise": 0.0,
+        "auth-noise-low-volume": 1.0,
+        "ftp-access-noise": 1.0
+      },
+      "macro_family_accuracy": 0.3103,
+      "errors": 0
+    },
+    "prediction_check": {
+      "predicted": {
+        "agree": 9,
+        "disagree": 12,
+        "uncertain": 16
+      },
+      "predicted_split": "9 agree / 12 disagree / 16 uncertain (section 4.1)",
+      "actual": {
+        "agree": 18,
+        "disagree": 19
+      },
+      "per_predicted_class": {
+        "agree (predict) -> disagree": 2,
+        "agree (predict) -> agree": 7,
+        "disagree (predict) -> disagree": 10,
+        "disagree (predict) -> agree": 2,
+        "uncertain -> disagree": 7,
+        "uncertain -> agree": 9
+      },
+      "prediction_misses": [
+        {
+          "id": "HG-012",
+          "predicted": "agree (predict)",
+          "expected": "ISOLATE_HOST",
+          "got": "IGNORE"
+        },
+        {
+          "id": "HG-013",
+          "predicted": "agree (predict)",
+          "expected": "ISOLATE_HOST",
+          "got": "IGNORE"
+        },
+        {
+          "id": "HG-020",
+          "predicted": "disagree (predict)",
+          "expected": "IGNORE",
+          "got": "IGNORE"
+        },
+        {
+          "id": "HG-021",
+          "predicted": "disagree (predict)",
+          "expected": "IGNORE",
+          "got": "IGNORE"
+        }
+      ],
+      "notes": "Agree = rules decision equals the expected decision. HG-012/HG-013 (predicted ISOLATE_HOST) returned IGNORE: no alert rows are visible to the rules for those targets. HG-020/HG-021 (predicted ISOLATE misfire) correctly IGNOREd."
+    }
+  },
+  "live_draws": [
+    {
+      "name": "r1",
+      "result_artifact": "eval/results/real-vendor-holdout-r1.json",
+      "recording": "eval/recordings/real-vendor-holdout-r1.jsonl",
+      "replay_gate": {
+        "identical": true,
+        "mismatches": [],
+        "cases": 37
+      },
+      "pinned": {
+        "model": "ornith-1.5-35b-a3b-apex-i-nanoplus",
+        "temperature": 0.1,
+        "seed": 7,
+        "max_tokens": 5500,
+        "max_turns": 12,
+        "judge_model": "ornith-1.5-35b-a3b-apex-i-nanoplus",
+        "judge_temperature": 0.0,
+        "db": "data/processed-real/real-vendor.db"
+      },
+      "recorded_at": "2026-11-27T10:34:30Z",
+      "metrics": {
+        "decision_accuracy": 0.6486,
+        "decision_ok": 24,
+        "cases": 37,
+        "case_pass_rate": 0.0811,
+        "case_pass": 3,
+        "false_positives": 8,
+        "assertion_recall": {
+          "attribution": {
+            "graded": 25,
+            "met": 24,
+            "recall": 0.96
+          },
+          "action": {
+            "graded": 24,
+            "met": 1,
+            "recall": 0.042
+          },
+          "restraint": {
+            "graded": 27,
+            "met": 27,
+            "recall": 1.0
+          },
+          "absence": {
+            "graded": 36,
+            "met": 33,
+            "recall": 0.917
+          },
+          "evidence": {
+            "graded": 37,
+            "met": 21,
+            "recall": 0.568
+          }
+        },
+        "family_accuracy": {
+          "external-c2": 0.0,
+          "brute-force-external-success": 0.0,
+          "brute-force-external": 0.0,
+          "kerberos-external": 0.0,
+          "c2-beacon": 0.0,
+          "lateral-movement-rdp": 0.0,
+          "zerologon": 0.0,
+          "smb-dll-lateral": 1.0,
+          "malformed-tls": 0.0,
+          "port-scan": 0.0,
+          "web-shell-discovery": 0.0,
+          "privesc-unquoted-path": 0.0,
+          "netgear-exploit-victim": 0.0,
+          "smb-lateral-victim": 0.0,
+          "malformed-tls-victim": 0.0,
+          "mysql-scan-victim": 0.0,
+          "dcerpc-scan-victim": 0.0,
+          "rdp-tunnel-victim": 0.0,
+          "dns-resolver-hard-negative": 0.0,
+          "dhcp-service": 0.0,
+          "mdns-noise": 0.0,
+          "llmnr-noise": 0.0,
+          "ssdp-noise": 0.0,
+          "llmnr-noise-ipv6": 0.0,
+          "mdns-noise-ipv6": 0.0,
+          "dhcpv6-noise-ipv6": 0.0,
+          "brute-forced-host-no-compromise": 0.0,
+          "auth-noise-low-volume": 0.0,
+          "ftp-access-noise": 1.0
+        },
+        "macro_family_accuracy": 0.069,
+        "errors": 1
+      }
+    },
+    {
+      "name": "r2",
+      "result_artifact": "eval/results/real-vendor-holdout-r2.json",
+      "recording": "eval/recordings/real-vendor-holdout-r2.jsonl",
+      "replay_gate": {
+        "identical": true,
+        "mismatches": [],
+        "cases": 37
+      },
+      "pinned": {
+        "model": "ornith-1.5-35b-a3b-apex-i-nanoplus",
+        "temperature": 0.1,
+        "seed": 7,
+        "max_tokens": 5500,
+        "max_turns": 12,
+        "judge_model": "ornith-1.5-35b-a3b-apex-i-nanoplus",
+        "judge_temperature": 0.0,
+        "db": "data/processed-real/real-vendor.db"
+      },
+      "recorded_at": "2026-11-27T10:44:42Z",
+      "metrics": {
+        "decision_accuracy": 0.6216,
+        "decision_ok": 23,
+        "cases": 37,
+        "case_pass_rate": 0.0811,
+        "case_pass": 3,
+        "false_positives": 11,
+        "assertion_recall": {
+          "attribution": {
+            "graded": 26,
+            "met": 24,
+            "recall": 0.923
+          },
+          "action": {
+            "graded": 25,
+            "met": 3,
+            "recall": 0.12
+          },
+          "restraint": {
+            "graded": 28,
+            "met": 28,
+            "recall": 1.0
+          },
+          "absence": {
+            "graded": 37,
+            "met": 33,
+            "recall": 0.892
+          },
+          "evidence": {
+            "graded": 37,
+            "met": 22,
+            "recall": 0.595
+          }
+        },
+        "family_accuracy": {
+          "external-c2": 0.0,
+          "brute-force-external-success": 0.0,
+          "brute-force-external": 0.0,
+          "kerberos-external": 0.0,
+          "c2-beacon": 0.0,
+          "lateral-movement-rdp": 0.0,
+          "zerologon": 0.0,
+          "smb-dll-lateral": 0.0,
+          "malformed-tls": 1.0,
+          "port-scan": 0.0,
+          "web-shell-discovery": 0.0,
+          "privesc-unquoted-path": 1.0,
+          "netgear-exploit-victim": 0.0,
+          "smb-lateral-victim": 0.0,
+          "malformed-tls-victim": 0.0,
+          "mysql-scan-victim": 0.0,
+          "dcerpc-scan-victim": 0.0,
+          "rdp-tunnel-victim": 0.0,
+          "dns-resolver-hard-negative": 0.0,
+          "dhcp-service": 0.0,
+          "mdns-noise": 0.0,
+          "llmnr-noise": 0.0,
+          "ssdp-noise": 0.0,
+          "llmnr-noise-ipv6": 0.0,
+          "mdns-noise-ipv6": 0.0,
+          "dhcpv6-noise-ipv6": 0.0,
+          "brute-forced-host-no-compromise": 0.0,
+          "auth-noise-low-volume": 0.0,
+          "ftp-access-noise": 0.5
+        },
+        "macro_family_accuracy": 0.0862,
+        "errors": 0
+      }
+    },
+    {
+      "name": "r3",
+      "result_artifact": "eval/results/real-vendor-holdout-r3.json",
+      "recording": "eval/recordings/real-vendor-holdout-r3.jsonl",
+      "replay_gate": {
+        "identical": true,
+        "mismatches": [],
+        "cases": 37
+      },
+      "pinned": {
+        "model": "ornith-1.5-35b-a3b-apex-i-nanoplus",
+        "temperature": 0.1,
+        "seed": 7,
+        "max_tokens": 5500,
+        "max_turns": 12,
+        "judge_model": "ornith-1.5-35b-a3b-apex-i-nanoplus",
+        "judge_temperature": 0.0,
+        "db": "data/processed-real/real-vendor.db"
+      },
+      "recorded_at": "2026-11-27T11:17:16Z",
+      "metrics": {
+        "decision_accuracy": 0.5946,
+        "decision_ok": 22,
+        "cases": 37,
+        "case_pass_rate": 0.0541,
+        "case_pass": 2,
+        "false_positives": 11,
+        "assertion_recall": {
+          "attribution": {
+            "graded": 26,
+            "met": 23,
+            "recall": 0.885
+          },
+          "action": {
+            "graded": 25,
+            "met": 2,
+            "recall": 0.08
+          },
+          "restraint": {
+            "graded": 28,
+            "met": 28,
+            "recall": 1.0
+          },
+          "absence": {
+            "graded": 37,
+            "met": 31,
+            "recall": 0.838
+          },
+          "evidence": {
+            "graded": 37,
+            "met": 21,
+            "recall": 0.568
+          }
+        },
+        "family_accuracy": {
+          "external-c2": 0.0,
+          "brute-force-external-success": 0.0,
+          "brute-force-external": 0.0,
+          "kerberos-external": 0.0,
+          "c2-beacon": 0.0,
+          "lateral-movement-rdp": 0.0,
+          "zerologon": 0.0,
+          "smb-dll-lateral": 1.0,
+          "malformed-tls": 0.0,
+          "port-scan": 0.0,
+          "web-shell-discovery": 0.0,
+          "privesc-unquoted-path": 0.0,
+          "netgear-exploit-victim": 0.0,
+          "smb-lateral-victim": 0.0,
+          "malformed-tls-victim": 0.0,
+          "mysql-scan-victim": 0.0,
+          "dcerpc-scan-victim": 0.0,
+          "rdp-tunnel-victim": 0.0,
+          "dns-resolver-hard-negative": 0.0,
+          "dhcp-service": 0.0,
+          "mdns-noise": 0.0,
+          "llmnr-noise": 0.0,
+          "ssdp-noise": 0.0,
+          "llmnr-noise-ipv6": 0.0,
+          "mdns-noise-ipv6": 0.0,
+          "dhcpv6-noise-ipv6": 0.0,
+          "brute-forced-host-no-compromise": 0.0,
+          "auth-noise-low-volume": 0.0,
+          "ftp-access-noise": 0.5
+        },
+        "macro_family_accuracy": 0.0517,
+        "errors": 0
+      }
+    }
+  ],
+  "aggregate": {
+    "mean": {
+      "decision_accuracy": 0.6216,
+      "case_pass_rate": 0.0721,
+      "macro_family_accuracy": 0.069
+    },
+    "min_max_spread": {
+      "decision_accuracy": [
+        0.5946,
+        0.6486
+      ],
+      "case_pass_rate": [
+        0.0541,
+        0.0811
+      ],
+      "macro_family_accuracy": [
+        0.0517,
+        0.0862
+      ]
+    },
+    "unanimous_pass_all3_cases": 1,
+    "unanimous_pass_all3_rate": 0.027,
+    "unanimous_pass_all3_ids": [
+      "HG-036"
+    ],
+    "unanimous_decision_all3_ids": [
+      "HG-001",
+      "HG-003",
+      "HG-004",
+      "HG-005",
+      "HG-006",
+      "HG-007",
+      "HG-008",
+      "HG-009",
+      "HG-011",
+      "HG-012",
+      "HG-016",
+      "HG-017",
+      "HG-023",
+      "HG-026",
+      "HG-027",
+      "HG-028",
+      "HG-029",
+      "HG-030",
+      "HG-031",
+      "HG-032",
+      "HG-036"
+    ]
+  },
+  "disclosures": {
+    "windows_evtx_coverage": "Windows EVTX coverage is attack-only: the corpus contains zero benign Windows control hosts, so no Windows false-positive rate is claimed anywhere in this report.",
+    "gate_revision": "The consult gate was revised from 50+ cases to 37 cases (17 attack / 20 benign). At 37 cases, one case is worth ~2.7 percentage points, so single-case swings are not treated as signal.",
+    "family_accuracy": "Macro-averaged family accuracy is the mean of per-subclass case-pass rates and is reported alongside raw case accuracy to keep dominant families (external brute-force, mdns/LLMNR noise) from masking niche-family failures."
+  }
+}

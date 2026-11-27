@@ -41,6 +41,7 @@ eval/results/real-vendor-holdout-r*.json
 eval/results/real-vendor-holdout-r*.txt
 eval/results/real-vendor-holdout-draw0.json
 eval/results/real-vendor-holdout-draw0.txt
+!eval/results/real-vendor-holdout-report.json
 
 # Environment
 .env
