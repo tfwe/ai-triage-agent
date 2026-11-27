@@ -413,8 +413,13 @@ def summarise_v2(rows: list[dict], dataset: list[dict]) -> dict:
     for a_type in ASSERTION_TYPES:
         key = f"{a_type}_ok"
         if a_type == "absence":
-            graded = [r for r in rows if r.get("absence_ok") is not None]
-            met = sum(1 for r in graded if r["absence_ok"])
+            # Absence is graded per assertion: the independent judge returns one
+            # verdict per absence assertion, and a case with no absence
+            # assertion contributes nothing (absence_ok defaults True there and
+            # must not be counted as a graded pass).
+            records = [rec for r in rows for rec in (r.get("absence_judge") or [])]
+            graded = records
+            met = sum(1 for rec in records if rec.get("ok") is True)
         elif a_type == "evidence":
             graded = [r for r in rows if r.get("evidence_total")]
             met = sum(1 for r in graded

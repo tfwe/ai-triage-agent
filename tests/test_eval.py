@@ -392,3 +392,28 @@ def test_replay_run_without_a_sidecar_fails_absence(
     assert row["absence_ok"] is False
     assert row["case_pass"] is False
     assert row["absence_judge"][0]["judge_parse"] == "missing_sidecar"
+
+
+def test_absence_recall_counts_judge_verdicts_not_cases():
+    """summary absence recall is per assertion: cases with no absence
+    assertion (absence_ok defaults True) must not inflate the denominator."""
+    from eval.run_evals import summarise_v2
+
+    dataset = [
+        {"id": "A", "subclass": "fam1", "expected": "IGNORE"},
+        {"id": "B", "subclass": "fam1", "expected": "IGNORE"},
+        {"id": "C", "subclass": "fam1", "expected": "IGNORE"},
+    ]
+    rows = [
+        {"id": "A", "expected": "IGNORE", "decision": "IGNORE", "case_pass": False,
+         "absence_ok": False, "absence_judge": [
+             {"ok": True, "judge_parse": "ok"},
+             {"ok": False, "judge_parse": "violation"}]},
+        {"id": "B", "expected": "IGNORE", "decision": "IGNORE", "case_pass": False,
+         "absence_ok": True, "absence_judge": [{"ok": True, "judge_parse": "ok"}]},
+        {"id": "C", "expected": "IGNORE", "decision": "IGNORE", "case_pass": True,
+         "absence_ok": True, "absence_judge": []},
+    ]
+
+    absence = summarise_v2(rows, dataset)["assertion_recall"]["absence"]
+    assert absence == {"graded": 3, "met": 2, "recall": 0.667}
