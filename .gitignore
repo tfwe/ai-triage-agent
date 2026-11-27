@@ -2,6 +2,10 @@
 data/raw/
 data/processed/
 data/cases/
+# Pass-7 real vendor export run: staged parser input and outputs are rebuilt
+# from the committed corpus by scripts/run_real_vendor_pipeline.py.
+data/raw-real/
+data/processed-real/
 data/public/*
 # Handover 11: the replayable holdout recording ships with the 14 holdout case
 # databases it replays against (the source archives are not redistributable,
