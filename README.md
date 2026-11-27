@@ -183,11 +183,12 @@ The pass-8 run ingested 4,996 endpoint events, 165 network sessions and 8,000 ID
 
 ### Real-vendor holdout (stage 4b, 37 cases)
 
-`eval/datasets/real-vendor-holdout.json` is the consult-2b approved holdout: 37 cases (17 attack, 20 benign), each with an expected decision plus independent attribution, action, restraint, absence and evidence assertions. Evidence assertions are literal SQL-LIKE signatures against `data/processed-real/real-vendor.db` with parser-verified `min_hits`. Three disclosures apply to everything below:
+`eval/datasets/real-vendor-holdout.json` is the consult-2b approved holdout: 37 cases (17 attack, 20 benign), each with an expected decision plus independent attribution, action, restraint, absence and evidence assertions. Evidence assertions are literal SQL-LIKE signatures against `data/processed-real/real-vendor.db` with parser-verified `min_hits`. Four disclosures apply to everything below:
 
 - **Windows EVTX coverage is attack-only.** The corpus contains zero benign Windows control hosts, so no Windows false-positive rate is claimed.
 - **The gate was revised from 50+ to 37 cases** after the consult gate. At 37 cases one case weighs ~2.7 percentage points, so single-case swings are not treated as signal.
 - **Macro-averaged family accuracy is reported alongside raw case accuracy**, so dominant families (external brute-force, mdns/LLMNR noise) do not mask niche-family failures.
+- **The grader's absence judge is the same model as the draw client.** Temperature 0.0 pins sampling, not the weights: a model can be systematically blind to its own omissions, so `absence_ok` is weaker evidence than the literal assertion checks. Two related grader caveats: the judge's raw output is graded by substring search (no "VIOLATION" in the response means pass, so an empty or nonconforming judge response grades as no violation), and in replay mode the judge is not invoked, so absence assertions never fail a replayed draw.
 
 The v2 grader in `eval/run_evals.py` grades decision first, then the independent assertions: literal evidence signature counts in the agent's tool log and in the database, deterministic substring checks for attribution/action/restraint, and a temperature-0 absence judge whose raw output is recorded in the result artifact. The v1 flat-schema path is unchanged and the test suite still passes.
 
