@@ -97,7 +97,7 @@ python -m eval.run_evals --mode replay --label replay-check
 
 Each `run_evals` call writes `eval/results/<label>.json` and `.txt`. Always pass `--label`; without it the file is named after the recorded model. Replay should give the same 28/31 decisions and a mean of 14,763.2 tokens per alert as `agent.txt`. Replay does not call a model, so its latency is not a measurement.
 
-Run the test suite (53 tests):
+Run the test suite (56 tests):
 
 ```bash
 python -m pytest
@@ -162,7 +162,20 @@ Then run the agent against that database:
 TRIAGE_DB_PATH=data/processed/triage.db python -m agent.core <host-or-ip> --mode live
 ```
 
-The parsers were run end to end on the synthetic corpus in this repository, and the loader produced the same row counts as the corpus build (187, 82, 35 and 28 rows). They have not been run on real vendor exports.
+The parsers were run end to end on the synthetic corpus in this repository, and the loader produced the same row counts as the corpus build (187, 82, 35 and 28 rows).
+
+### Real vendor export run (pass 8)
+
+The same parsers have also been run end to end on anonymized real vendor exports, and the agent triaged nine targets from that data with the live model. The corpus lives in `data/real-vendor/` (`provenance.json` pins every public source and the anonymization method): Zeek 8.2.2 JSON logs generated locally from 13 public PCAP-ATTACK attack captures, three Windows event log exports from EVTX-ATTACK-SAMPLES, real Linux auth syslog from logpai, and a Suricata alert slice from WRCCDC 2018. Reproduce it with:
+
+```bash
+.venv/bin/python scripts/build_real_vendor_corpus.py \
+    --raw-dir <pinned raw sources> --zeek-logs-dir <zeek 8.2.2 json logs>
+.venv/bin/python scripts/run_real_vendor_pipeline.py \
+    --write-results --targets <ip-or-host> ...
+```
+
+The pass-8 run ingested 4,996 endpoint events, 165 network sessions and 8,000 IDS alerts into `data/processed-real/real-vendor.db`, then ran the agent on nine targets (seven network IPs, one Windows host, one Linux host). The network IPs are the four highest-volume network participants and the three highest-volume alert sources; the hosts are the Windows C2 host and the Linux host. Parser output counts, quarantine counts, database row counts and the per-target agent decisions are in `eval/results/real-vendor-run.json`; the model recording for those runs is `eval/recordings/real-vendor-ornith.jsonl` (replayable offline). No raw private logs were used or committed; raw sources are pinned by sha256 in `data/real-vendor/provenance.json`.
 
 ## Model configuration
 
@@ -390,7 +403,7 @@ LLM_MODE=replay REPLAY_PATH=eval/recordings/public-ornith-r3-holdout.jsonl \
 | `eval/corpus/scenarios.json` | Synthetic vendor-shaped events per case |
 | `eval/recordings/agent.jsonl` | 132 recorded request/response exchanges |
 | `eval/results/` | `agent.txt`, `rules-baseline.txt` and their JSON versions |
-| `tests/` | 53 pytest tests; no network, model or API key needed |
+| `tests/` | 56 pytest tests; no network, model or API key needed |
 | `Dockerfile`, `docker-compose.yml`, `docker-entrypoint.py` | Container build, compose setup, pre-flight check |
 | `.env.example` | Every setting with placeholder values |
 | `.github/workflows/ci.yml` | Test job and offline replay job |

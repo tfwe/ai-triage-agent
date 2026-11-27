@@ -1,0 +1,214 @@
+{
+  "staged_files": 30,
+  "parsers": {
+    "asa": {
+      "output": "asa_fw_context.json",
+      "keys": 0,
+      "events": 0,
+      "quarantined": 0
+    },
+    "ecar": {
+      "output": "ecar_host_context.json",
+      "keys": 0,
+      "events": 0,
+      "quarantined": 0
+    },
+    "ids": {
+      "output": "ids_context.json",
+      "keys": 1,
+      "events": 8000,
+      "quarantined": 0
+    },
+    "linux": {
+      "output": "linux_host_context.json",
+      "keys": 2,
+      "events": 4000
+    },
+    "windows": {
+      "output": "windows_event_context.json",
+      "keys": 3,
+      "events": 996
+    },
+    "zeek": {
+      "output": "zeek_session_context.json",
+      "keys": 165,
+      "events": 165,
+      "quarantined": 1
+    }
+  },
+  "ingest_counts": {
+    "endpoint_events": 4996,
+    "network_traffic": 165,
+    "alerts": 8000,
+    "firewall_events": 0
+  },
+  "database": {
+    "endpoint_hosts": [
+      "HOST-LNX-A",
+      "HOST-LNX-B",
+      "HOST-WIN-A",
+      "HOST-WIN-B",
+      "HOST-WIN-C"
+    ],
+    "alert_ips": [
+      "100.64.0.121",
+      "100.64.0.130",
+      "100.64.0.165",
+      "100.64.1.65",
+      "100.64.1.71",
+      "100.64.2.212",
+      "100.64.2.217",
+      "100.64.2.244",
+      "100.64.3.204",
+      "100.64.3.60",
+      "100.64.3.64",
+      "100.64.3.68"
+    ],
+    "network_ips": [
+      "100.64.0.6",
+      "100.64.0.7",
+      "100.64.0.8",
+      "100.64.0.9",
+      "100.64.3.255",
+      "100.64.4.0",
+      "100.64.4.1",
+      "100.64.4.10",
+      "100.64.4.2",
+      "100.64.4.3",
+      "100.64.4.4",
+      "100.64.4.5",
+      "100.64.4.6",
+      "100.64.4.7",
+      "100.64.4.8",
+      "100.64.4.9",
+      "2001:db8::1769",
+      "2001:db8::3392",
+      "2001:db8::3779",
+      "2001:db8::44a3",
+      "2001:db8::b379",
+      "2001:db8::cd75",
+      "2001:db8::e93c",
+      "203.0.113.127",
+      "203.0.113.4"
+    ]
+  },
+  "agent_runs": [
+    {
+      "target": "100.64.4.6",
+      "exit_code": 0,
+      "decision": {
+        "decision": "ISOLATE_HOST",
+        "confidence_score": 90,
+        "reasoning": "No alerts, endpoint events, or firewall events matched 100.64.4.6. However, network_traffic shows a steady stream of small (44-45 byte) DNS queries (UDP/53) from 100.64.4.6 to a single peer 100.64.4.5, all sharing the session UID 'c2-dns-txt:*'. This equal-size, regular-cadence beaconing to one destination is a classic DNS-based C2 exfiltration/beaconing pattern. 100.64.4.6 is the source of the beacons, indicating it is the compromised host communicating with the external C2 peer 100.64.4.5.",
+        "recommended_playbook": "Isolate host 100.64.4.6 from the network immediately. Perform forensic analysis on the endpoint to identify the malware/C2 implant, capture the DNS beaconing samples, and block the C2 peer 100.64.4.5 at the firewall. Hunt for other hosts communicating with 100.64.4.5 on port 53."
+      },
+      "turns": 3,
+      "tool_calls": 7,
+      "tokens": 19718
+    },
+    {
+      "target": "100.64.4.5",
+      "exit_code": 0,
+      "decision": {
+        "decision": "IGNORE",
+        "confidence_score": 88,
+        "reasoning": "Exhaustive search across alerts, endpoint_events, firewall_events, and network_traffic found no alerts, no endpoint events, and no firewall events for 100.64.4.5. In network_traffic, 100.64.4.5 only ever appears as the destination (server) receiving 98 DNS queries on port 53 from 100.64.4.6, plus one flow on port 3. It sources zero traffic. The target is functioning as a benign internal DNS server answering queries; the beaconing-style DNS activity (TXT/PTR queries to dom-*.example domains, uid 'c2-dns-txt') originates from 100.64.4.6, which is the actual actor. Since the target receives rather than sources the flows and shows no signs of compromise, the correct action is IGNORE. Note: 100.64.4.6 should be investigated separately as a likely compromised host.",
+        "recommended_playbook": "IGNORE for 100.64.4.5 \u2014 it is a benign DNS server. Escalate a separate investigation into the source host 100.64.4.6, which is exhibiting DNS-based C2 beaconing behavior (TXT/PTR queries to suspicious domains), and consider ISOLATE_HOST for 100.64.4.6."
+      },
+      "turns": 6,
+      "tool_calls": 7,
+      "tokens": 67109
+    },
+    {
+      "target": "100.64.4.0",
+      "exit_code": 0,
+      "decision": {
+        "decision": "ISOLATE_HOST",
+        "confidence_score": 90,
+        "reasoning": "100.64.4.0 is the source of a DCSync attack (ca-dcsync) against internal host 100.64.3.255 on port 445, a credential-theft technique used to extract Active Directory password hashes. It also issued WMI/DCOM remote procedure calls (lm-wmi-proccall) to 100.64.3.255 on port 445, indicating lateral movement. These are definitive post-exploitation indicators of a compromised internal host. Although no alerts, endpoint_events, or firewall_events matched, the network_traffic evidence is conclusive that the host is compromised and actively attacking internally. It is also receiving inbound attacks (kerbrute spray, SAMR discovery, WMI, zerologon) from 100.64.3.255, suggesting a broader internal compromise.",
+        "recommended_playbook": "Isolate 100.64.4.0 from the network immediately. Preserve forensic images and memory dumps. Rotate credentials for all accounts that had access to 100.64.3.255 (DCSync targets AD DC). Investigate 100.64.3.255 as a co-compromised host given bidirectional attack traffic. Block lateral SMB/DCOM between subnets, hunt for the DCSync tooling (e.g., Impacket), and review AD for any accounts whose secrets were exfiltrated."
+      },
+      "turns": 4,
+      "tool_calls": 8,
+      "tokens": 41898
+    },
+    {
+      "target": "100.64.3.255",
+      "exit_code": 0,
+      "decision": {
+        "decision": "ISOLATE_HOST",
+        "confidence_score": 97,
+        "reasoning": "Target 100.64.3.255 is an internal host (100.64.x.x) that is the SOURCE of a comprehensive lateral-movement and credential-access toolkit in network_traffic. Evidence includes: (1) ca-kerbrute-spray \u2014 15+ near-identical Kerberos AS-REQ flows to port 88 against the 100.64.4.0 subnet (password spraying); (2) lm-wmi-proccall \u2014 WMI remote process execution to ports 135/445/137; (3) lm-smbexec-svcctl and lm-psexec-svcctl \u2014 SMB/PsExec remote execution via service control manager on port 445; (4) disc-samr-privgroups \u2014 SAM enumeration for privilege-group discovery. All flows originate from 100.64.3.255 and target internal hosts, indicating this host is compromised and actively attacking the internal network. No alerts, endpoint_events, or firewall_events matched the target IP, but the network_traffic evidence is conclusive and consistent with a known attack toolkit.",
+        "recommended_playbook": "ISOLATE_HOST \u2014 Immediately isolate 100.64.3.255 from the network (disable switch port / move to quarantine VLAN / block egress). Preserve forensic images before remediation. Investigate which host(s) in 100.64.4.0 received connections to determine blast radius and pivot points. Rotate credentials for all accounts that could have been targeted by the Kerberos spray. Hunt for the initial access vector and malware that launched the WMI/SMB/PsExec toolkit. Block the host at the perimeter and begin incident response per the compromised-host playbook."
+      },
+      "turns": 5,
+      "tool_calls": 8,
+      "tokens": 54633
+    },
+    {
+      "target": "100.64.3.60",
+      "exit_code": 0,
+      "decision": {
+        "decision": "BLOCK_IP",
+        "confidence_score": 92,
+        "reasoning": "100.64.3.60 is the source IP in dozens of identical IDS alerts (CVE-2016-10174 NETGEAR stack overflow exploit) targeting multiple internal hosts (100.64.2.212, .217, .244) on port 80 within a few seconds \u2014 a clear automated vulnerability scan. No endpoint events, firewall events, or network_traffic rows reference this IP, and no destination host shows any sign of compromise. The external IP is the primary threat vector with no confirmed host compromise, so blocking is the appropriate response.",
+        "recommended_playbook": "Block source IP 100.64.3.60 at the perimeter firewall/IPS immediately. Verify the targeted internal hosts (100.64.2.212, .217, .244) are patched against CVE-2016-10174 and confirm no successful exploitation occurred. Review firewall logs for any inbound connections that succeeded from this IP. Add the CVE signature to detection tuning and monitor for follow-up exploitation attempts from related addresses."
+      },
+      "turns": 3,
+      "tool_calls": 5,
+      "tokens": 15416
+    },
+    {
+      "target": "100.64.0.121",
+      "exit_code": 0,
+      "decision": {
+        "decision": "ISOLATE_HOST",
+        "confidence_score": 88,
+        "reasoning": "Target 100.64.0.121 is an internal (RFC 6598 CGNAT) host that generated 1000 identical IDS alerts ('ET SCAN Non-Allowed Host Tried to Connect to MySQL Server') in roughly 5 seconds, all sourced from 100.64.0.121 to internal destination 100.64.3.68 on MySQL port 3306 with cycling ephemeral destination ports. This is a rapid outbound connection-probe / scan pattern consistent with lateral movement or reconnaissance from a compromised internal host. There is no external IP acting as a threat vector, no inbound attack, and no confirmed compromise of the destination. The host is the origin of the malicious scanning activity, so isolation is the correct containment action.",
+        "recommended_playbook": "Isolate host 100.64.0.121 from the network immediately. Forensically image the endpoint, review running processes and network connections for the scanning tooling or malware responsible, check for persistence mechanisms and compromised credentials used for lateral movement, and compare against known-baseline behavior. Block outbound MySQL (3306) connections at the firewall while investigating, and hunt across the fleet for other hosts targeted by the same source IP or tooling."
+      },
+      "turns": 6,
+      "tool_calls": 13,
+      "tokens": 50521
+    },
+    {
+      "target": "100.64.0.165",
+      "exit_code": 0,
+      "decision": {
+        "decision": "BLOCK_IP",
+        "confidence_score": 90,
+        "reasoning": "Target 100.64.0.165 is the source_ip in 1000 'Non-Allowed Host Tried to Connect to MySQL Server' alerts fired within ~1.1 seconds, all targeting 100.64.3.68 across many ephemeral destination ports (45334-45354). This is a clear connection/port scanning pattern against an internal MySQL server. No endpoint_events, network_traffic, or firewall_events reference 100.64.0.165, so there is no evidence of host compromise on the source itself. The external IP is the primary threat vector with no confirmed host compromise, matching the BLOCK_IP decision shape.",
+        "recommended_playbook": "Block outbound/inbound traffic from 100.64.0.165 at the perimeter firewall. Verify the integrity and exposure of the targeted MySQL server 100.64.3.68, confirm it is not reachable from untrusted hosts, and review firewall rules restricting MySQL (3306) access to authorized networks only. Correlate with any other hosts this source attempted to reach."
+      },
+      "turns": 6,
+      "tool_calls": 9,
+      "tokens": 52332
+    },
+    {
+      "target": "HOST-WIN-C",
+      "exit_code": 0,
+      "decision": {
+        "decision": "ISOLATE_HOST",
+        "confidence_score": 95,
+        "reasoning": "HOST-WIN-C (100.64.0.6) shows clear compromise: the built-in Administrator account accessed the C$ administrative share and executed suspicious files (wodCmdTerm.exe, setup.bat) from Windows\\Temp. Network telemetry confirms the host is beaconing to external C2 (203.0.113.127 on port 80 via DGA domain dom-bff33d.example) with exfiltration-style payloads, and performing lateral movement via RDP tunneling/Meterpreter to internal host 100.64.0.7. This is an active host compromise with C2 and lateral movement, not an external-only threat.",
+        "recommended_playbook": "Immediately isolate HOST-WIN-C from the network. Preserve forensic images before remediation. Block outbound C2 to 203.0.113.127 and the DGA domain dom-bff33d.example at the perimeter. Investigate lateral movement to 100.64.0.7 (also isolate if compromised). Rotate credentials for the Administrator account and any accounts that authenticated from 100.64.0.6. Conduct full malware analysis of wodCmdTerm.exe and setup.bat. Review all other hosts that communicated with 100.64.0.6 or 100.64.0.7 for signs of compromise."
+      },
+      "turns": 4,
+      "tool_calls": 8,
+      "tokens": 34233
+    },
+    {
+      "target": "HOST-LNX-A",
+      "exit_code": 0,
+      "decision": {
+        "decision": "BLOCK_IP",
+        "confidence_score": 88,
+        "reasoning": "HOST-LNX-A is under an active SSH brute-force attack: 520 failed password attempts from 23 distinct external IPs in the 203.0.113.0/24 range, targeting common accounts (root, admin, guest, uucp, ftp). No alert, firewall event, or network_traffic record exists for this host in the DB. The only successful SSH login (203.0.113.92, user-3bd4) is unrelated \u2014 it occurred earlier with no preceding failed attempts, so there is no evidence of actual host compromise. The primary threat vector is the external source IPs, making BLOCK_IP the correct action.",
+        "recommended_playbook": "Block the malicious source IPs / 203.0.113.0/24 subnet at the perimeter firewall. Harden SSH on HOST-LNX-A: disable root login, enforce key-based auth, rate-limit or fail2ban SSH, and restrict exposure of port 22. Review the isolated successful login from 203.0.113.92 for legitimacy and monitor the host for post-compromise indicators."
+      },
+      "turns": 12,
+      "tool_calls": 23,
+      "tokens": 83501
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "sources": [
+    {
+      "file": "OpenSSH_2k.log",
+      "sha256": "1e4912727fa88245113d41b16a0cd25ceadba7f931e1c406542885b91254264f"
+    },
+    {
+      "file": "Linux_2k.log",
+      "sha256": "b3e20bc1afe732ab1bf3ed1de4bf9c809e4194e02f7dea911d918e5342e8e173"
+    },
+    {
+      "file": "evtx/discovery_sysmon_1_iis_pwd_and_config_discovery_appcmd.evtx",
+      "sha256": "5388d3281a902a1f3cc087697589145b7de6abdbbc0dc716abd6a702c44bb106"
+    },
+    {
+      "file": "evtx/privesc_unquoted_svc_sysmon_1_11.evtx",
+      "sha256": "5b3bd618ff215254db994f223f1700082dbb1f339a651e1c89ae41d857edbcc2"
+    },
+    {
+      "file": "evtx/LM_5145_Remote_FileCopy.evtx",
+      "sha256": "3806a2b6662d82e13969939251539e10532bda11f10a5ed6c3565b9c0679907e"
+    },
+    {
+      "file": "pcaps/C2_Foudre_Backdoor_DGA.pcapng",
+      "sha256": "08cc76efbbeeb1eed155964622dcdf512dff166bb0a9fe55ddbc8e18434a2138"
+    },
+    {
+      "file": "pcaps/cmds over dns txt queries and reponses.pcap",
+      "sha256": "17492c2b577101d57c12f8a0122c3c76d327592e2f1d3b4247db2e5eb01299a3"
+    },
+    {
+      "file": "pcaps/rdp_tunneling_meterpreter_portfwd.pcapng",
+      "sha256": "7d486ef6bc6794f483e95768f30ff99046afdc1c67caba9b740d925ee2dbd5f8"
+    },
+    {
+      "file": "pcaps/LM_rdp_sharprdp.pcapng",
+      "sha256": "4a558f4fd4ea0fd2c4885dc2f779b7b5eedbf0f8f54aba1a4bc02689520038be"
+    },
+    {
+      "file": "pcaps/LM_psexec_smb_dcerpc_epm_svcctl.pcapng",
+      "sha256": "771897616455a1d3595c663c118ac256edb790bcbda9bcbba2d4324b36bf55c3"
+    },
+    {
+      "file": "pcaps/LM_smbexec_smb_dcerpc_svcctl_epm.pcapng",
+      "sha256": "6581987a31be6839fe594172bcc1f567d1dd3086d41c0c6c6811c8644127d92b"
+    },
+    {
+      "file": "pcaps/LM_WMI_ProcessCallCreate.pcapng",
+      "sha256": "7626d813c7511db8a05b014872b32068e1e2a5cd7f7b2233b826a8f959779586"
+    },
+    {
+      "file": "pcaps/LM_dcom_mmc20.application_dcerpc.pcapng",
+      "sha256": "d5b268ca4960b9a9d87581bc046d8ff0a884c564e35beb45ab6d71f39ebc0de7"
+    },
+    {
+      "file": "pcaps/CA_kerbrute_passwordspray_kerberos_AS-REQ.pcapng",
+      "sha256": "f30458cef193fcbf9a96cf69c385062d731a0827fed518a0d64cd59f319453e9"
+    },
+    {
+      "file": "pcaps/DCSync_krbtgt_dcerpc_smb.pcapng",
+      "sha256": "d406c65e7805700838c84bc2567e875bf8802f289c831c836834f1c3e802c4dc"
+    },
+    {
+      "file": "pcaps/zerologon_mimikatz_ntlm_privacy_scan_and_exploit_encrypted.pcapng",
+      "sha256": "6c4d3a3d4ab0a84bc69d5f254225d0e8400da42bd1d5614b9a96b42b7373e907"
+    },
+    {
+      "file": "pcaps/discovery_scan_dcerpc_endpoint_mapper.pcapng",
+      "sha256": "6349431c2d47cf754e88a58ff6d01d3a42044017e039f05aafc99755439dcc94"
+    },
+    {
+      "file": "pcaps/Discovery_privgroups_domain_admins_samr_lookupnames_req.pcapng",
+      "sha256": "77f24fdbea8cca3e0c6e46708e886598a6bad239c7f9bc38c5d91ca5b6131bc2"
+    },
+    {
+      "file": "suri/eve.json",
+      "sha256": "30c4bba1853dd741116c0d570b4208123fe8099d56dda10f5827f102e3719989"
+    }
+  ],
+  "anonymization": {
+    "ipv4_mapped": 1237,
+    "ipv6_mapped": 9,
+    "macs_mapped": 1,
+    "domains_mapped": 63
+  },
+  "outputs": {}
+}
