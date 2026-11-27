@@ -113,11 +113,42 @@ def _rows(sql: str, params=(), db_path: str | None = None) -> list[dict]:
 
 
 def _is_external(value: str) -> bool:
+    """True when the address is outside the lab's internal address space.
+
+    Uses explicit network sets instead of ``ipaddress.is_private``: on Python
+    3.13 ``is_private`` reports 100.64.0.0/10 (the CGNAT range the real-vendor
+    corpus uses as the enterprise interior) as *not* private and 203.0.113.0/24
+    / 2001:db8::/32 as private, which inverts both decisions. Here:
+
+    - 100.64.0.0/10 (CGNAT) is internal — the corpus interior;
+    - 203.0.113.0/24 (TEST-NET-3) is external — the corpus attacker space;
+    - 2001:db8::/32 (documentation) is internal — the lab IPv6 peer space;
+    - loopback, link-local and the unallocated 0.0.0.0/8 block are internal;
+    - everything else is external.
+    """
     try:
         address = ipaddress.ip_address(value)
     except ValueError:
         return False
-    return not address.is_private and not address.is_loopback
+    return not any(address in network for network in _INTERNAL_NETWORKS)
+
+
+_INTERNAL_NETWORKS = tuple(
+    ipaddress.ip_network(net)
+    for net in (
+        "0.0.0.0/8",        # "this network" block
+        "10.0.0.0/8",       # RFC 1918
+        "100.64.0.0/10",    # CGNAT — lab enterprise interior
+        "127.0.0.0/8",      # loopback
+        "169.254.0.0/16",   # IPv4 link-local
+        "172.16.0.0/12",    # RFC 1918
+        "192.168.0.0/16",   # RFC 1918
+        "::1/128",          # IPv6 loopback
+        "fe80::/10",        # IPv6 link-local
+        "fc00::/7",         # IPv6 unique-local
+        "2001:db8::/32",    # IPv6 documentation — lab peer space
+    )
+)
 
 
 def _text_of(rows: list[dict]) -> str:

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 
-from agent.rules import classify
+from agent.rules import _is_external, classify
 from conftest import alert_row, endpoint_row, make_db, session_row
 
 
@@ -105,3 +105,48 @@ def test_evidence_payloads_are_matched_once_decoded(db_path):
 
     assert verdict.score >= 30
     assert any("4720" in item for item in verdict.evidence)
+
+
+def test_is_external_lab_interior_is_internal():
+    """100.64.0.0/10 (CGNAT) is the lab interior, not external."""
+    assert _is_external("100.64.4.4") is False
+    assert _is_external("100.64.3.64") is False
+    assert _is_external("100.64.0.130") is False
+
+
+def test_is_external_test_net_three_is_external():
+    """203.0.113.0/24 (TEST-NET-3) is the lab's external attacker space.
+
+    Regression: Python 3.13's ``ipaddress.is_private`` returns True for this
+    range, which inverted the external/internal decision for attacker IPs.
+    """
+    assert _is_external("203.0.113.92") is True
+    assert _is_external("203.0.113.127") is True
+
+
+def test_is_external_documentation_ipv6_is_internal():
+    """2001:db8::/32 peers are lab-internal."""
+    assert _is_external("2001:db8::3779") is False
+
+
+def test_is_external_rfc1918_and_loopback_are_internal():
+    assert _is_external("10.20.4.15") is False
+    assert _is_external("172.16.9.9") is False
+    assert _is_external("192.168.1.1") is False
+    assert _is_external("127.0.0.1") is False
+    assert _is_external("169.254.1.1") is False
+    assert _is_external("fe80::1") is False
+    assert _is_external("fc00::1") is False
+    assert _is_external("::1") is False
+
+
+def test_is_external_public_addresses_are_external():
+    assert _is_external("45.83.220.5") is True
+    assert _is_external("8.8.8.8") is True
+    assert _is_external("2606:4700:4700::1111") is True
+
+
+def test_is_external_unparseable_value_is_not_external():
+    assert _is_external("HOST-WIN-A") is False
+    assert _is_external("not-an-ip") is False
+    assert _is_external("") is False
