@@ -173,9 +173,13 @@ The same parsers have also been run end to end on anonymized real vendor exports
     --raw-dir <pinned raw sources> --zeek-logs-dir <zeek 8.2.2 json logs>
 .venv/bin/python scripts/run_real_vendor_pipeline.py \
     --write-results --targets <ip-or-host> ...
+.venv/bin/python scripts/run_real_vendor_pipeline.py \
+    --targets 100.64.4.6 100.64.4.5 100.64.4.0 100.64.3.255 100.64.3.60 \
+    100.64.0.121 100.64.0.165 HOST-WIN-C HOST-LNX-A \
+    --llm-mode replay --write-results
 ```
 
-The pass-8 run ingested 4,996 endpoint events, 165 network sessions and 8,000 IDS alerts into `data/processed-real/real-vendor.db`, then ran the agent on nine targets (seven network IPs, one Windows host, one Linux host). The network IPs are the four highest-volume network participants and the three highest-volume alert sources; the hosts are the Windows C2 host and the Linux host. Parser output counts, quarantine counts, database row counts and the per-target agent decisions are in `eval/results/real-vendor-run.json`; the model recording for those runs is `eval/recordings/real-vendor-ornith.jsonl` (replayable offline). No raw private logs were used or committed; raw sources are pinned by sha256 in `data/real-vendor/provenance.json`.
+The pass-8 run ingested 4,996 endpoint events, 165 network sessions and 8,000 IDS alerts into `data/processed-real/real-vendor.db`, then ran the agent on nine targets (seven network IPs, one Windows host, one Linux host). The network IPs are the four highest-volume network participants and the three highest-volume alert sources; the hosts are the Windows C2 host and the Linux host. Parser output counts, quarantine counts, database row counts and the per-target agent decisions are in `eval/results/real-vendor-run.json`; the model recording for those runs is `eval/recordings/real-vendor-ornith.jsonl` (replayable offline). The recording was made in a single live pass over all nine targets; replaying it reproduces all nine decisions with identical confidence scores, twice in a row. No raw private logs were used or committed; raw sources are pinned by sha256 in `data/real-vendor/provenance.json`.
 
 ## Model configuration
 
