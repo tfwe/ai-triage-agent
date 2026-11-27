@@ -37,7 +37,7 @@
     <Data Name="ParentProcessGuid">{365abb72-3251-5ceb-0000-00109e06e100}</Data>
     <Data Name="ParentProcessId">748</Data>
     <Data Name="ParentImage">C:\Windows\System32\inetsrv\w3wp.exe</Data>
-    <Data Name="ParentCommandLine">c:\windows\system32\inetsrv\w3wp.exe -ap "DefaultAppPool" -v "v2.0" -l "webengine4.dll" -a \\.\pipe\iisipm7486e07c-453c-4f8e-85c6-8c8e3be98cd5 -h "C:\inetpub\temp\apppools\DefaultAppPool\DefaultAppPool.config" -w "" -m 0 -t 20</Data>
+    <Data Name="ParentCommandLine">c:\windows\system32\inetsrv\w3wp.exe -ap "DefaultAppPool" -v "v2.0" -l "webengine4.dll" -a \\.\pipe\iisipm7486e07c-453c-4f8e-85c6-8c8e3be98cd5 -h "C:\inetpub\temp\apppools\DefaultAppPool\dom-89e5d2.example" -w "" -m 0 -t 20</Data>
   </EventData>
 </Event>
 <Event xmlns="http://dom-03e425.example/win/2004/08/events/event">
@@ -313,7 +313,7 @@
     <Data Name="Description">Application Server Command Line Admin Tool</Data>
     <Data Name="Product">Internet Information Services</Data>
     <Data Name="Company">Microsoft Corporation</Data>
-    <Data Name="CommandLine">"C:\Windows\System32\inetsrv\appcmd.exe"  list apppool "Filename: redirection.config" /text:processmodel.username</Data>
+    <Data Name="CommandLine">"C:\Windows\System32\inetsrv\appcmd.exe"  list apppool "Filename: dom-176c79.example" /text:processmodel.username</Data>
     <Data Name="CurrentDirectory">C:\Windows\Temp\</Data>
     <Data Name="User">IIS APPPOOL\DefaultAppPool</Data>
     <Data Name="LogonGuid">{365abb72-b26b-5cea-0000-002023240800}</Data>
@@ -354,7 +354,7 @@
     <Data Name="Description">Application Server Command Line Admin Tool</Data>
     <Data Name="Product">Internet Information Services</Data>
     <Data Name="Company">Microsoft Corporation</Data>
-    <Data Name="CommandLine">"C:\Windows\System32\inetsrv\appcmd.exe"  list apppool "Filename: redirection.config" /text:processmodel.password</Data>
+    <Data Name="CommandLine">"C:\Windows\System32\inetsrv\appcmd.exe"  list apppool "Filename: dom-176c79.example" /text:processmodel.password</Data>
     <Data Name="CurrentDirectory">C:\Windows\Temp\</Data>
     <Data Name="User">IIS APPPOOL\DefaultAppPool</Data>
     <Data Name="LogonGuid">{365abb72-b26b-5cea-0000-002023240800}</Data>
@@ -1092,7 +1092,7 @@
     <Data Name="Description">Application Server Command Line Admin Tool</Data>
     <Data Name="Product">Internet Information Services</Data>
     <Data Name="Company">Microsoft Corporation</Data>
-    <Data Name="CommandLine">"C:\Windows\System32\inetsrv\appcmd.exe"  list vdir "Filename: redirection.config" /text:userName</Data>
+    <Data Name="CommandLine">"C:\Windows\System32\inetsrv\appcmd.exe"  list vdir "Filename: dom-176c79.example" /text:userName</Data>
     <Data Name="CurrentDirectory">C:\Windows\Temp\</Data>
     <Data Name="User">IIS APPPOOL\DefaultAppPool</Data>
     <Data Name="LogonGuid">{365abb72-b26b-5cea-0000-002023240800}</Data>
@@ -1133,7 +1133,7 @@
     <Data Name="Description">Application Server Command Line Admin Tool</Data>
     <Data Name="Product">Internet Information Services</Data>
     <Data Name="Company">Microsoft Corporation</Data>
-    <Data Name="CommandLine">"C:\Windows\System32\inetsrv\appcmd.exe"  list vdir "Filename: redirection.config" /text:password</Data>
+    <Data Name="CommandLine">"C:\Windows\System32\inetsrv\appcmd.exe"  list vdir "Filename: dom-176c79.example" /text:password</Data>
     <Data Name="CurrentDirectory">C:\Windows\Temp\</Data>
     <Data Name="User">IIS APPPOOL\DefaultAppPool</Data>
     <Data Name="LogonGuid">{365abb72-b26b-5cea-0000-002023240800}</Data>

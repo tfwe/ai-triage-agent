@@ -119,12 +119,44 @@ IPV6_RE = re.compile(
 )
 MAC_RE = re.compile(r"(?<![\w:])([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}(?![\w:])")
 DOMAIN_RE = re.compile(
-    r"(?<![a-zA-Z0-9-])((?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+"
-    r"(?:pl|com|net|org|local|corp|io|info|biz|ru|cn|pw|top|xyz|google|gov|"
-    r"edu|uk|de|fr|ch|arpa)"
-    r")(?![a-zA-Z0-9-])",
+    r"(?<![a-zA-Z0-9-:.])((?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+"
+    r"[a-zA-Z]{2,24})"
+    r"(?![a-zA-Z0-9-])",
     re.IGNORECASE,
 )
+
+# Last labels that are really file extensions, not TLDs: never domain-alias
+# those tokens at write time (they are paths, not hosts). Deliberately does
+# NOT contain 'arpa': in-addr.arpa reverse-DNS tokens still leak private IPs
+# and must keep being domain-aliased.
+DOMAIN_FILE_EXTENSIONS = {
+    "log", "json", "xml", "csv", "txt", "gz", "db", "exe", "dll", "py",
+    "sh", "so", "conf", "ini", "evtx", "pcap", "pcapng", "jar", "php",
+    "html", "htm", "css", "js", "md", "zip", "tar", "bin", "sys", "dat",
+    "o", "ko", "deb", "rpm", "apt", "d", "nolog", "conf2",
+}
+
+# Dynamic username extraction from auth/syslog lines, compiled once.
+SYSLOG_USER_RES = [
+    re.compile(r"(?i)\binvalid user\s+([A-Za-z0-9_.-]{1,32})"),
+    re.compile(r"(?i)\bfailed password for (?:invalid user )?([A-Za-z0-9_.-]{1,32})"),
+    re.compile(r"(?i)\buser=([A-Za-z0-9_.-]{1,32})"),
+    re.compile(r"(?i)\bruser=([A-Za-z0-9_.-]{1,32})"),
+]
+
+# Email identities: the local part is a username token, the domain part a
+# hostname; both get collected and aliased (see scan() / apply()).
+EMAIL_LOCAL_RE = re.compile(
+    r"(?i)([A-Za-z0-9_.-]{2,32})"
+    r"@([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+\.[a-zA-Z]{2,24})")
+
+# Standard system/service accounts kept verbatim (not identity leaks).
+# Deliberately minimal: named service accounts (operator, uucp, daemon, ...)
+# are real build identities and get aliased in-position instead.
+USER_ALLOWLIST = {
+    "root", "admin", "user", "test", "guest", "unknown", "anonymous",
+    "Administrator", "administrator", "NT AUTHORITY", "SYSTEM",
+}
 
 
 def _hex(token: str, n: int = 6) -> str:
@@ -141,8 +173,10 @@ def _is_ipv6(token: str) -> bool:
     return True
 
 
-# Non-standard usernames observed in HOST-LNX-* syslog: -> user-<4hex> alias
-# (IEUser keeps its original fixed alias).
+# Non-standard usernames -> user-<4hex> alias (IEUser keeps its original
+# fixed alias). Beyond this static map, further usernames are collected
+# dynamically from syslog auth lines during scan() (see SYSLOG_USER_RES)
+# and aliased the same way in assign().
 USERNAME_MAP = {
     "IEUser": "user-1e4f",
     **{name: f"user-{_hex(name, 4)}" for name in (
@@ -178,6 +212,7 @@ class Anonymizer:
         self.ipv6_map: dict[str, str] = {}
         self.mac_map: dict[str, str] = {}
         self.domain_map: dict[str, str] = {}
+        self.user_map: dict[str, str] = {}
 
     def scan(self, text: str) -> None:
         for m in IPV4_RE.finditer(text):
@@ -195,6 +230,21 @@ class Anonymizer:
             self.mac_map.setdefault(mac, "")
         for m in DOMAIN_RE.finditer(text):
             self.domain_map.setdefault(m.group(1).lower(), "")
+        for rx in SYSLOG_USER_RES:
+            for m in rx.finditer(text):
+                name = m.group(1)
+                if (name in USER_ALLOWLIST or name in USERNAME_MAP
+                        or name.startswith(("user-", "0x"))):
+                    continue
+                # Numeric names ARE real username tokens (e.g. build IDs);
+                # they are collected too and aliased in-position in apply().
+                self.user_map.setdefault(name, "")
+        for m in EMAIL_LOCAL_RE.finditer(text):
+            local = m.group(1)
+            if (local in USER_ALLOWLIST or local in USERNAME_MAP
+                    or local.isdigit()):
+                continue
+            self.user_map.setdefault(local, "")
 
     def assign(self) -> None:
         """Fix the deterministic alias tables (sorted for reproducibility)."""
@@ -224,11 +274,21 @@ class Anonymizer:
             self.ipv6_map[addr] = f"2001:db8::{_hex(addr, 4)}"
         for mac in sorted(self.mac_map):
             h = _hex(mac, 8)
-            self.mac_map[mac] = (
-                f"0c:6a:{h[0:2]}:{h[2:4]}:{h[4:6]}:{h[6:8]}"
-            )
+            # IEEE 802 reserved documentation block (00:00:5e) so aliases
+            # never look like genuine vendor unicast MACs.
+            self.mac_map[mac] = f"00:00:5e:{h[0:2]}:{h[2:4]}:{h[4:6]}"
         for dom in sorted(self.domain_map):
             self.domain_map[dom] = f"dom-{_hex(dom)}.example"
+        # Dynamic usernames: user-<4hex> like the static map; on a 4-hex
+        # collision (with the static map or a previous dynamic name) extend
+        # that name to 8 hex deterministically, keeping sorted order stable.
+        taken = set(USERNAME_MAP.values())
+        for name in sorted(self.user_map):
+            alias = f"user-{_hex(name, 4)}"
+            if alias in taken:
+                alias = f"user-{_hex(name, 8)}"
+            taken.add(alias)
+            self.user_map[name] = alias
 
     def assert_no_collisions(self) -> None:
         """Exit non-zero if two distinct source tokens share an alias."""
@@ -237,6 +297,7 @@ class Anonymizer:
             ("ipv6", self.ipv6_map),
             ("mac", self.mac_map),
             ("domain", self.domain_map),
+            ("user", self.user_map),
         ):
             vals = list(mapping.values())
             if len(set(vals)) != len(vals):
@@ -259,7 +320,38 @@ class Anonymizer:
             return self.mac_map.get(m.group(0).lower(), m.group(0))
 
         def sub_dom(m: re.Match) -> str:
-            return self.domain_map.get(m.group(1).lower(), m.group(0))
+            dom = m.group(1).lower()
+            if dom.rsplit(".", 1)[-1] in DOMAIN_FILE_EXTENSIONS:
+                return m.group(0)  # file path, not a hostname
+            return self.domain_map.get(dom, m.group(0))
+
+        def sub_email(m: re.Match) -> str:
+            local, domain = m.group(1), m.group(2)
+            dom_l = domain.lower()
+            if dom_l.rsplit(".", 1)[-1] in DOMAIN_FILE_EXTENSIONS:
+                return m.group(0)  # file path, not a hostname
+            local_alias = (self.user_map.get(local) or USERNAME_MAP.get(local)
+                           or (local if local in USER_ALLOWLIST else None))
+            domain_alias = self.domain_map.get(dom_l)
+            if local_alias is None and domain_alias is None:
+                return m.group(0)
+            return "%s@%s" % (local_alias if local_alias is not None else local,
+                              domain_alias if domain_alias is not None else domain)
+
+        def sub_syslog_user(m: re.Match) -> str:
+            # In-position username swap at the capture sites only: kernel or
+            # other prose lines never see user-<hex> aliases substituted.
+            name = m.group(1)
+            if name in USER_ALLOWLIST or name.startswith(("user-", "0x")):
+                return m.group(0)
+            alias = self.user_map.get(name) or USERNAME_MAP.get(name)
+            if not alias or alias == name:
+                return m.group(0)
+            # Swap group 1 only: keep the surrounding context ("Invalid user")
+            # that rx.sub would otherwise swallow.
+            start = m.start(1) - m.start(0)
+            end = m.end(1) - m.start(0)
+            return m.group(0)[:start] + alias + m.group(0)[end:]
 
         text = IPV6_RE.sub(sub_ip6, text)
         text = IPV4_RE.sub(sub_ip4, text)
@@ -268,10 +360,13 @@ class Anonymizer:
                 rf"(?<![\w-]){re.escape(name)}(?![\w-])", alias, text,
                 flags=re.IGNORECASE,
             )
+        text = EMAIL_LOCAL_RE.sub(sub_email, text)
         text = DOMAIN_RE.sub(sub_dom, text)
         text = MAC_RE.sub(sub_mac, text)
         for name, alias in USERNAME_MAP.items():
             text = re.sub(rf"(?<![\w-]){re.escape(name)}(?![\w-])", alias, text)
+        for rx in SYSLOG_USER_RES:
+            text = rx.sub(sub_syslog_user, text)
         return text
 
     def summary(self) -> dict:
@@ -280,6 +375,7 @@ class Anonymizer:
             "ipv6_mapped": len(self.ipv6_map),
             "macs_mapped": len(self.mac_map),
             "domains_mapped": len(self.domain_map),
+            "users_mapped": len(self.user_map),
         }
 
 

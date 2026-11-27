@@ -1729,7 +1729,7 @@
     <Data Name="ProcessGuid">{747f3d96-b765-5ea4-0000-00106b420100}</Data>
     <Data Name="ProcessId">2056</Data>
     <Data Name="Image">C:\Windows\System32\svchost.exe</Data>
-    <Data Name="TargetFilename">C:\Windows\ServiceProfiles\NetworkService\AppData\Local\Microsoft\Windows\DeliveryOptimization\Logs\dosvc.20200425_221917_750.etl</Data>
+    <Data Name="TargetFilename">C:\Windows\ServiceProfiles\NetworkService\AppData\Local\Microsoft\Windows\DeliveryOptimization\Logs\dosvc.20200425_221917_dom-015d2d.example</Data>
     <Data Name="CreationUtcTime">2020-04-25 22:19:17.750</Data>
   </EventData>
 </Event>
@@ -2925,13 +2925,13 @@
     <Data Name="UtcTime">2020-04-25 22:19:34.611</Data>
     <Data Name="ProcessGuid">{747f3d96-b776-5ea4-0000-001006590b00}</Data>
     <Data Name="ProcessId">7000</Data>
-    <Data Name="Image">C:\Program Files\WindowsApps\Microsoft.MicrosoftOfficeHub_18.2002.1101.0_x64__8wekyb3d8bbwe\LocalBridge.exe</Data>
+    <Data Name="Image">C:\Program Files\WindowsApps\dom-67a616.example_18.2002.1101.0_x64__8wekyb3d8bbwe\LocalBridge.exe</Data>
     <Data Name="FileVersion">18.2002.1101.0</Data>
     <Data Name="Description">LocalBridge</Data>
     <Data Name="Product">LocalBridge</Data>
     <Data Name="Company"></Data>
     <Data Name="OriginalFileName">LocalBridge.exe</Data>
-    <Data Name="CommandLine">"C:\Program Files\WindowsApps\Microsoft.MicrosoftOfficeHub_18.2002.1101.0_x64__8wekyb3d8bbwe\LocalBridge.exe" /InvokerPRAID: Microsoft.MicrosoftOfficeHub notifications</Data>
+    <Data Name="CommandLine">"C:\Program Files\WindowsApps\dom-67a616.example_18.2002.1101.0_x64__8wekyb3d8bbwe\LocalBridge.exe" /InvokerPRAID: dom-67a616.example notifications</Data>
     <Data Name="CurrentDirectory">C:\Windows\system32\</Data>
     <Data Name="User">HOST-WIN-B\user-1e4f</Data>
     <Data Name="LogonGuid">{747f3d96-b767-5ea4-0000-00209bd30100}</Data>
@@ -3099,7 +3099,7 @@
     <Data Name="Product">BGInfo</Data>
     <Data Name="Company">Sysinternals</Data>
     <Data Name="OriginalFileName">Bginfo.exe</Data>
-    <Data Name="CommandLine">"C:\BGinfo\BGINFO.EXE" /accepteula /ic:\bginfo\bgconfig.bgi /timer:0</Data>
+    <Data Name="CommandLine">"C:\BGinfo\BGINFO.EXE" /accepteula /ic:\bginfo\dom-d4e24e.example /timer:0</Data>
     <Data Name="CurrentDirectory">C:\Windows\system32\</Data>
     <Data Name="User">HOST-WIN-B\user-1e4f</Data>
     <Data Name="LogonGuid">{747f3d96-b767-5ea4-0000-00209bd30100}</Data>

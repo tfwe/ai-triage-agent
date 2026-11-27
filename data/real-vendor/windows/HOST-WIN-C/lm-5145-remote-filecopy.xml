@@ -3351,7 +3351,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -3387,7 +3387,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Contacts\desktop.ini</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Contacts\desktop.ini</Data>
     <Data Name="AccessMask">0x120089</Data>
     <Data Name="AccessList">%%1538
 				%%1541
@@ -3425,7 +3425,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Desktop\desktop.ini</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Desktop\desktop.ini</Data>
     <Data Name="AccessMask">0x120089</Data>
     <Data Name="AccessList">%%1538
 				%%1541
@@ -3463,7 +3463,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Documents\desktop.ini</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Documents\desktop.ini</Data>
     <Data Name="AccessMask">0x120089</Data>
     <Data Name="AccessList">%%1538
 				%%1541
@@ -3501,7 +3501,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Downloads\desktop.ini</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Downloads\desktop.ini</Data>
     <Data Name="AccessMask">0x120089</Data>
     <Data Name="AccessList">%%1538
 				%%1541
@@ -3539,7 +3539,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Favorites\desktop.ini</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Favorites\desktop.ini</Data>
     <Data Name="AccessMask">0x120089</Data>
     <Data Name="AccessList">%%1538
 				%%1541
@@ -3577,7 +3577,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Links\desktop.ini</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Links\desktop.ini</Data>
     <Data Name="AccessMask">0x120089</Data>
     <Data Name="AccessList">%%1538
 				%%1541
@@ -3615,7 +3615,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Music\desktop.ini</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Music\desktop.ini</Data>
     <Data Name="AccessMask">0x120089</Data>
     <Data Name="AccessList">%%1538
 				%%1541
@@ -3653,7 +3653,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Pictures\desktop.ini</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Pictures\desktop.ini</Data>
     <Data Name="AccessMask">0x120089</Data>
     <Data Name="AccessList">%%1538
 				%%1541
@@ -3691,7 +3691,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Saved Games\desktop.ini</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Saved Games\desktop.ini</Data>
     <Data Name="AccessMask">0x120089</Data>
     <Data Name="AccessList">%%1538
 				%%1541
@@ -3729,7 +3729,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Searches\desktop.ini</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Searches\desktop.ini</Data>
     <Data Name="AccessMask">0x120089</Data>
     <Data Name="AccessList">%%1538
 				%%1541
@@ -3767,7 +3767,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Videos\desktop.ini</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Videos\desktop.ini</Data>
     <Data Name="AccessMask">0x120089</Data>
     <Data Name="AccessList">%%1538
 				%%1541
@@ -3805,7 +3805,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Contacts</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Contacts</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -3841,7 +3841,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Desktop</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Desktop</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -3877,7 +3877,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Documents</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Documents</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -3913,7 +3913,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Downloads</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Downloads</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -3949,7 +3949,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Favorites</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Favorites</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -3985,7 +3985,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Favorites\Links\desktop.ini</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Favorites\Links\desktop.ini</Data>
     <Data Name="AccessMask">0x120089</Data>
     <Data Name="AccessList">%%1538
 				%%1541
@@ -4023,7 +4023,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Favorites\Links for United States\desktop.ini</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Favorites\Links for United States\desktop.ini</Data>
     <Data Name="AccessMask">0x120089</Data>
     <Data Name="AccessList">%%1538
 				%%1541
@@ -4061,7 +4061,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Favorites\Links</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Favorites\Links</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -4097,7 +4097,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Favorites\Links for United States</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Favorites\Links for United States</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -4133,7 +4133,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Links</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Links</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -4169,7 +4169,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Music</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Music</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -4205,7 +4205,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Pictures</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Pictures</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -4241,7 +4241,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Saved Games</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Saved Games</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -4277,7 +4277,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Searches</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Searches</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -4313,7 +4313,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\Administrator.EXAMPLE\Videos</Data>
+    <Data Name="RelativeTargetName">Users\dom-f0d7ed.example\Videos</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -15645,7 +15645,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\fs.realpath</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\dom-3d13cf.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -17805,7 +17805,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.exporters.gexf</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-b275d4.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -17841,7 +17841,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.exporters.graphml</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-787490.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -17877,7 +17877,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.exporters.image</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-4d0e4d.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -17949,7 +17949,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.exporters.spreadsheet</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-d0a512.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -17985,7 +17985,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.exporters.svg</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-8ef9e8.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18021,7 +18021,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.exporters.xlsx</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-5950a7.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18057,7 +18057,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.helpers.graph</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-2e7ca1.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18093,7 +18093,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.layouts.dagre</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-78e592.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18129,7 +18129,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.layouts.forceAtlas2</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-564cb2.example.forceAtlas2</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18165,7 +18165,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.layouts.forceLink</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-f33ff3.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18201,7 +18201,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.layouts.fruchtermanReingold</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-77a1aa.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18237,7 +18237,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.layouts.noverlap</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-691da1.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18273,7 +18273,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.parsers.cypher</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-b195c4.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18309,7 +18309,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.parsers.gexf</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-c957bc.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18381,7 +18381,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.pathfinding.astar</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-e34b17.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18417,7 +18417,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.activeState</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-dcc5d3.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18453,7 +18453,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.animate</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-82203a.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18489,7 +18489,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.colorbrewer</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-64d8e4.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18525,7 +18525,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.design</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-df0ca4.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18561,7 +18561,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.dragNodes</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-a22fc2.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18597,7 +18597,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.edgeSiblings</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-440b92.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18633,7 +18633,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.filter</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-81bdfc.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18669,7 +18669,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.fullScreen</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-82b7c6.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18705,7 +18705,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.generators</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-ebbb61.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18741,7 +18741,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.keyboard</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-572f81.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18777,7 +18777,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.lasso</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-00af8c.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18813,7 +18813,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.leaflet</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-c538d2.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18849,7 +18849,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.legend</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-c7b55e.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18885,7 +18885,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.locate</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-8b98df.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18921,7 +18921,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.neighborhoods</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-7ad9a2.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18957,7 +18957,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.poweredBy</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-e79bb9.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -18993,7 +18993,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.relativeSize</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-d7c93e.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -19029,7 +19029,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.select</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-234a5e.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -19065,7 +19065,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.plugins.tooltips</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-98087c.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -19101,7 +19101,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.renderers.customEdgeShapes</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-46ce70.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -19137,7 +19137,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.renderers.edgeLabels</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-b75506.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -19173,7 +19173,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.renderers.glyphs</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-513513.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -19209,7 +19209,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.renderers.halo</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-259619.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -19245,7 +19245,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.renderers.linkurious</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-9da7d6.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -19281,7 +19281,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.statistics.HITS</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-9aa77b.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -19317,7 +19317,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\sigma.statistics.louvain</Data>
+    <Data Name="RelativeTargetName">Users\user01\Desktop\BloodHound-win32-x64\BloodHound-win32-x64\resources\app\node_modules\linkurious\plugins\dom-06e061.example</Data>
     <Data Name="AccessMask">0x100081</Data>
     <Data Name="AccessList">%%1541
 				%%4416
@@ -31311,7 +31311,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Windows\Temp\setup.bat</Data>
+    <Data Name="RelativeTargetName">Windows\Temp\dom-5631e5.example</Data>
     <Data Name="AccessMask">0x17019f</Data>
     <Data Name="AccessList">%%1537
 				%%1538
@@ -31355,7 +31355,7 @@
     <Data Name="IpPort">55632</Data>
     <Data Name="ShareName">\\*\C$</Data>
     <Data Name="ShareLocalPath">\??\C:\</Data>
-    <Data Name="RelativeTargetName">Windows\Temp\setup.bat</Data>
+    <Data Name="RelativeTargetName">Windows\Temp\dom-5631e5.example</Data>
     <Data Name="AccessMask">0x17019f</Data>
     <Data Name="AccessList">%%1537
 				%%1538
