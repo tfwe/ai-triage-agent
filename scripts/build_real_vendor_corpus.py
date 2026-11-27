@@ -229,6 +229,12 @@ class Anonymizer:
             mac = m.group(0).lower()
             self.mac_map.setdefault(mac, "")
         for m in DOMAIN_RE.finditer(text):
+            # same JSON key-position guard as apply(): never collect schema
+            # keys like "id.orig_h" as domains
+            mm = re.match(r"[a-zA-Z0-9_-]*", text[m.end():])
+            tail = mm.group(0) if mm else ""
+            if text[m.end() + len(tail):].startswith('":'):
+                continue
             self.domain_map.setdefault(m.group(1).lower(), "")
         for rx in SYSLOG_USER_RES:
             for m in rx.finditer(text):
@@ -361,7 +367,22 @@ class Anonymizer:
                 flags=re.IGNORECASE,
             )
         text = EMAIL_LOCAL_RE.sub(sub_email, text)
-        text = DOMAIN_RE.sub(sub_dom, text)
+        def domain_pass(text: str) -> str:
+            # JSON key-position guard: a JSON key is a quoted token immediately
+            # followed by '":' (values are never followed by '":'). Skip matches
+            # in key position (e.g. Zeek's "id.orig_h") so schema keys are never
+            # rewritten; DOMAIN_RE still aliases domain-shaped string VALUES.
+            out, pos = [], 0
+            for m in DOMAIN_RE.finditer(text):
+                mm = re.match(r"[a-zA-Z0-9_-]*", text[m.end():])
+                tail = mm.group(0) if mm else ""
+                if text[m.end() + len(tail):].startswith('":'):
+                    continue  # key position, not data
+                out.append(text[pos:m.start()]); out.append(sub_dom(m)); pos = m.end()
+            out.append(text[pos:])
+            return "".join(out)
+
+        text = domain_pass(text)
         text = MAC_RE.sub(sub_mac, text)
         for name, alias in USERNAME_MAP.items():
             text = re.sub(rf"(?<![\w-]){re.escape(name)}(?![\w-])", alias, text)
