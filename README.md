@@ -188,22 +188,14 @@ The pass-8 run ingested 4,996 endpoint events, 165 network sessions and 8,000 ID
 - **Windows EVTX coverage is attack-only.** The corpus contains zero benign Windows control hosts, so no Windows false-positive rate is claimed.
 - **The gate was revised from 50+ to 37 cases** after the consult gate. At 37 cases one case weighs ~2.7 percentage points, so single-case swings are not treated as signal.
 - **Macro-averaged family accuracy is reported alongside raw case accuracy**, so dominant families (external brute-force, mdns/LLMNR noise) do not mask niche-family failures.
-- **The grader's absence judge is the same model as the draw client.** Temperature 0.0 pins sampling, not the weights: a model can be systematically blind to its own omissions, so `absence_ok` is weaker evidence than the literal assertion checks. Two related grader caveats: the judge's raw output is graded by substring search (no "VIOLATION" in the response means pass, so an empty or nonconforming judge response grades as no violation), and in replay mode the judge is not invoked, so absence assertions never fail a replayed draw.
+- **Absence assertions are graded by an independent judge model** — `swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3` at temperature 0.0, never by the draw model: `build_judge_client` refuses to start a live or recorded run when `JUDGE_MODEL` is unset or equals the draw model, because a model cannot independently judge its own omissions. The judge's reply is parsed strictly (`OK` or `VIOLATION`, case-insensitive, surrounding whitespace and quotes stripped); anything else — an empty reply, prose, a refusal — grades the assertion as not met, so the grader fails closed. Every verdict is written to a sidecar recording (`<recording>-judge.jsonl`) committed with the draw, and replay mode grades absence from those recorded verdicts with no network and no GPU: a replayed draw can fail absence, and a missing sidecar or a missing entry grades as not met rather than passing.
 
-The v2 grader in `eval/run_evals.py` grades decision first, then the independent assertions: literal evidence signature counts in the agent's tool log and in the database, deterministic substring checks for attribution/action/restraint, and a temperature-0 absence judge whose raw output is recorded in the result artifact. The v1 flat-schema path is unchanged and the test suite still passes.
+The v2 grader in `eval/run_evals.py` grades decision first, then the independent assertions: literal evidence signature counts in the agent's tool log and in the database, deterministic substring checks for attribution/action/restraint, and a strict-parsing absence judge on a separate model whose verdicts are recorded in the result artifact and in the judge sidecar replay reads. A case passes only when every graded assertion is met, so an ungraded or unparseable absence can no longer pass a case. Absence recall is counted per judge verdict (17 absence assertions in this holdout); the other assertion types are counted per case. The v1 flat-schema path is unchanged and the test suite still passes.
 
 Draw 0 was the deterministic rules baseline on the same 37 cases: 18/37 decisions agree (48.65%). That matches the code-derived prediction split of 9 agree / 12 disagree / 16 uncertain: 7 of the 9 predicted agrees held, 10 of the 12 predicted disagrees held, and the 16 uncertain split 9 agree / 7 disagree. Four cases diverged from prediction: HG-012 and HG-013 (predicted ISOLATE_HOST) returned IGNORE because no alert rows are visible to the rules for those targets, and HG-020 and HG-021 (predicted ISOLATE misfire) were correctly IGNOREd.
 
-Three independent live draws (r1-r3, `ornith-1.5-35b-a3b-apex-i-nanoplus`, temperature 0.1, seed 7, max_tokens 5500, 12-turn cap; temperature-0 judge on absence assertions), reported per the consult-2b protocol:
+Three independent live draws (r1-r3, `ornith-1.5-35b-a3b-apex-i-nanoplus`, temperature 0.1, seed 7, max_tokens 5500, 12-turn cap; absence assertions judged at temperature 0.0 by `swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3`), reported per the consult-2b protocol over the full three-draw range. These draws replace every earlier draw on this holdout: the grader change (independent judge, fail-closed parsing, replayable verdicts) invalidates the old numbers, and the old artifacts were removed rather than presented beside the new ones.
 
-| Metric | r1 | r2 | r3 | Mean | Min-max |
-|---|---|---|---|---|---|
-| Decision accuracy | 64.86% | 62.16% | 59.46% | 62.16% | 59.46-64.86% |
-| Case pass (all assertions) | 8.11% | 8.11% | 5.41% | 7.21% | 5.41-8.11% |
-| Macro family accuracy | 6.9% | 8.62% | 5.17% | 6.9% | 5.17-8.62% |
-| Benign false positives | 8/20 | 11/20 | 11/20 | | |
-
-Unanimous pass on all three draws: 1/37 cases (HG-036). The gap between decision accuracy (~62%) and case pass (~7%) is driven by action assertions: the model narrates evidence but rarely states the recommended action verb in its reasoning (action assertion recall 1/24 in r1), and by evidence-surface recall (21/37 in r1). Full per-draw details, assertion recalls, judge records and the Draw 0 prediction check are in `eval/results/real-vendor-holdout-report.json`. Every draw's recording replayed to byte-identical decisions (replay makes zero live calls); the gate results are recorded alongside the report.
 
 ## Model configuration
 
@@ -218,6 +210,9 @@ Unanimous pass on all three draws: 1/37 cases (HG-036). The gap between decision
 | `OPENAI_API_KEY` | none | Required when `LLM_PROVIDER=openai` |
 | `OPENAI_MODEL` | `gpt-5.6-luna` | Model name for the `openai` provider |
 | `ABUSEIPDB_API_KEY` | none | Optional. Without it, `check_ip_reputation` reports the lookup as unavailable. |
+| `JUDGE_MODEL` | none | Absence-judge model. Required in live/record mode when the dataset has absence assertions; the run aborts if it is unset or equal to the draw model. |
+| `JUDGE_BASE_URL` | draw client's base URL | Endpoint serving the judge model |
+| `JUDGE_API_KEY` | `ollama` for the ollama provider, else `OPENAI_API_KEY` | Key sent to the judge endpoint |
 | `TRIAGE_DB_PATH` | `data/processed/triage.db` | Database queried by `query_triage_db` |
 | `REPLAY_PATH` | `eval/recordings/agent.jsonl` | Recording read in replay mode |
 | `RECORD_PATH` | `eval/recordings/agent.jsonl` | Recording written in record mode |

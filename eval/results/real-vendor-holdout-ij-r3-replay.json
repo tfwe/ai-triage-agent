@@ -1,0 +1,1649 @@
+{
+  "mode": "replay",
+  "model": "ornith-1.5-35b-a3b-apex-i-nanoplus",
+  "dataset": "eval/datasets/real-vendor-holdout.json",
+  "dataset_sha256": "61d32dc2cac1f99d",
+  "schema": "v2-assertions",
+  "pinned": {
+    "model": "ornith-1.5-35b-a3b-apex-i-nanoplus",
+    "temperature": null,
+    "seed": null,
+    "max_tokens": null,
+    "max_turns": 12,
+    "judge_model": "swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3",
+    "judge_temperature": 0.0,
+    "db": "data/processed-real/real-vendor.db"
+  },
+  "price_in_per_mtok": 0.0,
+  "price_out_per_mtok": 0.0,
+  "recorded_at": "2026-11-27T19:14:08Z",
+  "host": {
+    "python": "3.13.5",
+    "platform": "Linux-6.18.50+rpt-rpi-v8-aarch64-with-glibc2.41"
+  },
+  "summary": {
+    "cases": 37,
+    "decision_ok": 23,
+    "decision_accuracy": 0.6216,
+    "case_pass": 2,
+    "case_pass_rate": 0.0541,
+    "false_positives": 10,
+    "false_positive_rate": 0.5,
+    "assertion_recall": {
+      "attribution": {
+        "graded": 26,
+        "met": 23,
+        "recall": 0.885
+      },
+      "action": {
+        "graded": 25,
+        "met": 2,
+        "recall": 0.08
+      },
+      "restraint": {
+        "graded": 28,
+        "met": 28,
+        "recall": 1.0
+      },
+      "absence": {
+        "graded": 17,
+        "met": 12,
+        "recall": 0.706
+      },
+      "evidence": {
+        "graded": 37,
+        "met": 20,
+        "recall": 0.541
+      }
+    },
+    "macro_family_accuracy": 0.0517,
+    "family_accuracy": {
+      "external-c2": 0.0,
+      "brute-force-external-success": 0.0,
+      "brute-force-external": 0.0,
+      "kerberos-external": 0.0,
+      "c2-beacon": 0.0,
+      "lateral-movement-rdp": 0.0,
+      "zerologon": 0.0,
+      "smb-dll-lateral": 1.0,
+      "malformed-tls": 0.0,
+      "port-scan": 0.0,
+      "web-shell-discovery": 0.0,
+      "privesc-unquoted-path": 0.0,
+      "netgear-exploit-victim": 0.0,
+      "smb-lateral-victim": 0.0,
+      "malformed-tls-victim": 0.0,
+      "mysql-scan-victim": 0.0,
+      "dcerpc-scan-victim": 0.0,
+      "rdp-tunnel-victim": 0.0,
+      "dns-resolver-hard-negative": 0.0,
+      "dhcp-service": 0.0,
+      "mdns-noise": 0.0,
+      "llmnr-noise": 0.0,
+      "ssdp-noise": 0.0,
+      "llmnr-noise-ipv6": 0.0,
+      "mdns-noise-ipv6": 0.0,
+      "dhcpv6-noise-ipv6": 0.0,
+      "brute-forced-host-no-compromise": 0.0,
+      "auth-noise-low-volume": 0.0,
+      "ftp-access-noise": 0.5
+    },
+    "errors": 0
+  },
+  "per_case": [
+    {
+      "id": "HG-001",
+      "expected": "BLOCK_IP",
+      "target": "203.0.113.127",
+      "class": "attack",
+      "subclass": "external-c2",
+      "decision": "BLOCK_IP",
+      "confidence": 90,
+      "playbook": "BLOCK the external C2 IP 203.0.113.127 at the perimeter firewall/egress filtering immediately. Additionally, the internal source host 100.64.0.6 is the compromised beaconing endpoint and should be isolated (ISOLATE_HOST) for forensic analysis and remediation, as it is actively exfiltrating data to this C2 server. Block the associated DGA domain dom-bff33d.example as well.",
+      "latency_ms": 53.79741685464978,
+      "tokens": 11632,
+      "cost_usd": 0.0,
+      "prompt_tokens": 8362,
+      "completion_tokens": 3270,
+      "tool_calls": 6,
+      "turns": 3,
+      "decision_ok": true,
+      "checks": {
+        "attribution_ok": true,
+        "action_ok": false,
+        "restraint_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 0,
+      "evidence_total": 2,
+      "evidence_signatures": [],
+      "evidence_db_counts": {
+        "\"dest_ip\": \"203.0.113.127\", \"dest_port\": 80": 1,
+        "\"host\": \"dom-bff33d.example\"": 1
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-002",
+      "expected": "BLOCK_IP",
+      "target": "203.0.113.92",
+      "class": "attack",
+      "subclass": "brute-force-external-success",
+      "decision": "ISOLATE_HOST",
+      "confidence": 62,
+      "playbook": "ISOLATE_HOST \u2014 Isolate HOST-LNX-A from the network, preserve forensic images, revoke/rotate credentials for user-3bd4, review the full sshd session and command history from 203.0.113.92, check for additional accounts or persistence mechanisms, and triage the originating external IP for the source of the compromised credentials.",
+      "latency_ms": 86.14807110279799,
+      "tokens": 20779,
+      "cost_usd": 0.0,
+      "prompt_tokens": 16334,
+      "completion_tokens": 4445,
+      "tool_calls": 7,
+      "turns": 4,
+      "decision_ok": false,
+      "checks": {
+        "attribution_ok": true,
+        "action_ok": false,
+        "restraint_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [
+        {
+          "must_not_claim": [
+            "203.0.113.92 is an internal host"
+          ],
+          "case_id": "HG-002",
+          "assertion_index": 4,
+          "judge_tokens": 0,
+          "judge_model": "swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3",
+          "judge_raw": "OK",
+          "judge_parse": "ok",
+          "ok": true
+        },
+        {
+          "must_not_claim": [
+            "no successful logon occurred"
+          ],
+          "case_id": "HG-002",
+          "assertion_index": 5,
+          "judge_tokens": 0,
+          "judge_model": "swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3",
+          "judge_raw": "OK",
+          "judge_parse": "ok",
+          "ok": true
+        }
+      ],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "from 203.0.113.92"
+      ],
+      "evidence_db_counts": {
+        "from 203.0.113.92": 2
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-003",
+      "expected": "BLOCK_IP",
+      "target": "203.0.113.121",
+      "class": "attack",
+      "subclass": "brute-force-external",
+      "decision": "BLOCK_IP",
+      "confidence": 95,
+      "playbook": "Block external IP 203.0.113.121 at the perimeter firewall/IPS immediately. Verify HOST-LNX-A has not been compromised (confirm no successful sshd logins from this or other sources, review for any added accounts or SSH keys). Enforce SSH hardening: disable root login (PermitRootLogin no), switch to key-based auth, deploy fail2ban/SSH rate limiting, and consider allowlisting source IPs. Review whether the alert that triggered this was a false positive since no matching alert record exists in the alerts table.",
+      "latency_ms": 113.60435886308551,
+      "tokens": 21166,
+      "cost_usd": 0.0,
+      "prompt_tokens": 18778,
+      "completion_tokens": 2388,
+      "tool_calls": 9,
+      "turns": 4,
+      "decision_ok": true,
+      "checks": {
+        "attribution_ok": true,
+        "action_ok": false,
+        "restraint_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [
+        {
+          "must_not_claim": [
+            "203.0.113.121 is an internal host"
+          ],
+          "case_id": "HG-003",
+          "assertion_index": 4,
+          "judge_tokens": 0,
+          "judge_model": "swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3",
+          "judge_raw": "OK",
+          "judge_parse": "ok",
+          "ok": true
+        }
+      ],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "from 203.0.113.121"
+      ],
+      "evidence_db_counts": {
+        "from 203.0.113.121": 580
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-004",
+      "expected": "BLOCK_IP",
+      "target": "203.0.113.129",
+      "class": "attack",
+      "subclass": "brute-force-external",
+      "decision": "BLOCK_IP",
+      "confidence": 96,
+      "playbook": "Block source IP 203.0.113.129 at the perimeter firewall (and add to blocklist). Since the attack targeted SSH, verify HOST-LNX-A has no successful compromise, enforce key-based SSH authentication, disable password SSH login (PermitRootLogin no / PasswordAuthentication no), and deploy fail2ban or similar rate-limiting. Review other internet-facing hosts for the same source IP.",
+      "latency_ms": 92.63790911063552,
+      "tokens": 20002,
+      "cost_usd": 0.0,
+      "prompt_tokens": 17932,
+      "completion_tokens": 2070,
+      "tool_calls": 8,
+      "turns": 4,
+      "decision_ok": true,
+      "checks": {
+        "attribution_ok": true,
+        "action_ok": false,
+        "restraint_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [
+        {
+          "must_not_claim": [
+            "203.0.113.129 is an internal host"
+          ],
+          "case_id": "HG-004",
+          "assertion_index": 4,
+          "judge_tokens": 0,
+          "judge_model": "swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3",
+          "judge_raw": "OK",
+          "judge_parse": "ok",
+          "ok": true
+        }
+      ],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "from 203.0.113.129"
+      ],
+      "evidence_db_counts": {
+        "from 203.0.113.129": 189
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-005",
+      "expected": "BLOCK_IP",
+      "target": "203.0.113.104",
+      "class": "attack",
+      "subclass": "brute-force-external",
+      "decision": "BLOCK_IP",
+      "confidence": 92,
+      "playbook": "Block external IP 203.0.113.104 at the perimeter firewall/IPS immediately. Investigate HOST-LNX-B to confirm no successful root login occurred from this or related IPs, rotate root and any privileged credentials, enforce SSH key-based auth / disable root password login, and review fail2ban or account-lockout policies to mitigate future brute-force attempts.",
+      "latency_ms": 113.1124917883426,
+      "tokens": 21506,
+      "cost_usd": 0.0,
+      "prompt_tokens": 19115,
+      "completion_tokens": 2391,
+      "tool_calls": 11,
+      "turns": 5,
+      "decision_ok": true,
+      "checks": {
+        "attribution_ok": true,
+        "action_ok": false,
+        "restraint_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [
+        {
+          "must_not_claim": [
+            "successful logon",
+            "203.0.113.104 compromised HOST-LNX-B"
+          ],
+          "case_id": "HG-005",
+          "assertion_index": 4,
+          "judge_tokens": 0,
+          "judge_model": "swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3",
+          "judge_raw": "OK",
+          "judge_parse": "ok",
+          "ok": true
+        }
+      ],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "rhost=203.0.113.104"
+      ],
+      "evidence_db_counts": {
+        "rhost=203.0.113.104": 80
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-006",
+      "expected": "BLOCK_IP",
+      "target": "203.0.113.161",
+      "class": "attack",
+      "subclass": "brute-force-external",
+      "decision": "BLOCK_IP",
+      "confidence": 92,
+      "playbook": "Block source IP 203.0.113.161 at the perimeter firewall. Investigate HOST-LNX-B to confirm no successful root login occurred and review for any other brute-force indicators. Enforce SSH hardening: disable root SSH login (PermitRootLogin no), require key-based authentication, and deploy fail2ban or account lockout policies. Monitor for continued attempts from associated ranges.",
+      "latency_ms": 90.93623189255595,
+      "tokens": 22749,
+      "cost_usd": 0.0,
+      "prompt_tokens": 20596,
+      "completion_tokens": 2153,
+      "tool_calls": 12,
+      "turns": 6,
+      "decision_ok": true,
+      "checks": {
+        "attribution_ok": true,
+        "action_ok": false,
+        "restraint_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [
+        {
+          "must_not_claim": [
+            "successful logon",
+            "203.0.113.161 compromised HOST-LNX-B"
+          ],
+          "case_id": "HG-006",
+          "assertion_index": 4,
+          "judge_tokens": 0,
+          "judge_model": "swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3",
+          "judge_raw": "OK",
+          "judge_parse": "ok",
+          "ok": true
+        }
+      ],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "rhost=203.0.113.161"
+      ],
+      "evidence_db_counts": {
+        "rhost=203.0.113.161": 23
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-007",
+      "expected": "BLOCK_IP",
+      "target": "203.0.113.143",
+      "class": "attack",
+      "subclass": "brute-force-external",
+      "decision": "BLOCK_IP",
+      "confidence": 88,
+      "playbook": "Block 203.0.113.143 at the perimeter firewall. Additionally, enforce SSH hardening on HOST-LNX-B: disable root login (PermitRootLogin no), deploy key-based authentication, and install fail2ban or similar rate-limiting to mitigate future brute-force attempts. Monitor for any subsequent successful authentication from other sources.",
+      "latency_ms": 81.47070510312915,
+      "tokens": 25055,
+      "cost_usd": 0.0,
+      "prompt_tokens": 22776,
+      "completion_tokens": 2279,
+      "tool_calls": 10,
+      "turns": 5,
+      "decision_ok": true,
+      "checks": {
+        "attribution_ok": true,
+        "action_ok": false,
+        "restraint_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [
+        {
+          "must_not_claim": [
+            "successful logon",
+            "203.0.113.143 compromised HOST-LNX-B"
+          ],
+          "case_id": "HG-007",
+          "assertion_index": 4,
+          "judge_tokens": 0,
+          "judge_model": "swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3",
+          "judge_raw": "OK",
+          "judge_parse": "ok",
+          "ok": true
+        }
+      ],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "rhost=203.0.113.143"
+      ],
+      "evidence_db_counts": {
+        "rhost=203.0.113.143": 15
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-008",
+      "expected": "BLOCK_IP",
+      "target": "203.0.113.107",
+      "class": "attack",
+      "subclass": "kerberos-external",
+      "decision": "BLOCK_IP",
+      "confidence": 90,
+      "playbook": "Block external IP 203.0.113.107 at the perimeter firewall. Investigate HOST-LNX-B for any signs of successful compromise, enforce account lockout policies and rate-limiting on SSH/klogind, and consider implementing fail2ban or similar brute-force protection. Review for any other internal hosts targeted by the same IP.",
+      "latency_ms": 70.51485194824636,
+      "tokens": 20183,
+      "cost_usd": 0.0,
+      "prompt_tokens": 17796,
+      "completion_tokens": 2387,
+      "tool_calls": 7,
+      "turns": 4,
+      "decision_ok": true,
+      "checks": {
+        "attribution_ok": true,
+        "action_ok": false,
+        "restraint_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [
+        {
+          "must_not_claim": [
+            "successful Kerberos logon"
+          ],
+          "case_id": "HG-008",
+          "assertion_index": 4,
+          "judge_tokens": 0,
+          "judge_model": "swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3",
+          "judge_raw": "OK",
+          "judge_parse": "ok",
+          "ok": true
+        }
+      ],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "Authentication failed from 203.0.113.107"
+      ],
+      "evidence_db_counts": {
+        "Authentication failed from 203.0.113.107": 23
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-009",
+      "expected": "ISOLATE_HOST",
+      "target": "100.64.0.6",
+      "class": "attack",
+      "subclass": "c2-beacon",
+      "decision": "ISOLATE_HOST",
+      "confidence": 92,
+      "playbook": "Isolate host 100.64.0.6 from the network immediately. Preserve forensic images, disable the compromised Administrator account, terminate active sessions, and conduct full malware analysis on the dropped executables in Windows\\Temp. Investigate lateral movement to 100.64.0.7 and sweep the domain for the same IOCs.",
+      "latency_ms": 51.74450110644102,
+      "tokens": 21676,
+      "cost_usd": 0.0,
+      "prompt_tokens": 19203,
+      "completion_tokens": 2473,
+      "tool_calls": 5,
+      "turns": 3,
+      "decision_ok": true,
+      "checks": {
+        "attribution_ok": true,
+        "action_ok": false
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 0,
+      "evidence_total": 2,
+      "evidence_signatures": [],
+      "evidence_db_counts": {
+        "\"dest_ip\": \"203.0.113.127\", \"dest_port\": 80": 1,
+        "\"host\": \"dom-bff33d.example\"": 1
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-010",
+      "expected": "ISOLATE_HOST",
+      "target": "100.64.4.2",
+      "class": "attack",
+      "subclass": "lateral-movement-rdp",
+      "decision": "IGNORE",
+      "confidence": 88,
+      "playbook": "No action required. This appears to be benign internal RDP administrative traffic. Continue standard monitoring; no isolation or blocking warranted.",
+      "latency_ms": 84.42602399736643,
+      "tokens": 20568,
+      "cost_usd": 0.0,
+      "prompt_tokens": 17021,
+      "completion_tokens": 3547,
+      "tool_calls": 10,
+      "turns": 4,
+      "decision_ok": false,
+      "checks": {
+        "attribution_ok": true,
+        "action_ok": false
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 0,
+      "evidence_total": 1,
+      "evidence_signatures": [],
+      "evidence_db_counts": {
+        "\"dest_ip\": \"100.64.4.4\", \"dest_port\": 3389": 4
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-011",
+      "expected": "ISOLATE_HOST",
+      "target": "100.64.4.1",
+      "class": "attack",
+      "subclass": "zerologon",
+      "decision": "ISOLATE_HOST",
+      "confidence": 90,
+      "playbook": "ISOLATE_HOST - Immediately isolate 100.64.4.1 from the network. Investigate for domain controller compromise (Zerologon targets DCs), enumerate lateral movement to other internal hosts, rotate credentials/kerberos keys, and perform forensic collection on the host. Block outbound SMB/DCPROMO traffic from this host pending investigation.",
+      "latency_ms": 57.20799206756055,
+      "tokens": 22093,
+      "cost_usd": 0.0,
+      "prompt_tokens": 19347,
+      "completion_tokens": 2746,
+      "tool_calls": 9,
+      "turns": 4,
+      "decision_ok": true,
+      "checks": {
+        "attribution_ok": true,
+        "action_ok": false
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 0,
+      "evidence_total": 1,
+      "evidence_signatures": [],
+      "evidence_db_counts": {
+        "\"dest_ip\": \"100.64.4.0\", \"dest_port\": 135": 1
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-012",
+      "expected": "ISOLATE_HOST",
+      "target": "100.64.3.64",
+      "class": "attack",
+      "subclass": "smb-dll-lateral",
+      "decision": "ISOLATE_HOST",
+      "confidence": 88,
+      "playbook": "Isolate host 100.64.3.64 from the network immediately. Preserve forensic images, inspect for the originating malware/cred tooling, and hunt for successful SMB sessions to 100.64.1.71 (check for DLL load success, new processes, rundll32 execution). Rotate credentials for any accounts used from this host, and review lateral movement to additional internal targets. Block outbound SMB (445) at the perimeter until remediation is confirmed.",
+      "latency_ms": 86.02121891453862,
+      "tokens": 64147,
+      "cost_usd": 0.0,
+      "prompt_tokens": 60586,
+      "completion_tokens": 3561,
+      "tool_calls": 14,
+      "turns": 6,
+      "decision_ok": true,
+      "checks": {
+        "attribution_ok": true,
+        "action_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "ET POLICY SMB2 NT Create AndX Request For a DLL File - Possible Lateral Movement"
+      ],
+      "evidence_db_counts": {
+        "ET POLICY SMB2 NT Create AndX Request For a DLL File - Possible Lateral Movement": 1000
+      },
+      "case_pass": true,
+      "error": null
+    },
+    {
+      "id": "HG-013",
+      "expected": "ISOLATE_HOST",
+      "target": "100.64.3.204",
+      "class": "attack",
+      "subclass": "malformed-tls",
+      "decision": "BLOCK_IP",
+      "confidence": 88,
+      "playbook": "BLOCK the source IP 100.64.3.204 at the perimeter firewall/IDS. Correlate with the destination host 100.64.0.130 to confirm it was the intended target and assess any impact on port 902 (VMware remote console). Review firewall logs for additional flows from this IP and add it to the blocklist. No host isolation is warranted for 100.64.3.204 since there is no endpoint evidence of compromise on it.",
+      "latency_ms": 61.27837882377207,
+      "tokens": 21880,
+      "cost_usd": 0.0,
+      "prompt_tokens": 18164,
+      "completion_tokens": 3716,
+      "tool_calls": 8,
+      "turns": 4,
+      "decision_ok": false,
+      "checks": {
+        "attribution_ok": true,
+        "action_ok": false
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "SURICATA TLS invalid record/traffic"
+      ],
+      "evidence_db_counts": {
+        "SURICATA TLS invalid record/traffic": 1000
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-014",
+      "expected": "ISOLATE_HOST",
+      "target": "100.64.1.65",
+      "class": "attack",
+      "subclass": "port-scan",
+      "decision": "ISOLATE_HOST",
+      "confidence": 78,
+      "playbook": "Isolate host 100.64.1.65 from the network immediately. Preserve forensic images and memory for analysis. Investigate the host for malware, unauthorized credentials, and signs of compromise. Review MySQL server 100.64.3.68 for unauthorized access attempts and review which services/credentials this host should legitimately use. Block outbound connections from 100.64.1.65 to 100.64.3.68 and hunt for additional hosts exhibiting the same scan pattern.",
+      "latency_ms": 41.286924155429006,
+      "tokens": 21502,
+      "cost_usd": 0.0,
+      "prompt_tokens": 12118,
+      "completion_tokens": 9384,
+      "tool_calls": 4,
+      "turns": 3,
+      "decision_ok": true,
+      "checks": {
+        "attribution_ok": true,
+        "action_ok": false
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "ET SCAN Non-Allowed Host Tried to Connect to MySQL Server"
+      ],
+      "evidence_db_counts": {
+        "ET SCAN Non-Allowed Host Tried to Connect to MySQL Server": 1000
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-015",
+      "expected": "ISOLATE_HOST",
+      "target": "100.64.0.8",
+      "class": "attack",
+      "subclass": "port-scan",
+      "decision": "IGNORE",
+      "confidence": 72,
+      "playbook": "No immediate action required. Monitor 100.64.0.8 for additional flows (especially to other internal hosts or ports) and correlate with any future alerts. If a pattern of repeated DCERPC discovery emerges, escalate to BLOCK_IP/ISOLATE_HOST accordingly.",
+      "latency_ms": 57.25301010534167,
+      "tokens": 11712,
+      "cost_usd": 0.0,
+      "prompt_tokens": 8800,
+      "completion_tokens": 2912,
+      "tool_calls": 10,
+      "turns": 4,
+      "decision_ok": false,
+      "checks": {
+        "attribution_ok": true,
+        "action_ok": false
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 0,
+      "evidence_total": 1,
+      "evidence_signatures": [],
+      "evidence_db_counts": {
+        "\"dest_ip\": \"100.64.0.9\", \"dest_port\": 135": 1
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-016",
+      "expected": "ISOLATE_HOST",
+      "target": "HOST-WIN-A",
+      "class": "attack",
+      "subclass": "web-shell-discovery",
+      "decision": "ISOLATE_HOST",
+      "confidence": 92,
+      "playbook": "Isolate HOST-WIN-A from the network immediately. Preserve forensic images before remediation. Investigate the parent PowerShell process (PID 2584) and decode the base64 payload to identify the malware family. Rotate all credentials associated with the IIS APPPOOL\\DefaultAppPool account and any accounts that ran on this host. Perform full malware analysis and rebuild the host from known-good image if needed.",
+      "latency_ms": 39.6876169834286,
+      "tokens": 115311,
+      "cost_usd": 0.0,
+      "prompt_tokens": 113053,
+      "completion_tokens": 2258,
+      "tool_calls": 8,
+      "turns": 5,
+      "decision_ok": true,
+      "checks": {
+        "attribution_ok": true,
+        "action_ok": false
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [
+        {
+          "must_not_claim": [
+            "benign admin activity"
+          ],
+          "case_id": "HG-016",
+          "assertion_index": 4,
+          "judge_tokens": 0,
+          "judge_model": "swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3",
+          "judge_raw": "OK",
+          "judge_parse": "ok",
+          "ok": true
+        }
+      ],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "appcmd.exe"
+      ],
+      "evidence_db_counts": {
+        "appcmd.exe": 39
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-017",
+      "expected": "ISOLATE_HOST",
+      "target": "HOST-WIN-B",
+      "class": "attack",
+      "subclass": "privesc-unquoted-path",
+      "decision": "ISOLATE_HOST",
+      "confidence": 90,
+      "playbook": "Isolate HOST-WIN-B (100.64.0.6) from the network immediately to stop the C2 beacon to 203.0.113.127. Block egress to 203.0.113.127 and the domain dom-bff33d.example at the firewall. Preserve the host for forensic imaging, then remediate via rebuild from known-good image. Investigate the meterpreter RDP tunnel to 100.64.0.7 for lateral movement and rotate credentials for user-1e4f and any local accounts.",
+      "latency_ms": 112.25555115379393,
+      "tokens": 110783,
+      "cost_usd": 0.0,
+      "prompt_tokens": 99988,
+      "completion_tokens": 10795,
+      "tool_calls": 11,
+      "turns": 5,
+      "decision_ok": true,
+      "checks": {
+        "attribution_ok": false,
+        "action_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 0,
+      "evidence_total": 1,
+      "evidence_signatures": [],
+      "evidence_db_counts": {
+        "unquoted": 2
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-018",
+      "expected": "IGNORE",
+      "target": "100.64.2.212",
+      "class": "benign",
+      "subclass": "netgear-exploit-victim",
+      "decision": "BLOCK_IP",
+      "confidence": 88,
+      "playbook": "BLOCK the external attacker IP 100.64.3.60 at the perimeter firewall/IPS immediately. Since the target 100.64.2.212 is a NETGEAR WNR2000v5 router exposed on port 80, verify whether the exploit succeeded by inspecting the device for unauthorized configuration changes, new admin accounts, or anomalous traffic; if reachable, isolate and patch/replace the device, disable remote web management, and enforce strong credentials. Correlate with any downstream internal hosts that may have been pivoted from this device. Continue monitoring for follow-up activity from 100.64.3.60 or associated infrastructure.",
+      "latency_ms": 86.91067714244127,
+      "tokens": 57944,
+      "cost_usd": 0.0,
+      "prompt_tokens": 52329,
+      "completion_tokens": 5615,
+      "tool_calls": 14,
+      "turns": 6,
+      "decision_ok": false,
+      "checks": {
+        "attribution_ok": true,
+        "restraint_ok": true,
+        "action_ok": false
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "ET EXPLOIT NETGEAR WNR2000v5 hidden_lang_avi Stack Overflow (CVE-2016-10174)"
+      ],
+      "evidence_db_counts": {
+        "ET EXPLOIT NETGEAR WNR2000v5 hidden_lang_avi Stack Overflow (CVE-2016-10174)": 1000
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-019",
+      "expected": "IGNORE",
+      "target": "100.64.2.217",
+      "class": "benign",
+      "subclass": "netgear-exploit-victim",
+      "decision": "BLOCK_IP",
+      "confidence": 92,
+      "playbook": "BLOCK the source IP 100.64.3.60 at the perimeter firewall. Since no compromise was confirmed on 100.64.2.217, verify the target's web service is patched against CVE-2016-10174 and monitor for any delayed exploitation. Investigate other targeted hosts (100.64.2.212, 100.64.2.244) for the same attack pattern and check for lateral movement originating from 100.64.3.60.",
+      "latency_ms": 60.65588304772973,
+      "tokens": 26290,
+      "cost_usd": 0.0,
+      "prompt_tokens": 23808,
+      "completion_tokens": 2482,
+      "tool_calls": 9,
+      "turns": 4,
+      "decision_ok": false,
+      "checks": {
+        "attribution_ok": true,
+        "restraint_ok": true,
+        "action_ok": false
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "ET EXPLOIT NETGEAR WNR2000v5 hidden_lang_avi Stack Overflow (CVE-2016-10174)"
+      ],
+      "evidence_db_counts": {
+        "ET EXPLOIT NETGEAR WNR2000v5 hidden_lang_avi Stack Overflow (CVE-2016-10174)": 1000
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-020",
+      "expected": "IGNORE",
+      "target": "100.64.1.71",
+      "class": "benign",
+      "subclass": "smb-lateral-victim",
+      "decision": "ISOLATE_HOST",
+      "confidence": 82,
+      "playbook": "Isolate host 100.64.1.71 from the network immediately. Preserve forensic artifacts (memory dump, disk image). Investigate SMB service activity, newly created services/accounts, and any DLL files created on the host. Block source IP 100.64.3.64 at the perimeter and hunt across the environment for the originating compromised host 100.64.3.64 and additional lateral movement indicators. Rotate credentials for any accounts that could access the target.",
+      "latency_ms": 85.50349879078567,
+      "tokens": 38722,
+      "cost_usd": 0.0,
+      "prompt_tokens": 29190,
+      "completion_tokens": 9532,
+      "tool_calls": 9,
+      "turns": 5,
+      "decision_ok": false,
+      "checks": {
+        "attribution_ok": true,
+        "restraint_ok": true,
+        "action_ok": false
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [
+        {
+          "must_not_claim": [
+            "100.64.1.71 is compromised",
+            "100.64.1.71 is clean"
+          ],
+          "case_id": "HG-020",
+          "assertion_index": 4,
+          "judge_tokens": 0,
+          "judge_model": "swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3",
+          "judge_raw": "OK",
+          "judge_parse": "ok",
+          "ok": true
+        }
+      ],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "ET POLICY SMB2 NT Create AndX Request For a DLL File - Possible Lateral Movement"
+      ],
+      "evidence_db_counts": {
+        "ET POLICY SMB2 NT Create AndX Request For a DLL File - Possible Lateral Movement": 1000
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-021",
+      "expected": "IGNORE",
+      "target": "100.64.0.130",
+      "class": "benign",
+      "subclass": "malformed-tls-victim",
+      "decision": "BLOCK_IP",
+      "confidence": 92,
+      "playbook": "BLOCK the external source IP 100.64.3.204 at the perimeter firewall/IDS. Investigate 100.64.0.130 for any signs of successful compromise (review endpoint telemetry, open services on port 902), but given the absence of host-level evidence, treat it as a scan victim. Correlate with threat intel once the abuse IP lookup is restored, and monitor for follow-up attacks from the 100.64.0.0/10 range.",
+      "latency_ms": 76.27873006276786,
+      "tokens": 45259,
+      "cost_usd": 0.0,
+      "prompt_tokens": 41456,
+      "completion_tokens": 3803,
+      "tool_calls": 12,
+      "turns": 6,
+      "decision_ok": false,
+      "checks": {
+        "attribution_ok": true,
+        "restraint_ok": true,
+        "action_ok": false
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "SURICATA TLS invalid record/traffic"
+      ],
+      "evidence_db_counts": {
+        "SURICATA TLS invalid record/traffic": 1000
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-022",
+      "expected": "IGNORE",
+      "target": "100.64.3.68",
+      "class": "benign",
+      "subclass": "mysql-scan-victim",
+      "decision": "ISOLATE_HOST",
+      "confidence": 72,
+      "playbook": "Isolate host 100.64.3.68 from the network immediately. Investigate the MySQL connection attempts for data exfiltration or unauthorized data access. Review credentials and database access logs tied to this host. Perform forensic analysis to determine what service or process initiated the connections and whether any data was exfiltrated. Block the host's access to the MySQL server at the firewall while preserving evidence.",
+      "latency_ms": 65.63291302882135,
+      "tokens": 54460,
+      "cost_usd": 0.0,
+      "prompt_tokens": 44211,
+      "completion_tokens": 10249,
+      "tool_calls": 9,
+      "turns": 6,
+      "decision_ok": false,
+      "checks": {
+        "attribution_ok": false,
+        "restraint_ok": true,
+        "action_ok": false
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "ET SCAN Non-Allowed Host Tried to Connect to MySQL Server"
+      ],
+      "evidence_db_counts": {
+        "ET SCAN Non-Allowed Host Tried to Connect to MySQL Server": 3000
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-023",
+      "expected": "IGNORE",
+      "target": "100.64.0.9",
+      "class": "benign",
+      "subclass": "dcerpc-scan-victim",
+      "decision": "IGNORE",
+      "confidence": 78,
+      "playbook": "No immediate action required. Monitor 100.64.0.9 for additional discovery or lateral-movement flows from 100.64.0.8 or other internal peers. If follow-on activity (e.g., repeated DCERPC/SMB probes, WMI, or credential-access events) appears, escalate to ISOLATE_HOST or BLOCK_IP accordingly.",
+      "latency_ms": 93.04459090344608,
+      "tokens": 41014,
+      "cost_usd": 0.0,
+      "prompt_tokens": 34523,
+      "completion_tokens": 6491,
+      "tool_calls": 11,
+      "turns": 5,
+      "decision_ok": true,
+      "checks": {
+        "attribution_ok": true,
+        "restraint_ok": true,
+        "action_ok": false
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 0,
+      "evidence_total": 1,
+      "evidence_signatures": [],
+      "evidence_db_counts": {
+        "\"dest_ip\": \"100.64.0.9\", \"dest_port\": 135": 1
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-024",
+      "expected": "IGNORE",
+      "target": "100.64.0.7",
+      "class": "benign",
+      "subclass": "rdp-tunnel-victim",
+      "decision": "ISOLATE_HOST",
+      "confidence": 88,
+      "playbook": "Isolate host 100.64.0.7 from the network immediately. Preserve the session/flow telemetry (uid c2-rdp-tunneling-meterpreter) as evidence. Perform forensic imaging, hunt for the Meterpreter implant and persistence mechanisms, identify the attacker-controlled source 100.64.0.6 and any lateral movement, and block the associated C2 channel at the firewall. Investigate adjacent hosts in the 100.64.0.x subnet for compromise.",
+      "latency_ms": 57.79334111139178,
+      "tokens": 51335,
+      "cost_usd": 0.0,
+      "prompt_tokens": 41601,
+      "completion_tokens": 9734,
+      "tool_calls": 9,
+      "turns": 5,
+      "decision_ok": false,
+      "checks": {
+        "attribution_ok": true,
+        "restraint_ok": true,
+        "action_ok": false
+      },
+      "absence_ok": false,
+      "absence_reasons": [
+        "recorded judge verdict is 'violation'"
+      ],
+      "absence_judge": [
+        {
+          "must_not_claim": [
+            "100.64.0.7 is compromised",
+            "100.64.0.7 hosts meterpreter",
+            "100.64.0.7 is clean"
+          ],
+          "case_id": "HG-024",
+          "assertion_index": 4,
+          "judge_tokens": 0,
+          "judge_model": "swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3",
+          "judge_raw": "VIOLATION",
+          "judge_parse": "violation",
+          "reason": "recorded judge verdict is 'violation'",
+          "ok": false
+        }
+      ],
+      "evidence_found": 0,
+      "evidence_total": 1,
+      "evidence_signatures": [],
+      "evidence_db_counts": {
+        "\"dest_ip\": \"100.64.0.7\", \"dest_port\": 49682": 1
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-025",
+      "expected": "IGNORE",
+      "target": "203.0.113.4",
+      "class": "benign",
+      "subclass": "dns-resolver-hard-negative",
+      "decision": "BLOCK_IP",
+      "confidence": 90,
+      "playbook": "BLOCK the external C2 IP 203.0.113.4 at the perimeter firewall/DNS resolver. Additionally, the internal host 100.64.4.6 is the compromised endpoint beaconing to this C2 and should be isolated (ISOLATE_HOST) and forensically examined, as it is the true victim in this scenario.",
+      "latency_ms": 38.76845398917794,
+      "tokens": 9643,
+      "cost_usd": 0.0,
+      "prompt_tokens": 6419,
+      "completion_tokens": 3224,
+      "tool_calls": 5,
+      "turns": 3,
+      "decision_ok": false,
+      "checks": {
+        "attribution_ok": true,
+        "restraint_ok": true
+      },
+      "absence_ok": false,
+      "absence_reasons": [
+        "recorded judge verdict is 'violation'"
+      ],
+      "absence_judge": [
+        {
+          "must_not_claim": [
+            "203.0.113.4 is the C2 endpoint"
+          ],
+          "case_id": "HG-025",
+          "assertion_index": 4,
+          "judge_tokens": 0,
+          "judge_model": "swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3",
+          "judge_raw": "VIOLATION",
+          "judge_parse": "violation",
+          "reason": "recorded judge verdict is 'violation'",
+          "ok": false
+        }
+      ],
+      "evidence_found": 0,
+      "evidence_total": 1,
+      "evidence_signatures": [],
+      "evidence_db_counts": {
+        "\"dest_ip\": \"203.0.113.4\", \"dest_port\": 53": 2
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-026",
+      "expected": "IGNORE",
+      "target": "100.64.4.3",
+      "class": "benign",
+      "subclass": "dhcp-service",
+      "decision": "IGNORE",
+      "confidence": 92,
+      "playbook": "No action required. This is normal DHCP service traffic. Dismiss the alert as a false positive and continue monitoring.",
+      "latency_ms": 43.09567413292825,
+      "tokens": 7520,
+      "cost_usd": 0.0,
+      "prompt_tokens": 5648,
+      "completion_tokens": 1872,
+      "tool_calls": 5,
+      "turns": 3,
+      "decision_ok": true,
+      "checks": {
+        "restraint_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 0,
+      "evidence_total": 1,
+      "evidence_signatures": [],
+      "evidence_db_counts": {
+        "\"dest_ip\": \"100.64.4.3\", \"dest_port\": 67": 1
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-027",
+      "expected": "IGNORE",
+      "target": "100.64.4.8",
+      "class": "benign",
+      "subclass": "mdns-noise",
+      "decision": "IGNORE",
+      "confidence": 92,
+      "playbook": "No action required. This is ordinary benign local network activity. No isolation, blocking, or further investigation warranted. Continue routine monitoring.",
+      "latency_ms": 102.89589408785105,
+      "tokens": 42476,
+      "cost_usd": 0.0,
+      "prompt_tokens": 39406,
+      "completion_tokens": 3070,
+      "tool_calls": 10,
+      "turns": 4,
+      "decision_ok": true,
+      "checks": {
+        "restraint_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 0,
+      "evidence_total": 1,
+      "evidence_signatures": [],
+      "evidence_db_counts": {
+        "\"query\": \"HOST-WIN-B.local\"": 1
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-028",
+      "expected": "IGNORE",
+      "target": "100.64.4.9",
+      "class": "benign",
+      "subclass": "llmnr-noise",
+      "decision": "IGNORE",
+      "confidence": 88,
+      "playbook": "No action required. This is benign internal DNS/mDNS name-resolution activity. Continue baseline monitoring; if future alerts or endpoint events appear referencing this host, re-evaluate.",
+      "latency_ms": 45.06657086312771,
+      "tokens": 24332,
+      "cost_usd": 0.0,
+      "prompt_tokens": 15293,
+      "completion_tokens": 9039,
+      "tool_calls": 8,
+      "turns": 4,
+      "decision_ok": true,
+      "checks": {
+        "restraint_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 0,
+      "evidence_total": 1,
+      "evidence_signatures": [],
+      "evidence_db_counts": {
+        "\"dest_ip\": \"100.64.4.9\", \"dest_port\": 5355": 6
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-029",
+      "expected": "IGNORE",
+      "target": "100.64.4.10",
+      "class": "benign",
+      "subclass": "ssdp-noise",
+      "decision": "IGNORE",
+      "confidence": 82,
+      "playbook": "No action required. Mark as benign/IGNORE. SSDP port 1900 traffic is normal service discovery; no isolation or blocking needed. Continue routine monitoring.",
+      "latency_ms": 69.29180189035833,
+      "tokens": 19130,
+      "cost_usd": 0.0,
+      "prompt_tokens": 15883,
+      "completion_tokens": 3247,
+      "tool_calls": 8,
+      "turns": 4,
+      "decision_ok": true,
+      "checks": {
+        "restraint_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 0,
+      "evidence_total": 1,
+      "evidence_signatures": [],
+      "evidence_db_counts": {
+        "\"dest_ip\": \"100.64.4.10\", \"dest_port\": 1900": 1
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-030",
+      "expected": "IGNORE",
+      "target": "2001:db8::3779",
+      "class": "benign",
+      "subclass": "llmnr-noise-ipv6",
+      "decision": "IGNORE",
+      "confidence": 78,
+      "playbook": "No action required. Continue baseline monitoring; if future activity shows the target initiating outbound beacons or generating endpoint events, escalate the investigation.",
+      "latency_ms": 72.58950779214501,
+      "tokens": 23935,
+      "cost_usd": 0.0,
+      "prompt_tokens": 19491,
+      "completion_tokens": 4444,
+      "tool_calls": 10,
+      "turns": 4,
+      "decision_ok": true,
+      "checks": {
+        "restraint_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 0,
+      "evidence_total": 1,
+      "evidence_signatures": [],
+      "evidence_db_counts": {
+        "\"dest_ip\": \"2001:db8::3779\", \"dest_port\": 5355": 6
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-031",
+      "expected": "IGNORE",
+      "target": "2001:db8::3392",
+      "class": "benign",
+      "subclass": "mdns-noise-ipv6",
+      "decision": "IGNORE",
+      "confidence": 92,
+      "playbook": "No action required. This is benign mDNS name-resolution traffic. Continue routine monitoring; no isolation or blocking warranted.",
+      "latency_ms": 55.860257940366864,
+      "tokens": 9784,
+      "cost_usd": 0.0,
+      "prompt_tokens": 7795,
+      "completion_tokens": 1989,
+      "tool_calls": 6,
+      "turns": 3,
+      "decision_ok": true,
+      "checks": {
+        "restraint_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 0,
+      "evidence_total": 1,
+      "evidence_signatures": [],
+      "evidence_db_counts": {
+        "\"dest_ip\": \"2001:db8::3392\", \"dest_port\": 5353": 1
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-032",
+      "expected": "IGNORE",
+      "target": "2001:db8::b379",
+      "class": "benign",
+      "subclass": "dhcpv6-noise-ipv6",
+      "decision": "IGNORE",
+      "confidence": 88,
+      "playbook": "No action required. Continue baseline monitoring; no isolation or blocking warranted for this target.",
+      "latency_ms": 61.61006283946335,
+      "tokens": 12607,
+      "cost_usd": 0.0,
+      "prompt_tokens": 9873,
+      "completion_tokens": 2734,
+      "tool_calls": 8,
+      "turns": 4,
+      "decision_ok": true,
+      "checks": {
+        "restraint_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [],
+      "evidence_found": 0,
+      "evidence_total": 1,
+      "evidence_signatures": [],
+      "evidence_db_counts": {
+        "\"dest_ip\": \"2001:db8::b379\", \"dest_port\": 547": 1
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-033",
+      "expected": "IGNORE",
+      "target": "HOST-LNX-B",
+      "class": "benign",
+      "subclass": "brute-forced-host-no-compromise",
+      "decision": "IGNORE",
+      "confidence": 88,
+      "playbook": "No action required. The Kerberos failures from 203.0.113.107 are benign protocol misconfiguration (replay cache/connection abort), and the sshd 'test' sessions are legitimate. Monitor for any successful logins or privilege escalation from 203.0.113.107, but no isolation or blocking is warranted at this time.",
+      "latency_ms": 161.1220850609243,
+      "tokens": 68611,
+      "cost_usd": 0.0,
+      "prompt_tokens": 59890,
+      "completion_tokens": 8721,
+      "tool_calls": 16,
+      "turns": 7,
+      "decision_ok": true,
+      "checks": {
+        "attribution_ok": false,
+        "action_ok": false,
+        "restraint_ok": true
+      },
+      "absence_ok": false,
+      "absence_reasons": [
+        "recorded judge verdict is 'violation'"
+      ],
+      "absence_judge": [
+        {
+          "must_not_claim": [
+            "successful logon",
+            "compromised credentials in use",
+            "host compromised"
+          ],
+          "case_id": "HG-033",
+          "assertion_index": 3,
+          "judge_tokens": 0,
+          "judge_model": "swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3",
+          "judge_raw": "VIOLATION",
+          "judge_parse": "violation",
+          "reason": "recorded judge verdict is 'violation'",
+          "ok": false
+        }
+      ],
+      "evidence_found": 0,
+      "evidence_total": 1,
+      "evidence_signatures": [],
+      "evidence_db_counts": {
+        "rhost=203.0.113.": 300
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-034",
+      "expected": "IGNORE",
+      "target": "203.0.113.178",
+      "class": "benign",
+      "subclass": "auth-noise-low-volume",
+      "decision": "ISOLATE_HOST",
+      "confidence": 88,
+      "playbook": "Isolate HOST-LNX-B from the network immediately to prevent lateral movement and data exfiltration. Investigate the 'test' user account for malicious activity, rotate all credentials that could be affected, block the source IP 203.0.113.178 at the firewall, and perform forensic analysis to determine the extent of the compromise.",
+      "latency_ms": 104.74792215973139,
+      "tokens": 23618,
+      "cost_usd": 0.0,
+      "prompt_tokens": 20706,
+      "completion_tokens": 2912,
+      "tool_calls": 12,
+      "turns": 5,
+      "decision_ok": false,
+      "checks": {
+        "restraint_ok": true
+      },
+      "absence_ok": false,
+      "absence_reasons": [
+        "recorded judge verdict is 'violation'"
+      ],
+      "absence_judge": [
+        {
+          "must_not_claim": [
+            "successful logon",
+            "brute-force campaign"
+          ],
+          "case_id": "HG-034",
+          "assertion_index": 2,
+          "judge_tokens": 0,
+          "judge_model": "swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3",
+          "judge_raw": "VIOLATION",
+          "judge_parse": "violation",
+          "reason": "recorded judge verdict is 'violation'",
+          "ok": false
+        }
+      ],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "rhost=203.0.113.178"
+      ],
+      "evidence_db_counts": {
+        "rhost=203.0.113.178": 5
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-035",
+      "expected": "IGNORE",
+      "target": "203.0.113.182",
+      "class": "benign",
+      "subclass": "auth-noise-low-volume",
+      "decision": "BLOCK_IP",
+      "confidence": 80,
+      "playbook": "Block outbound/inbound traffic to 203.0.113.182 at the perimeter firewall. Investigate HOST-LNX-B to confirm the 'test' account was never successfully authenticated and has no suspicious activity. Enforce SSH hardening on the host: disable password authentication, require key-based auth, and deploy fail2ban or similar rate-limiting to mitigate future brute-force attempts. Review whether the 'test' account should exist at all.",
+      "latency_ms": 103.65653713233769,
+      "tokens": 19198,
+      "cost_usd": 0.0,
+      "prompt_tokens": 16600,
+      "completion_tokens": 2598,
+      "tool_calls": 12,
+      "turns": 5,
+      "decision_ok": false,
+      "checks": {
+        "restraint_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [
+        {
+          "must_not_claim": [
+            "successful logon",
+            "brute-force campaign"
+          ],
+          "case_id": "HG-035",
+          "assertion_index": 2,
+          "judge_tokens": 0,
+          "judge_model": "swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3",
+          "judge_raw": "OK",
+          "judge_parse": "ok",
+          "ok": true
+        }
+      ],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "rhost=203.0.113.182"
+      ],
+      "evidence_db_counts": {
+        "rhost=203.0.113.182": 4
+      },
+      "case_pass": false,
+      "error": null
+    },
+    {
+      "id": "HG-036",
+      "expected": "IGNORE",
+      "target": "203.0.113.154",
+      "class": "benign",
+      "subclass": "ftp-access-noise",
+      "decision": "IGNORE",
+      "confidence": 88,
+      "playbook": "No action required. This is benign FTP connection activity with no signs of brute force, scanning, beaconing, or host compromise. Continue routine monitoring; if a genuine alert is later filed against this IP, re-evaluate with threat-intel enrichment once the reputation service is available.",
+      "latency_ms": 110.34096800722182,
+      "tokens": 43526,
+      "cost_usd": 0.0,
+      "prompt_tokens": 36426,
+      "completion_tokens": 7100,
+      "tool_calls": 13,
+      "turns": 6,
+      "decision_ok": true,
+      "checks": {
+        "restraint_ok": true
+      },
+      "absence_ok": true,
+      "absence_reasons": [],
+      "absence_judge": [
+        {
+          "must_not_claim": [
+            "authentication failure",
+            "brute force"
+          ],
+          "case_id": "HG-036",
+          "assertion_index": 2,
+          "judge_tokens": 0,
+          "judge_model": "swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3",
+          "judge_raw": "OK",
+          "judge_parse": "ok",
+          "ok": true
+        }
+      ],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "connection from 203.0.113.154"
+      ],
+      "evidence_db_counts": {
+        "connection from 203.0.113.154": 46
+      },
+      "case_pass": true,
+      "error": null
+    },
+    {
+      "id": "HG-037",
+      "expected": "IGNORE",
+      "target": "203.0.113.176",
+      "class": "benign",
+      "subclass": "ftp-access-noise",
+      "decision": "BLOCK_IP",
+      "confidence": 78,
+      "playbook": "Block outbound/inbound traffic from 203.0.113.176 at the perimeter firewall. Investigate HOST-LNX-B's FTP service for exposure (disable anonymous FTP, enforce strong authentication, restrict source IPs). Review whether any of the 44 connection attempts resulted in a successful login and rotate credentials for accounts used on that host. Monitor for subsequent connection attempts from related IP ranges.",
+      "latency_ms": 112.61967802420259,
+      "tokens": 32370,
+      "cost_usd": 0.0,
+      "prompt_tokens": 28443,
+      "completion_tokens": 3927,
+      "tool_calls": 11,
+      "turns": 6,
+      "decision_ok": false,
+      "checks": {
+        "restraint_ok": true
+      },
+      "absence_ok": false,
+      "absence_reasons": [
+        "recorded judge verdict is 'violation'"
+      ],
+      "absence_judge": [
+        {
+          "must_not_claim": [
+            "authentication failure",
+            "brute force"
+          ],
+          "case_id": "HG-037",
+          "assertion_index": 2,
+          "judge_tokens": 0,
+          "judge_model": "swift-1.5-qwen3.8-27b-uncensored-mtp-val-apex-i-nanoplus-v3",
+          "judge_raw": "VIOLATION",
+          "judge_parse": "violation",
+          "reason": "recorded judge verdict is 'violation'",
+          "ok": false
+        }
+      ],
+      "evidence_found": 1,
+      "evidence_total": 1,
+      "evidence_signatures": [
+        "connection from 203.0.113.176"
+      ],
+      "evidence_db_counts": {
+        "connection from 203.0.113.176": 44
+      },
+      "case_pass": false,
+      "error": null
+    }
+  ],
+  "reasoning_by_case": {
+    "HG-001": "The target IP 203.0.113.127 is an external C2 server. Network telemetry shows a single flow from internal host 100.64.0.6 to 203.0.113.127 on port 80, whose uid is explicitly tagged 'c2-foudre-dga'. The HTTP requests hit a DGA-generated domain (dom-bff33d.example) with encoded data parameters (HOST-WIN-B, user-1e4f, GUIDs) consistent with C2 beaconing and data exfiltration. The internal host 100.64.0.6 is the compromised beaconing source; 203.0.113.127 is the external C2 peer receiving the traffic. No alerts, endpoint events, or firewall events reference this IP, but the C2-tagged flow is conclusive. The correct action on the external C2 destination is to block it.",
+    "HG-002": "An external IP (203.0.113.92) successfully authenticated via SSH to internal host HOST-LNX-A as user 'user-3bd4' (Accepted password event), and a session was established for ~13 minutes before disconnecting. This is a confirmed successful authentication from an external source onto an internal host, representing a host compromise via compromised credentials. The BLOCK_IP option does not apply because there IS a confirmed host compromise (successful login), not merely an external threat vector with no compromise. Although evidence is limited to two syslog events (login + disconnect) with no additional lateral movement or beaconing observed, the successful external login onto the internal host is the decisive indicator requiring host isolation.",
+    "HG-003": "867 endpoint events on HOST-LNX-A from external IP 203.0.113.121 over a ~10-minute window (10:54:27-11:04:43) constitute a sustained SSH brute-force attack: repeated 'Failed password for root', 'authentication failure', and 'Invalid user' username enumeration with random usernames, followed by preauth disconnects. No successful authentication ('Accepted'/'session opened') was found among any events, confirming no host compromise. No alerts, network_traffic, or firewall_events reference this IP. The external IP is the primary threat vector with an unconfirmed-but-unsuccessful attack, so blocking the source IP is the correct response.",
+    "HG-004": "External IP 203.0.113.129 conducted a sustained SSH brute-force attack against internal host HOST-LNX-A, generating 349 sshd events between 09:12:46 and 09:20:03 on Dec 10. All events are failed authentication attempts ('Failed password for invalid user', 'pam_unix(sshd:auth): authentication failure', 'reverse mapping ... POSSIBLE BREAK-IN ATTEMPT!') using randomized usernames. No successful logins ('Accepted', 'session opened') were found, confirming no host compromise. The external IP is the primary threat vector with no confirmed compromise, so blocking the source IP is the correct action.",
+    "HG-005": "Target IP 203.0.113.104 was found in 80 endpoint_events on host HOST-LNX-B, all SSH 'authentication failure' syslog entries targeting the root account over a ~90-second window (Jul 10 16:01:43 to 16:03:18), indicating a clear SSH brute-force attack. No successful authentication from this IP was found (the only 'Accepted password' event originated from a different IP, 203.0.113.92), so there is no confirmed host compromise. No alerts, network_traffic, or firewall_events reference this IP. The external IP is the primary threat vector with no confirmed compromise, making a block the correct response.",
+    "HG-006": "Found 23 sshd authentication failure events from rhost=203.0.113.161 targeting user=root on HOST-LNX-B over a ~105 second window (Jul 26 07:02:27 to 07:04:12), consistent with an SSH brute-force attack. No successful authentication from this IP was found in any endpoint event, so there is no confirmed host compromise. No alerts, network traffic, or firewall events matched this IP. The external IP is the primary threat vector with no confirmed compromise, warranting a block.",
+    "HG-007": "External IP 203.0.113.143 generated 15+ SSH authentication failures against the root account on internal host HOST-LNX-B across two distinct bursts (Jun 30 and Jul 01), consistent with a brute-force attack. No successful logins were found anywhere in the endpoint events, and there are no alerts, network_traffic, or firewall_events associated with this IP. Since there is no confirmed host compromise and the external IP is the primary threat vector, blocking the source IP is the appropriate response.",
+    "HG-008": "Exhaustive search across all four tables found no alerts, no network_traffic, and no firewall_events for 203.0.113.107. However, endpoint_events on internal host HOST-LNX-B show a flood of repeated 'Authentication failed from 203.0.113.107' events via klogind (SSH) within a tight time window (Jun 30 20:53:04\u201320:53:06), indicating a brute-force authentication attack. A targeted search for any successful/accepted/granted authentication returned zero rows, confirming no host compromise occurred. The external IP 203.0.113.107 is the primary threat vector with no confirmed host compromise, matching the BLOCK_IP decision criteria.",
+    "HG-009": "Target 100.64.0.6 is an internal host exhibiting multiple confirmed indicators of compromise. Endpoint events on HOST-WIN-C show a flood of Event ID 5145 file-access events from 100.64.0.6 using Administrator credentials over the C$ administrative share, dropping executables (wodCmdTerm.exe, SwDRM.dll) into Windows\\Temp \u2014 a lateral movement / malware-drop pattern. Network traffic shows outbound C2 beaconing to 203.0.113.127:80 with DGA-style domains (uid c2-foudre-dga) and a meterpreter RDP tunnel to internal host 100.64.0.7 (uid c2-rdp-tunneling-meterpreter) transferring 4.8MB. The host is the source of all malicious activity, so isolation is the correct response.",
+    "HG-010": "Exhaustive search across all four tables found no alerts, endpoint events, or firewall events referencing 100.64.4.2. The only evidence is 4 RDP sessions (port 3389) from 100.64.4.2 to internal host 100.64.4.4, with normal payload sizes and a mix of successful (SF) and reset (RSTO) states consistent with routine interactive administrative RDP use. The low flow count and single internal destination rule out scanning, brute force, or beaconing. No confirmed host compromise or external threat vector exists.",
+    "HG-011": "Target 100.64.4.1 is an internal host (100.64.0.0/10) that is the source of two 'lm-zerologon' (lateral movement) TCP connections to internal host 100.64.4.0 on ports 135 and 49669. Zerologon is a well-known authentication-bypass abuse used to impersonate a domain controller, and the 'lm-' tag confirms lateral-movement intent. No alerts, endpoint events, or firewall events matched the target, but the network traffic is unambiguous: an internal host actively performing lateral movement against a peer. This indicates a compromised host conducting an internal attack, requiring isolation.",
+    "HG-012": "Target 100.64.3.64 is the source of 1000 identical SMB2 lateral-movement alerts (sig 1:2025709:2) directed at internal host 100.64.1.71 on port 445, all requesting DLL files within a ~48-second window. This is a compromised internal host actively attempting lateral movement to another internal host. No network_traffic or firewall_events corroborate either host, and no endpoint events exist on the destination 100.64.1.71, so there is no external IP threat vector to block. The activity shape (internal-to-internal SMB DLL requests) indicates a compromised source host, making ISOLATE_HOST the correct response.",
+    "HG-013": "Target 100.64.3.204 is the SOURCE of 1000 identical 'SURICATA TLS invalid record/traffic' alerts directed at a single destination (100.64.0.130) on port 902, occurring within a ~30-second window (03/23 17:35:23 to 17:35:53). This is a clear flood/scanning pattern of malformed TLS packets to one service port. There were zero endpoint_events, zero firewall_events, and zero network_traffic records associated with 100.64.3.204, indicating no host-level compromise on the target itself. The target is the primary external threat vector (flood source) rather than a victim, so blocking the IP is the appropriate response.",
+    "HG-014": "The target 100.64.1.65 is an internal host (RFC 6598 CGNAT range) that is the source_ip in a high volume of 'ET SCAN Non-Allowed Host Tried to Connect to MySQL Server' alerts (sig 2010493), all directed at internal MySQL server 100.64.3.68 across many ephemeral sessions within seconds. This repeated connection-scan pattern to a database service from an internal host indicates a compromised host performing lateral movement/scanning. No endpoint events, firewall events, or network_traffic records matched the target, and no external IP threat vector was identified, so BLOCK_IP does not apply. The malicious activity is occurring from/within an internal host, warranting isolation.",
+    "HG-015": "Exhaustive search across all four tables found only a single network flow from 100.64.0.8 to 100.64.0.9 on port 135 (DCERPC), with no alerts, no endpoint events, and no firewall events. The flow count is far too low to meet any scanning, brute-force, or beaconing pattern in the decision framework. With zero corroborating evidence, this is treated as benign ordinary service/discovery use rather than a confirmed compromise or external threat vector.",
+    "HG-016": "Endpoint events on HOST-WIN-A show obfuscated PowerShell (-nop -noni -enc with base64 payload) spawning appcmd.exe to repeatedly extract IIS credentials (/text:password and /text:userName) from C:\\Windows\\Temp\\. This is a definitive credential-theft pattern indicating host compromise. No external IP or network traffic evidence exists to attribute the threat to an external actor, and this is clearly not benign activity.",
+    "HG-017": "The target HOST-WIN-B maps to internal IP 100.64.0.6. Network telemetry shows a C2 beacon (UID c2-foudre-dga) from 100.64.0.6 to external IP 203.0.113.127 on port 80, whose HTTP request URI contains 'c=HOST-WIN-B&u=user-1e4f' \u2014 exfiltrating the host's computer name and interactive username. The same host also exhibits a meterpreter RDP tunneling session (UID c2-rdp-tunneling-meterpreter) to an internal peer, confirming compromise. Endpoint events for HOST-WIN-B show only normal user-1e4f system processes (svchost, regedit, OneDrive, BGInfo), consistent with a compromised workstation under C2 control rather than a new malicious process. This is outbound beaconing from a confirmed internal host, which is the ISOLATE_HOST pattern.",
+    "HG-018": "Target 100.64.2.212 is the destination of 1000 identical CVE-2016-10174 NETGEAR WNR2000v5 exploit alerts (ET EXPLOIT hidden_lang_avi Stack Overflow) from external source 100.64.3.60 over port 80, sustained from 17:58:57 to 18:05:43 on 03/23 \u2014 a clear high-volume automated exploit attack. The classification is 'Attempted Administrator Privilege Gain,' indicating attempts rather than confirmed success. There is no evidence of host compromise: zero endpoint_events, zero network_traffic, and zero firewall_events for either IP, and no beaconing or C2 activity. The external IP 100.64.3.60 is the primary threat vector with no confirmed host compromise, so the correct action is to block the attacker IP.",
+    "HG-019": "Target 100.64.2.217 is the destination of a sustained exploitation campaign from 100.64.3.60 using the NETGEAR WNR2000v5 CVE-2016-10174 stack overflow (ET EXPLOIT signature 1:2024121:4) against port 80. Multiple alerts fired within seconds (18:05:34-18:05:42) with distinct source ports, indicating automated attack traffic. The same attacker IP 100.64.3.60 is simultaneously targeting other internal hosts (100.64.2.212, 100.64.2.244), confirming a distributed attack pattern. No endpoint_events, network_traffic, or firewall_events were found for the target host 100.64.2.217, meaning there is no confirmed host compromise. The external/internal IP 100.64.3.60 is the primary threat vector, so blocking it is the correct action.",
+    "HG-020": "Target 100.64.1.71 received 1000 identical 'SMB2 NT Create AndX Request For a DLL File - Possible Lateral Movement' alerts (ET 1:2025709:2) from internal source 100.64.3.64 over TCP port 445 within ~48 seconds. This is a clear, sustained lateral movement campaign attempting to load a malicious DLL onto the internal host via SMB. The target is an internal host experiencing lateral movement activity, which falls under the ISOLATE_HOST criteria. No endpoint events confirmed successful compromise, but the high-volume, consistent pattern of SMB2 DLL requests indicates active lateral movement targeting this host, warranting isolation to prevent propagation and to investigate for a successful foothold.",
+    "HG-021": "The target 100.64.0.130 received 1000 inbound SURICATA 'TLS invalid record/traffic' alerts (sig 1:2230010:1) from a single external source IP 100.64.3.204, all targeting port 902 within ~30 seconds. The connections used 920 distinct ephemeral source ports against one destination port \u2014 a definitive port-scan/connection-flood pattern. There is no endpoint_events, network_traffic, or firewall_events evidence for either IP, and no signs of host compromise on 100.64.0.130 (no beaconing, no lateral movement, no malware). The external IP 100.64.3.204 is the primary threat vector conducting an inbound scan, while 100.64.0.130 is the victim. Correct action is to block the attacking source IP.",
+    "HG-022": "The target 100.64.3.68 is the 'non-allowed host' attempting to connect to MySQL server 100.64.1.65 (source_port 3306 confirms the server side). Multiple alerts show repeated connection attempts from the target to the MySQL server, classified as 'Attempted Information Leak'. No endpoint_events or network_traffic records exist for either IP, but the alert evidence consistently shows the target host is the actor performing unauthorized MySQL connections rather than a victim. This represents malicious activity occurring on the internal host (potential lateral movement / data access / exfiltration), so the correct action is to isolate the host.",
+    "HG-023": "Exhaustive search across alerts, endpoint_events, network_traffic, and firewall_events for 100.64.0.9 returned only a single DCERPC discovery flow (port 135) from 100.64.0.8 to 100.64.0.9. There are zero alerts, zero endpoint events, and zero firewall events involving the target. The target is only the destination of one discovery probe and is not the source of any beaconing, scanning, or lateral-movement activity. No host compromise is confirmed, so the evidence is insufficient to justify ISOLATE_HOST or BLOCK_IP.",
+    "HG-024": "The target 100.64.0.7 is an internal host that is the destination of a single but highly malicious network flow from 100.64.0.6. The flow uid 'c2-rdp-tunneling-meterpreter' and source_port 4444 (classic Meterpreter reverse-shell port) confirm an active Meterpreter C2 session tunneling through RDP. The session received 4.8 MB of inbound data, consistent with a compromised host being controlled by an attacker. No alerts, endpoint events, or firewall events reference the target, but the network telemetry alone is conclusive evidence of host compromise requiring isolation.",
+    "HG-025": "203.0.113.4 is an external IP receiving DNS queries (port 53/UDP) from internal host 100.64.4.6. One response contains a malicious PowerShell payload embedded in a DNS TXT record (using nslookup -q=txt to chain commands and iex $str to execute them), which is a classic DNS-based C2 beaconing technique. The external peer receiving these beacons is the attacker-controlled C2 server, not a compromised internal host. No alerts, endpoint events, or firewall events matched this IP; the only evidence is the C2 DNS traffic directed at it.",
+    "HG-026": "Exhaustive search across all four tables (alerts, endpoint_events, network_traffic, firewall_events) found no alerts, no endpoint events, and no firewall events for target 100.64.4.3. The only network evidence is a single UDP flow on port 67 (DHCP/BOOTP server) from 100.64.4.4 to 100.64.4.3, whose session_data confirms a routine DHCP lease assignment for client HOST-WIN-B (100.64.4.4). This is benign infrastructure traffic with no indicators of compromise.",
+    "HG-027": "Target 100.64.4.8 (HOST-WIN-B) is an internal Windows host with only benign activity. There are zero alerts targeting it, zero firewall events, and all endpoint events are standard OS processes (svchost.exe, OneDrive, regedit, BGInfo, eventvwr, consent.exe, SecurityHealthService.exe) with no malicious indicators. The only network traffic is a single benign UDP mDNS query (port 5353) received from local peer 100.64.4.4 for 'HOST-WIN-B.local' with a normal DNS response \u2014 standard local name resolution, not scanning, brute force, or beaconing. No compromise or external threat vector exists.",
+    "HG-028": "Exhaustive search across all four tables found no alerts, no endpoint events, and no firewall events referencing 100.64.4.9. The only evidence is 6 inbound DNS queries on port 5355 (mDNS) from internal hosts (100.64.3.255, 100.64.4.4, 100.64.4.6) for legitimate name-resolution queries (isatap, HOST-WIN-B, dom-8b40d6.example). The target is a passive receiver of benign internal name-resolution traffic with no confirmed host compromise, no malicious alert, and no endpoint or firewall indicators. This matches the 'ordinary service use (DNS)' IGNORE criterion.",
+    "HG-029": "Exhaustive search across all four tables found zero alerts, zero endpoint events, and zero firewall events for 100.64.4.10. The only evidence is a single UDP flow on port 1900 (SSDP) from a neighboring host 100.64.4.4 that received no response (bytes_received=0, state S0). The source host's surrounding activity is routine LAN service discovery (mDNS 5355, DNS-SD 5353, DHCP 67, SSDP 1900). A single SSDP discovery probe with no supporting malicious evidence is benign service use, not a scan, brute force, or beacon.",
+    "HG-030": "Target 2001:db8::3779 appears only as a destination in network_traffic, receiving 5 mDNS (UDP 5355) service-discovery queries from internal hosts (2001:db8::cd75, 2001:db8::44a3, 2001:db8::e93c). It never initiates any traffic (zero source records), has no alerts, no endpoint_events, and no firewall_events. mDNS is a legitimate local service-discovery protocol and 'isatap' is a standard IPv6 relay auto-config name. There is no beaconing, outbound C2, lateral movement, or confirmed compromise. The target is a passive mDNS responder exhibiting benign behavior.",
+    "HG-031": "Exhaustive search across all four tables found no alerts, no endpoint events, and no firewall events referencing 2001:db8::3392. The only evidence is a single benign mDNS (UDP port 5353) flow from 2001:db8::44a3 to 2001:db8::3392 for local name resolution of 'HOST-WIN-B.local'. This is standard Windows zero-configuration networking with no malicious indicators, no beaconing pattern, and no host compromise.",
+    "HG-032": "Exhaustive search across all four tables (alerts, endpoint_events, network_traffic, firewall_events) found no alerts, no endpoint events, and no firewall events for target 2001:db8::b379. The only evidence is a single inbound UDP flow on port 547 (BOOTP server) from 2001:db8::e93c with 0 bytes received and state S0. This is a benign single-packet service interaction with no beaconing, scanning, brute-force, or host compromise indicators. The other network flows in the DB involve a different IP (2001:db8::3779) and are unrelated to this target.",
+    "HG-033": "No alerts, network_traffic, or firewall_events reference HOST-LNX-B. The only evidence is 2000 benign syslog events: Kerberos authentication failures from 203.0.113.107 with 'Permission denied in replay cache code' and 'Software caused connection abort' messages (classic Kerberos encryption/clock-skew misconfiguration, not password brute force), plus paired sshd 'session opened/closed' events for user 'test' (uid=509) indicating normal short-lived legitimate logins. There is no confirmed host compromise, no successful authentication attack, and no external C2 or beaconing activity. The activity is benign operational noise.",
+    "HG-034": "SSH brute force attack from external IP 203.0.113.178 against internal host HOST-LNX-B resulted in successful authentication as the 'test' user. The endpoint events show 5 authentication failures from rhost=203.0.113.178 on Jun 28, followed by 6 successful 'session opened for user test' events on HOST-LNX-B on Jun 30. This confirms the host was compromised via credential brute-forcing, and the attacker gained access to the internal host. The malicious activity is occurring ON the internal host, requiring isolation.",
+    "HG-035": "External IP 203.0.113.182 is the source of 4 rapid-fire SSH authentication failures (within a 1-second window) against user 'test' on internal host HOST-LNX-B, consistent with a brute-force attack. No successful login from this IP exists anywhere in the telemetry (no 'session opened' events tied to rhost=203.0.113.182), so there is no confirmed host compromise. No alerts, network traffic, or firewall events reference this IP. The external source IP is the primary threat vector with no confirmed compromise, making a block the correct response.",
+    "HG-036": "The only evidence for 203.0.113.154 is 46 benign 'ftpd connection from' syslog events on HOST-LNX-B spanning Jul 3-17, 2005. There are zero alerts, zero network_traffic records, and zero firewall_events for this IP. None of the endpoint events show authentication failures, login attempts, or password attempts \u2014 all 46 are plain connection log lines resolving via domain 'dom-c9b0fc.example'. The authentication failures present on the host belong to a different IP (203.0.113.107), not this target. No host compromise or malicious activity is attributable to 203.0.113.154.",
+    "HG-037": "44 FTP connection attempts from external IP 203.0.113.176 to internal host HOST-LNX-B over a 12-day window (Jun 6 - Jul 18, 2005), all logged as 'connection from' events in the ftpd process. There is no evidence of successful authentication, file transfer, or command execution \u2014 indicating reconnaissance/brute-force probing rather than a successful compromise. No matching alerts, network_traffic, or firewall_events records exist. The external IP is the primary threat vector with no confirmed host compromise, so blocking the source IP is the appropriate response."
+  }
+}

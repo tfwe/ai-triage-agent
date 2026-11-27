@@ -33,15 +33,21 @@ data/public/cases/*
 eval/recordings/public-*.jsonl
 !eval/recordings/public-ornith-r3-holdout.jsonl
 
-# Stage-4b real-vendor holdout: per-draw recordings and per-draw result files
-# are reproducible from the pinned metadata recorded in the committed report
-# (eval/results/real-vendor-holdout-report.json).
+# Stage-4b real-vendor holdout (independent-judge redraw). The per-draw
+# recordings, judge-verdict sidecars and per-draw result files ARE committed:
+# the judge sidecars are what makes replay of the absence grading offline and
+# deterministic, so they ship with the report they back (the pre-redraw
+# same-model-judge artifacts were not comparable and were removed).
 eval/recordings/real-vendor-holdout-*.jsonl
 eval/results/real-vendor-holdout-r*.json
 eval/results/real-vendor-holdout-r*.txt
 eval/results/real-vendor-holdout-draw0.json
 eval/results/real-vendor-holdout-draw0.txt
 !eval/results/real-vendor-holdout-report.json
+!eval/recordings/real-vendor-holdout-ij-*.jsonl
+!eval/recordings/real-vendor-holdout-ij-*.jsonl-judge.jsonl
+!eval/results/real-vendor-holdout-ij-*.json
+!eval/results/real-vendor-holdout-ij-*.txt
 
 # Environment
 .env

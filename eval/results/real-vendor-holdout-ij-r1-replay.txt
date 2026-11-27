@@ -1,0 +1,2 @@
+mode=replay model=ornith-1.5-35b-a3b-apex-i-nanoplus cases=37 dataset=61d32dc2cac1f99d at 2026-11-27T19:13:58Z
+decision_accuracy=0.6216 case_pass=0.0541 fp=10 macro_family=0.0517
