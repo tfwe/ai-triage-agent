@@ -24,7 +24,7 @@ import time
 from datetime import datetime, timezone
 
 import database
-from agent.client import LLMClient, build_client, OpenAIClient
+from agent.client import ClientError, LLMClient, build_client, OpenAIClient
 from agent.core import run_triage_agent
 from agent.rules import classify
 from config import settings
@@ -108,6 +108,19 @@ def check_static_assertions(case: dict, reasoning: str) -> dict:
     return checks
 
 
+def parse_judge_verdict(raw: str | None) -> str:
+    """Strict verdict parse: after stripping whitespace and quote characters
+    the reply must be exactly 'OK' or 'VIOLATION' (case-insensitive).
+    Anything else -- including an empty reply -- is 'nonconforming', and the
+    absence assertion fails closed."""
+    text = (raw or "").strip().strip("\"'`“”").strip()
+    if text.upper() == "OK":
+        return "ok"
+    if text.upper() == "VIOLATION":
+        return "violation"
+    return "nonconforming"
+
+
 def judge_absence(judge_client: LLMClient, reasoning: str,
                   must_not_claim: list[str]) -> tuple[bool, dict]:
     prompt = (
@@ -125,14 +138,69 @@ def judge_absence(judge_client: LLMClient, reasoning: str,
         tools=[],
     )
     raw = (message.content or "").strip()
-    ok = "VIOLATION" not in raw.upper()
+    verdict = parse_judge_verdict(raw)
+    ok = verdict == "ok"  # fail closed: nonconforming output is not a pass
     return ok, {
         "judge_model": judge_client.model,
         "judge_temperature": JUDGE_TEMPERATURE,
         "judge_prompt": prompt,
         "judge_raw": raw,
+        "judge_parse": verdict,
         "judge_tokens": message.prompt_tokens + message.completion_tokens,
     }
+
+
+def judge_sidecar_path(recording_path: str) -> str:
+    """Judge-verdict sidecar sits next to its recording: <recording>-judge.jsonl."""
+    return f"{recording_path}-judge.jsonl"
+
+
+def read_judge_sidecar(path: str | None) -> dict[tuple[str, int], dict] | None:
+    """Parse the judge sidecar into (case_id, assertion_index) -> entry.
+    Returns None when the sidecar itself is missing (replay grades fail
+    closed); callers treat a None return as 'no verdicts at all'."""
+    if not path or not os.path.exists(path):
+        return None
+    entries: dict[tuple[str, int], dict] = {}
+    with open(path, encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if not line:
+                continue
+            entry = json.loads(line)
+            entries[(entry.get("case_id"), int(entry.get("assertion_index", 0)))] = entry
+    return entries
+
+
+def replay_judge_verdict(case_id: str, index: int, must_not_claim: list[str],
+                         entries: dict[tuple[str, int], dict] | None,
+                         sidecar_path: str | None) -> tuple[bool, dict]:
+    """Grade one absence assertion from the recorded sidecar (replay mode).
+    A missing sidecar, a missing entry and a nonconforming recorded verdict
+    all fail closed; a recorded VIOLATION fails the assertion."""
+    base = {
+        "case_id": case_id,
+        "assertion_index": index,
+        "must_not_claim": must_not_claim,
+        "judge_tokens": 0,
+    }
+    if entries is None:
+        return False, {**base, "judge_model": None, "judge_raw": None,
+                       "judge_parse": "missing_sidecar",
+                       "reason": f"no judge sidecar at {sidecar_path!r}"}
+    entry = entries.get((case_id, index))
+    if entry is None:
+        return False, {**base, "judge_model": None, "judge_raw": None,
+                       "judge_parse": "missing_entry",
+                       "reason": "no recorded judge verdict for this assertion"}
+    raw = entry.get("raw") or ""
+    verdict = parse_judge_verdict(raw)
+    ok = verdict == "ok"
+    record = {**base, "judge_model": entry.get("judge_model"),
+              "judge_raw": raw, "judge_parse": verdict}
+    if not ok:
+        record["reason"] = f"recorded judge verdict is {verdict!r}"
+    return ok, record
 
 
 def evidence_surfaces(case: dict, tool_log: list[dict]) -> tuple[int, int, list[str]]:
@@ -147,26 +215,45 @@ def evidence_surfaces(case: dict, tool_log: list[dict]) -> tuple[int, int, list[
 
 
 def build_judge_client(mode: str = "live") -> LLMClient | None:
-    """Same model/endpoint as the draw client but pinned to temperature 0.
-    Judge calls are never recorded: their raw output is stored in the result
-    artifact, and the replay gate only replays the triage conversations."""
+    """Build the independent absence-judge client.
+
+    The judge is configured separately from the draw client (judge_model /
+    judge_base_url / judge_api_key): temperature 0 pins sampling, not the
+    weights, and a model can be systematically blind to its own omissions, so
+    the judge model must differ from the draw client's model. Judge calls are
+    never recorded: their raw output is stored in the result artifact and the
+    judge sidecar, and the replay gate only replays the triage conversations.
+    """
     if mode == "replay":
         return None
-    client = build_client(mode="live")
-    if not isinstance(client, OpenAIClient):
-        return None
+    if not settings.judge_model:
+        raise ClientError(
+            "JUDGE_MODEL is unset but the absence judge is required in "
+            f"{mode} mode: the judge must be an independent model, so it "
+            "cannot default to the draw client's model. Set JUDGE_MODEL in .env."
+        )
     if settings.llm_provider == "ollama":
-        base_url, api_key = settings.ollama_base_url, "ollama"
+        base_url = settings.judge_base_url or settings.ollama_base_url
+        api_key = settings.judge_api_key or "ollama"
+        draw_model = settings.ollama_model
     else:
-        base_url, api_key = settings.openai_base_url, settings.openai_api_key
+        base_url = settings.judge_base_url or settings.openai_base_url
+        api_key = settings.judge_api_key or settings.openai_api_key
+        draw_model = settings.openai_model
+    if settings.judge_model == draw_model:
+        raise ClientError(
+            f"judge model {settings.judge_model!r} equals the draw client's "
+            f"model ({draw_model!r}): the absence judge must be an "
+            "independent model, not the same weights."
+        )
     return OpenAIClient(
-        model=client.model,
+        model=settings.judge_model,
         base_url=base_url,
         api_key=api_key,
         temperature=JUDGE_TEMPERATURE,
-        seed=client.seed,
+        seed=7,
         timeout=900.0,
-        max_tokens=client.max_tokens,
+        max_tokens=5500,
     )
 
 
@@ -178,6 +265,7 @@ def evaluate_agent_v2(
     max_turns: int = EVAL_MAX_TURNS,
     price_in: float = 0.0,
     price_out: float = 0.0,
+    judge_sidecar: str | None = None,
 ) -> dict:
     settings.triage_db_path = db_path
     started = time.perf_counter()
@@ -197,15 +285,41 @@ def evaluate_agent_v2(
         decision = result.action.decision
         checks = check_static_assertions(case, reasoning)
         found, total, signatures = evidence_surfaces(case, result.tool_log)
+        # Absence grading. live/record: the independent judge is called and
+        # its raw verdict is written to the judge sidecar next to the
+        # recording. Replay: the judge is not invoked; the recorded verdicts
+        # from the sidecar are re-graded deterministically. Fail closed in
+        # both paths: nonconforming output, a VIOLATION verdict, a missing
+        # sidecar entry or a missing sidecar all fail the absence check.
+        sidecar_entries = (
+            read_judge_sidecar(judge_sidecar) if judge_client is None else None
+        )
         absence_records: list[dict] = []
         absence_ok: bool | None = True
-        for a in case["assertions"]:
+        for index, a in enumerate(case["assertions"]):
             if a["type"] != "absence":
                 continue
-            if judge_client is None:
-                absence_ok = None
-                continue
-            ok, record = judge_absence(judge_client, reasoning, a["must_not_claim"])
+            if judge_client is not None:
+                ok, record = judge_absence(judge_client, reasoning, a["must_not_claim"])
+                if judge_sidecar:
+                    with open(judge_sidecar, "a", encoding="utf-8") as handle:
+                        handle.write(json.dumps({
+                            "case_id": case["id"],
+                            "assertion_index": index,
+                            "must_not_claim": a["must_not_claim"],
+                            "judge_model": judge_client.model,
+                            "raw": record["judge_raw"],
+                            "ok": ok,
+                        }) + "\n")
+            else:
+                ok, record = replay_judge_verdict(
+                    case["id"], index, a["must_not_claim"],
+                    sidecar_entries, judge_sidecar,
+                )
+            record["ok"] = ok
+            if not ok:
+                record.setdefault(
+                    "reason", f"absence judge verdict is {record['judge_parse']!r}")
             absence_records.append({"must_not_claim": a["must_not_claim"], **record})
             absence_ok = absence_ok and ok
         db_counts = {}
@@ -227,14 +341,18 @@ def evaluate_agent_v2(
             "decision_ok": decision == case["expected_decision"],
             "checks": checks,
             "absence_ok": absence_ok,
+            "absence_reasons": [
+                r["reason"] for r in absence_records if r.get("ok") is False],
             "absence_judge": absence_records,
             "evidence_found": found,
             "evidence_total": total,
             "evidence_signatures": signatures,
             "evidence_db_counts": db_counts,
+            # An absence assertion must be graded met (True): an ungraded
+            # absence can no longer pass a case.
             "case_pass": bool(decision == case["expected_decision"])
             and all(checks.values())
-            and absence_ok is not False
+            and absence_ok is True
             and found == total,
             "error": None,
         }
@@ -252,6 +370,7 @@ def evaluate_agent_v2(
             "decision_ok": False,
             "checks": {},
             "absence_ok": None,
+            "absence_reasons": [],
             "absence_judge": [],
             "evidence_found": 0,
             "evidence_total": sum(
@@ -609,6 +728,19 @@ def run_suite_v2(
     assertion list (decision first, then attribution/action/restraint/absence/
     evidence)."""
     judge_client = build_judge_client(mode=mode) if client is not None else None
+    # Judge-verdict sidecar: live/record runs write the judge's raw verdicts
+    # next to the recording (derived from RECORD_PATH) so a later replay can
+    # grade absence deterministically with no GPU. Replay reads the sidecar
+    # recorded against the active REPLAY_PATH; missing entries fail closed.
+    sidecar: str | None = None
+    if client is not None:
+        if judge_client is not None:
+            sidecar = judge_sidecar_path(settings.record_path)
+            os.makedirs(os.path.dirname(os.path.abspath(sidecar)), exist_ok=True)
+            with open(sidecar, "w", encoding="utf-8"):
+                pass  # one fresh sidecar per run
+        elif mode == "replay":
+            sidecar = judge_sidecar_path(settings.replay_path)
     rows: list[dict] = []
     for case in dataset:
         db_path = db_override or case_db(case["id"])
@@ -617,7 +749,7 @@ def run_suite_v2(
         else:
             result = evaluate_agent_v2(case, db_path, client, judge_client,
                                        max_turns=max_turns, price_in=price_in,
-                                       price_out=price_out)
+                                       price_out=price_out, judge_sidecar=sidecar)
         rows.append({
             "id": case["id"],
             "expected": case["expected_decision"],

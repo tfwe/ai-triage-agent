@@ -26,6 +26,18 @@ class Settings(BaseSettings):
     # Triage database used by the query_triage_db tool
     triage_db_path: str = "data/processed/triage.db"
 
+    # Absence judge (v2 grader). Must be an INDEPENDENT model from the draw
+    # client: temperature 0 pins sampling, not the weights, so a model can be
+    # systematically blind to its own omissions. judge_model is required in
+    # live/record mode (build_judge_client raises without it); replay mode
+    # grades absence from recorded judge verdicts and never calls the judge.
+    # judge_base_url/judge_api_key default to the draw client's endpoint
+    # (ollama_base_url + "ollama" for the ollama provider, openai_base_url +
+    # openai_api_key otherwise); set them to point the judge elsewhere.
+    judge_model: Optional[str] = None
+    judge_base_url: Optional[str] = None
+    judge_api_key: Optional[str] = None
+
     # Automatically load from the .env file in the root directory
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
