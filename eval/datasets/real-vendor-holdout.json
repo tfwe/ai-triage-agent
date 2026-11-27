@@ -1,0 +1,1743 @@
+[
+  {
+    "id": "HG-001",
+    "target": "203.0.113.127",
+    "class": "attack",
+    "subclass": "external-c2",
+    "source_slices": [
+      "data/real-vendor/zeek/beacon-capture/conn.json",
+      "http.json",
+      "files.json"
+    ],
+    "scenario": "External C2 server receiving repeated HTTP GET beacon traffic from internal host 100.64.0.6, with an HTTP-host beacon channel to a pseudo-random DGA hostname.",
+    "expected_decision": "BLOCK_IP",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "BLOCK_IP",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "100.64.0.6"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "network_traffic",
+        "signature": "\"dest_ip\": \"203.0.113.127\", \"dest_port\": 80",
+        "match": {
+          "src_ip": "100.64.0.6"
+        },
+        "min_hits": 1,
+        "note": "1 beacon connections"
+      },
+      {
+        "type": "evidence",
+        "source": "network_traffic",
+        "signature": "\"host\": \"dom-bff33d.example\"",
+        "match": {
+          "src_ip": "100.64.0.6"
+        },
+        "min_hits": 1,
+        "note": "DGA HTTP-host beacons"
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "block",
+          "perimeter"
+        ],
+        "reference": [
+          "203.0.113.127"
+        ]
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 203.0.113.127"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-002",
+    "target": "203.0.113.92",
+    "class": "attack",
+    "subclass": "brute-force-external-success",
+    "source_slices": [
+      "data/real-vendor/HOST-LNX-A/syslog.log"
+    ],
+    "scenario": "External SSH attacker against HOST-LNX-A that obtained a successful logon: 2 recorded auth events including 1 accepted password.",
+    "expected_decision": "BLOCK_IP",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "BLOCK_IP",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "HOST-LNX-A"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "endpoint_events",
+        "signature": "from 203.0.113.92",
+        "match": {
+          "hostname": "HOST-LNX-A"
+        },
+        "min_hits": 2,
+        "note": "all auth lines naming the source"
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "block",
+          "perimeter"
+        ],
+        "reference": [
+          "203.0.113.92"
+        ]
+      },
+      {
+        "type": "absence",
+        "must_not_claim": [
+          "203.0.113.92 is an internal host"
+        ]
+      },
+      {
+        "type": "absence",
+        "must_not_claim": [
+          "no successful logon occurred"
+        ]
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "credential",
+          "reset"
+        ],
+        "reference": [
+          "HOST-LNX-A"
+        ]
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 203.0.113.92"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-003",
+    "target": "203.0.113.121",
+    "class": "attack",
+    "subclass": "brute-force-external",
+    "source_slices": [
+      "data/real-vendor/HOST-LNX-A/syslog.log"
+    ],
+    "scenario": "External SSH attacker against HOST-LNX-A: 582 recorded auth events (failed/invalid). No host telemetry attributes compromise to this IP alone.",
+    "expected_decision": "BLOCK_IP",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "BLOCK_IP",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "HOST-LNX-A"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "endpoint_events",
+        "signature": "from 203.0.113.121",
+        "match": {
+          "hostname": "HOST-LNX-A"
+        },
+        "min_hits": 580,
+        "note": "all auth lines naming the source"
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "block",
+          "perimeter"
+        ],
+        "reference": [
+          "203.0.113.121"
+        ]
+      },
+      {
+        "type": "absence",
+        "must_not_claim": [
+          "203.0.113.121 is an internal host"
+        ]
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 203.0.113.121"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-004",
+    "target": "203.0.113.129",
+    "class": "attack",
+    "subclass": "brute-force-external",
+    "source_slices": [
+      "data/real-vendor/HOST-LNX-A/syslog.log"
+    ],
+    "scenario": "External SSH attacker against HOST-LNX-A: 189 recorded auth events (failed/invalid). No host telemetry attributes compromise to this IP alone.",
+    "expected_decision": "BLOCK_IP",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "BLOCK_IP",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "HOST-LNX-A"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "endpoint_events",
+        "signature": "from 203.0.113.129",
+        "match": {
+          "hostname": "HOST-LNX-A"
+        },
+        "min_hits": 189,
+        "note": "all auth lines naming the source"
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "block",
+          "perimeter"
+        ],
+        "reference": [
+          "203.0.113.129"
+        ]
+      },
+      {
+        "type": "absence",
+        "must_not_claim": [
+          "203.0.113.129 is an internal host"
+        ]
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 203.0.113.129"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-005",
+    "target": "203.0.113.104",
+    "class": "attack",
+    "subclass": "brute-force-external",
+    "source_slices": [
+      "data/real-vendor/HOST-LNX-B/syslog.log"
+    ],
+    "scenario": "External SSH credential attack against HOST-LNX-B: 80 pam_unix authentication-failure events with this source address. No successful logon observed for this source.",
+    "expected_decision": "BLOCK_IP",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "BLOCK_IP",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "HOST-LNX-B"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "endpoint_events",
+        "signature": "rhost=203.0.113.104",
+        "match": {
+          "hostname": "HOST-LNX-B"
+        },
+        "min_hits": 80,
+        "note": "pam_unix failure lines naming the source"
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "block",
+          "perimeter"
+        ],
+        "reference": [
+          "203.0.113.104"
+        ]
+      },
+      {
+        "type": "absence",
+        "must_not_claim": [
+          "successful logon",
+          "203.0.113.104 compromised HOST-LNX-B"
+        ]
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 203.0.113.104"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-006",
+    "target": "203.0.113.161",
+    "class": "attack",
+    "subclass": "brute-force-external",
+    "source_slices": [
+      "data/real-vendor/HOST-LNX-B/syslog.log"
+    ],
+    "scenario": "External SSH credential attack against HOST-LNX-B: 23 pam_unix authentication-failure events with this source address. No successful logon observed for this source.",
+    "expected_decision": "BLOCK_IP",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "BLOCK_IP",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "HOST-LNX-B"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "endpoint_events",
+        "signature": "rhost=203.0.113.161",
+        "match": {
+          "hostname": "HOST-LNX-B"
+        },
+        "min_hits": 23,
+        "note": "pam_unix failure lines naming the source"
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "block",
+          "perimeter"
+        ],
+        "reference": [
+          "203.0.113.161"
+        ]
+      },
+      {
+        "type": "absence",
+        "must_not_claim": [
+          "successful logon",
+          "203.0.113.161 compromised HOST-LNX-B"
+        ]
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 203.0.113.161"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-007",
+    "target": "203.0.113.143",
+    "class": "attack",
+    "subclass": "brute-force-external",
+    "source_slices": [
+      "data/real-vendor/HOST-LNX-B/syslog.log"
+    ],
+    "scenario": "External SSH credential attack against HOST-LNX-B: 15 pam_unix authentication-failure events with this source address. No successful logon observed for this source.",
+    "expected_decision": "BLOCK_IP",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "BLOCK_IP",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "HOST-LNX-B"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "endpoint_events",
+        "signature": "rhost=203.0.113.143",
+        "match": {
+          "hostname": "HOST-LNX-B"
+        },
+        "min_hits": 15,
+        "note": "pam_unix failure lines naming the source"
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "block",
+          "perimeter"
+        ],
+        "reference": [
+          "203.0.113.143"
+        ]
+      },
+      {
+        "type": "absence",
+        "must_not_claim": [
+          "successful logon",
+          "203.0.113.143 compromised HOST-LNX-B"
+        ]
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 203.0.113.143"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-008",
+    "target": "203.0.113.107",
+    "class": "attack",
+    "subclass": "kerberos-external",
+    "source_slices": [
+      "data/real-vendor/HOST-LNX-B/syslog.log"
+    ],
+    "scenario": "External source hits klogind on HOST-LNX-B with 23 Kerberos 'Authentication failed' events (replay-cache permission denied) - credential attack against Kerberos rlogin.",
+    "expected_decision": "BLOCK_IP",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "BLOCK_IP",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "klogind",
+          "HOST-LNX-B"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "endpoint_events",
+        "signature": "Authentication failed from 203.0.113.107",
+        "match": {
+          "hostname": "HOST-LNX-B"
+        },
+        "min_hits": 23
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "block",
+          "perimeter"
+        ],
+        "reference": [
+          "203.0.113.107"
+        ]
+      },
+      {
+        "type": "absence",
+        "must_not_claim": [
+          "successful Kerberos logon"
+        ]
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 203.0.113.107"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-009",
+    "target": "100.64.0.6",
+    "class": "attack",
+    "subclass": "c2-beacon",
+    "source_slices": [
+      "data/real-vendor/zeek/beacon-capture/conn.json",
+      "http.json",
+      "files.json"
+    ],
+    "scenario": "Internal host beaconing to external C2 203.0.113.127 over HTTP with a pseudo-random DGA hostname and downloading a payload file.",
+    "expected_decision": "ISOLATE_HOST",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "ISOLATE_HOST",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "203.0.113.127"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "network_traffic",
+        "signature": "\"dest_ip\": \"203.0.113.127\", \"dest_port\": 80",
+        "match": {
+          "src_ip": "100.64.0.6"
+        },
+        "min_hits": 1
+      },
+      {
+        "type": "evidence",
+        "source": "network_traffic",
+        "signature": "\"host\": \"dom-bff33d.example\"",
+        "match": {
+          "src_ip": "100.64.0.6"
+        },
+        "min_hits": 1
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "isolate",
+          "block"
+        ],
+        "reference": [
+          "100.64.0.6",
+          "203.0.113.127"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-010",
+    "target": "100.64.4.2",
+    "class": "attack",
+    "subclass": "lateral-movement-rdp",
+    "source_slices": [
+      "data/real-vendor/zeek/rdp-capture/conn.json",
+      "ssl.json",
+      "x509.json"
+    ],
+    "scenario": "Internal host 100.64.4.2 opens an RDP session (TLS, port 3389) to peer 100.64.4.4 - SharpRDP-style lateral movement; x509 data shows a self-signed certificate with CN=HOST-WIN-B in the same capture.",
+    "expected_decision": "ISOLATE_HOST",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "ISOLATE_HOST",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "100.64.4.4"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "network_traffic",
+        "signature": "\"dest_ip\": \"100.64.4.4\", \"dest_port\": 3389",
+        "match": {
+          "src_ip": "100.64.4.2"
+        },
+        "min_hits": 4,
+        "note": "TLS RDP session"
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "isolate",
+          "credential"
+        ],
+        "reference": [
+          "100.64.4.2"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-011",
+    "target": "100.64.4.1",
+    "class": "attack",
+    "subclass": "zerologon",
+    "source_slices": [
+      "data/real-vendor/zeek/zerologon-capture/conn.json"
+    ],
+    "scenario": "Internal host 100.64.4.1 performs a high-volume DC-sync-shaped traffic pattern against domain controller 100.64.4.0:135 (ZeroLogon-style MS-NRPC abuse).",
+    "expected_decision": "ISOLATE_HOST",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "ISOLATE_HOST",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "100.64.4.0"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "network_traffic",
+        "signature": "\"dest_ip\": \"100.64.4.0\", \"dest_port\": 135",
+        "match": {
+          "src_ip": "100.64.4.1"
+        },
+        "min_hits": 1,
+        "note": "1 RPC sessions"
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "isolate",
+          "credential"
+        ],
+        "reference": [
+          "100.64.4.1"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-012",
+    "target": "100.64.3.64",
+    "class": "attack",
+    "subclass": "smb-dll-lateral",
+    "source_slices": [
+      "data/real-vendor/ids/IDS-WRCCDC-2018/fast.log"
+    ],
+    "scenario": "Internal host 100.64.3.64 floods victim 100.64.1.71:445 with SMB2 NT Create requests for DLL files - lateral-movement weaponization.",
+    "expected_decision": "ISOLATE_HOST",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "ISOLATE_HOST",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "100.64.1.71"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "alerts",
+        "signature": "ET POLICY SMB2 NT Create AndX Request For a DLL File - Possible Lateral Movement",
+        "match": {
+          "src_ip": "100.64.3.64"
+        },
+        "min_hits": 1000
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "isolate",
+          "block"
+        ],
+        "reference": [
+          "100.64.3.64"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-013",
+    "target": "100.64.3.204",
+    "class": "attack",
+    "subclass": "malformed-tls",
+    "source_slices": [
+      "data/real-vendor/ids/IDS-WRCCDC-2018/fast.log"
+    ],
+    "scenario": "Internal host 100.64.3.204 emits a sustained flood of malformed TLS traffic toward peer 100.64.0.130:902.",
+    "expected_decision": "ISOLATE_HOST",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "ISOLATE_HOST",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "100.64.0.130"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "alerts",
+        "signature": "SURICATA TLS invalid record/traffic",
+        "match": {
+          "src_ip": "100.64.3.204"
+        },
+        "min_hits": 1000
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "isolate"
+        ],
+        "reference": [
+          "100.64.3.204"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-014",
+    "target": "100.64.1.65",
+    "class": "attack",
+    "subclass": "port-scan",
+    "source_slices": [
+      "data/real-vendor/ids/IDS-WRCCDC-2018/fast.log"
+    ],
+    "scenario": "Internal host 100.64.1.65 makes hundreds of connections to the MySQL service port on 100.64.3.68.",
+    "expected_decision": "ISOLATE_HOST",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "ISOLATE_HOST",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "100.64.3.68"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "alerts",
+        "signature": "ET SCAN Non-Allowed Host Tried to Connect to MySQL Server",
+        "match": {
+          "src_ip": "100.64.1.65"
+        },
+        "min_hits": 1000
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "isolate"
+        ],
+        "reference": [
+          "100.64.1.65"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-015",
+    "target": "100.64.0.8",
+    "class": "attack",
+    "subclass": "port-scan",
+    "source_slices": [
+      "data/real-vendor/zeek/rpc-discovery-capture/conn.json"
+    ],
+    "scenario": "Internal host 100.64.0.8 connects to the RPC endpoint mapper (135) on 100.64.0.9 - service-discovery scan of a Windows RPC service.",
+    "expected_decision": "ISOLATE_HOST",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "ISOLATE_HOST",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "100.64.0.9"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "network_traffic",
+        "signature": "\"dest_ip\": \"100.64.0.9\", \"dest_port\": 135",
+        "match": {
+          "src_ip": "100.64.0.8"
+        },
+        "min_hits": 1
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "isolate"
+        ],
+        "reference": [
+          "100.64.0.8"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-016",
+    "target": "HOST-WIN-A",
+    "class": "attack",
+    "subclass": "web-shell-discovery",
+    "source_slices": [
+      "data/real-vendor/windows/HOST-WIN-A/discovery-appcmd.xml"
+    ],
+    "scenario": "Sysmon on HOST-WIN-A records encoded PowerShell spawning discovery via IIS appcmd.exe (list config / vdir enumeration) - web-server config and password discovery.",
+    "expected_decision": "ISOLATE_HOST",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "ISOLATE_HOST",
+        "weight": 2
+      },
+      {
+        "type": "evidence",
+        "source": "endpoint_events",
+        "signature": "appcmd.exe",
+        "match": {
+          "hostname": "HOST-WIN-A"
+        },
+        "min_hits": 39,
+        "note": "verified count set in main() from parser rows"
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "appcmd.exe",
+          "powershell"
+        ]
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "isolate"
+        ],
+        "reference": [
+          "HOST-WIN-A"
+        ]
+      },
+      {
+        "type": "absence",
+        "must_not_claim": [
+          "benign admin activity"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-017",
+    "target": "HOST-WIN-B",
+    "class": "attack",
+    "subclass": "privesc-unquoted-path",
+    "source_slices": [
+      "data/real-vendor/windows/HOST-WIN-B/privesc-unquoted-svc.xml"
+    ],
+    "scenario": "Sysmon on HOST-WIN-B records privilege-escalation activity consistent with an unquoted service path (service binaries resolving through a writable path).",
+    "expected_decision": "ISOLATE_HOST",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "ISOLATE_HOST",
+        "weight": 2
+      },
+      {
+        "type": "evidence",
+        "source": "endpoint_events",
+        "signature": "unquoted",
+        "match": {
+          "hostname": "HOST-WIN-B"
+        },
+        "min_hits": 1,
+        "note": "verified count set in main() from parser rows"
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "unquoted"
+        ]
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "isolate"
+        ],
+        "reference": [
+          "HOST-WIN-B"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-018",
+    "target": "100.64.2.212",
+    "class": "benign",
+    "subclass": "netgear-exploit-victim",
+    "source_slices": [
+      "data/real-vendor/ids/IDS-WRCCDC-2018/fast.log"
+    ],
+    "scenario": "100.64.2.212 is the destination of 1000 NETGEAR WNR2000v5 hidden_lang_avi stack overflow exploit attempts from internal source 100.64.3.60. No compromise evidence on the victim; correct action is IGNORE on the victim while containing the source.",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "100.64.3.60"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "alerts",
+        "signature": "ET EXPLOIT NETGEAR WNR2000v5 hidden_lang_avi Stack Overflow (CVE-2016-10174)",
+        "match": {
+          "dest_ip": "100.64.2.212"
+        },
+        "min_hits": 1000
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 100.64.2.212"
+        ]
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "isolate",
+          "contain"
+        ],
+        "reference": [
+          "100.64.3.60"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-019",
+    "target": "100.64.2.217",
+    "class": "benign",
+    "subclass": "netgear-exploit-victim",
+    "source_slices": [
+      "data/real-vendor/ids/IDS-WRCCDC-2018/fast.log"
+    ],
+    "scenario": "100.64.2.217 is the destination of 1000 NETGEAR WNR2000v5 hidden_lang_avi stack overflow exploit attempts from internal source 100.64.3.60. No compromise evidence on the victim; correct action is IGNORE on the victim while containing the source.",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "100.64.3.60"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "alerts",
+        "signature": "ET EXPLOIT NETGEAR WNR2000v5 hidden_lang_avi Stack Overflow (CVE-2016-10174)",
+        "match": {
+          "dest_ip": "100.64.2.217"
+        },
+        "min_hits": 1000
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 100.64.2.217"
+        ]
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "isolate",
+          "contain"
+        ],
+        "reference": [
+          "100.64.3.60"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-020",
+    "target": "100.64.1.71",
+    "class": "benign",
+    "subclass": "smb-lateral-victim",
+    "source_slices": [
+      "data/real-vendor/ids/IDS-WRCCDC-2018/fast.log"
+    ],
+    "scenario": "100.64.1.71 receives SMB2 DLL-create requests from 100.64.3.64 - attempted lateral movement. No host telemetry on 100.64.1.71 exists in this corpus, so compromise is neither confirmed nor excluded; grade the victim IGNORE and contain the source.",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "100.64.3.64"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "alerts",
+        "signature": "ET POLICY SMB2 NT Create AndX Request For a DLL File - Possible Lateral Movement",
+        "match": {
+          "dest_ip": "100.64.1.71"
+        },
+        "min_hits": 1000
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 100.64.1.71"
+        ]
+      },
+      {
+        "type": "absence",
+        "must_not_claim": [
+          "100.64.1.71 is compromised",
+          "100.64.1.71 is clean"
+        ]
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "isolate",
+          "contain"
+        ],
+        "reference": [
+          "100.64.3.64"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-021",
+    "target": "100.64.0.130",
+    "class": "benign",
+    "subclass": "malformed-tls-victim",
+    "source_slices": [
+      "data/real-vendor/ids/IDS-WRCCDC-2018/fast.log"
+    ],
+    "scenario": "100.64.0.130:902 receives a malformed-TLS flood from 100.64.3.204. Victim of an anomalous traffic source; no compromise evidence on the victim.",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "100.64.3.204"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "alerts",
+        "signature": "SURICATA TLS invalid record/traffic",
+        "match": {
+          "dest_ip": "100.64.0.130"
+        },
+        "min_hits": 1000
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 100.64.0.130"
+        ]
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "isolate",
+          "contain"
+        ],
+        "reference": [
+          "100.64.3.204"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-022",
+    "target": "100.64.3.68",
+    "class": "benign",
+    "subclass": "mysql-scan-victim",
+    "source_slices": [
+      "data/real-vendor/ids/IDS-WRCCDC-2018/fast.log"
+    ],
+    "scenario": "100.64.3.68 is the scanned MySQL service host receiving connections from 100.64.0.121, 100.64.1.65 and 100.64.0.165. The victim is not the threat actor - hard negative: alert text names a malicious pattern but the target only plays the service role.",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "100.64.0.121",
+          "100.64.1.65",
+          "100.64.0.165"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "alerts",
+        "signature": "ET SCAN Non-Allowed Host Tried to Connect to MySQL Server",
+        "match": {
+          "dest_ip": "100.64.3.68"
+        },
+        "min_hits": 3000
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 100.64.3.68"
+        ]
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "isolate",
+          "contain"
+        ],
+        "reference": [
+          "100.64.0.121",
+          "100.64.1.65",
+          "100.64.0.165"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-023",
+    "target": "100.64.0.9",
+    "class": "benign",
+    "subclass": "dcerpc-scan-victim",
+    "source_slices": [
+      "data/real-vendor/zeek/rpc-discovery-capture/conn.json"
+    ],
+    "scenario": "100.64.0.9 receives RPC endpoint-mapper probes from 100.64.0.8:135. Discovery attempt against the host; no compromise evidence.",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "100.64.0.8"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "network_traffic",
+        "signature": "\"dest_ip\": \"100.64.0.9\", \"dest_port\": 135",
+        "match": {
+          "src_ip": "100.64.0.8"
+        },
+        "min_hits": 1
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 100.64.0.9"
+        ]
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "isolate",
+          "contain"
+        ],
+        "reference": [
+          "100.64.0.8"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-024",
+    "target": "100.64.0.7",
+    "class": "benign",
+    "subclass": "rdp-tunnel-victim",
+    "source_slices": [
+      "data/real-vendor/zeek/tunnel-capture/conn.json"
+    ],
+    "scenario": "100.64.0.7 receives an inbound RDP-tunneling session (49682) from 100.64.0.6 - meterpreter port-forward target; the tunnel source is the compromised host. No host telemetry on 100.64.0.7 exists in this corpus, so compromise is neither confirmed nor excluded; grade the victim IGNORE and contain the tunnel source.",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "100.64.0.6"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "network_traffic",
+        "signature": "\"dest_ip\": \"100.64.0.7\", \"dest_port\": 49682",
+        "match": {
+          "src_ip": "100.64.0.6"
+        },
+        "min_hits": 1
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 100.64.0.7"
+        ]
+      },
+      {
+        "type": "absence",
+        "must_not_claim": [
+          "100.64.0.7 is compromised",
+          "100.64.0.7 hosts meterpreter",
+          "100.64.0.7 is clean"
+        ]
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "isolate",
+          "contain"
+        ],
+        "reference": [
+          "100.64.0.6"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-025",
+    "target": "203.0.113.4",
+    "class": "benign",
+    "subclass": "dns-resolver-hard-negative",
+    "source_slices": [
+      "data/real-vendor/zeek/dns-capture/conn.json",
+      "dns.json"
+    ],
+    "scenario": "203.0.113.4 is the enterprise DNS resolver queried by compromised host 100.64.4.6 (the resolver carries TXT queries but is legitimate infrastructure).",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "100.64.4.6"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "network_traffic",
+        "signature": "\"dest_ip\": \"203.0.113.4\", \"dest_port\": 53",
+        "match": {
+          "src_ip": "100.64.4.6"
+        },
+        "min_hits": 2
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "block 203.0.113.4",
+          "isolate 203.0.113.4"
+        ]
+      },
+      {
+        "type": "absence",
+        "must_not_claim": [
+          "203.0.113.4 is the C2 endpoint"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-026",
+    "target": "100.64.4.3",
+    "class": "benign",
+    "subclass": "dhcp-service",
+    "source_slices": [
+      "data/real-vendor/zeek/rdp-capture/conn.json",
+      "dhcp.json"
+    ],
+    "scenario": "DHCP server (lease REQUEST/ACK for HOST-WIN-B at 100.64.4.4). Pure service role inside an attack capture.",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "evidence",
+        "source": "network_traffic",
+        "signature": "\"dest_ip\": \"100.64.4.3\", \"dest_port\": 67",
+        "match": {
+          "src_ip": "100.64.4.4"
+        },
+        "min_hits": 1
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 100.64.4.3",
+          "block 100.64.4.3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-027",
+    "target": "100.64.4.8",
+    "class": "benign",
+    "subclass": "mdns-noise",
+    "source_slices": [
+      "data/real-vendor/zeek/rdp-capture/dns.json",
+      "conn.json"
+    ],
+    "scenario": "mDNS peer answering .local queries (5353) from HOST-WIN-B.",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "evidence",
+        "source": "network_traffic",
+        "signature": "\"query\": \"HOST-WIN-B.local\"",
+        "match": {
+          "dest_ip": "100.64.4.8",
+          "dest_port": 5353
+        },
+        "min_hits": 1
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 100.64.4.8",
+          "block 100.64.4.8"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-028",
+    "target": "100.64.4.9",
+    "class": "benign",
+    "subclass": "llmnr-noise",
+    "source_slices": [
+      "data/real-vendor/zeek/rdp-capture/conn.json",
+      "dns.json"
+    ],
+    "scenario": "LLMNR peer receiving 5355 queries.",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "evidence",
+        "source": "network_traffic",
+        "signature": "\"dest_ip\": \"100.64.4.9\", \"dest_port\": 5355",
+        "match": null,
+        "min_hits": 6
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 100.64.4.9",
+          "block 100.64.4.9"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-029",
+    "target": "100.64.4.10",
+    "class": "benign",
+    "subclass": "ssdp-noise",
+    "source_slices": [
+      "data/real-vendor/zeek/rdp-capture/conn.json"
+    ],
+    "scenario": "SSDP (1900) peer reached from HOST-WIN-B.",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "evidence",
+        "source": "network_traffic",
+        "signature": "\"dest_ip\": \"100.64.4.10\", \"dest_port\": 1900",
+        "match": null,
+        "min_hits": 1
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 100.64.4.10",
+          "block 100.64.4.10"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-030",
+    "target": "2001:db8::3779",
+    "class": "benign",
+    "subclass": "llmnr-noise-ipv6",
+    "source_slices": [
+      "data/real-vendor/zeek/rdp-capture/conn.json"
+    ],
+    "scenario": "IPv6 LLMNR responder hub reached from multiple hosts (documentation range).",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "evidence",
+        "source": "network_traffic",
+        "signature": "\"dest_ip\": \"2001:db8::3779\", \"dest_port\": 5355",
+        "match": null,
+        "min_hits": 6
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 2001:db8::3779"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-031",
+    "target": "2001:db8::3392",
+    "class": "benign",
+    "subclass": "mdns-noise-ipv6",
+    "source_slices": [
+      "data/real-vendor/zeek/rdp-capture/conn.json",
+      "dns.json"
+    ],
+    "scenario": "IPv6 mDNS peer (5353) answering .local queries.",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "evidence",
+        "source": "network_traffic",
+        "signature": "\"dest_ip\": \"2001:db8::3392\", \"dest_port\": 5353",
+        "match": null,
+        "min_hits": 1
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 2001:db8::3392"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-032",
+    "target": "2001:db8::b379",
+    "class": "benign",
+    "subclass": "dhcpv6-noise-ipv6",
+    "source_slices": [
+      "data/real-vendor/zeek/dns-capture/conn.json"
+    ],
+    "scenario": "IPv6 DHCPv6 (547) peer inside the C2 capture - service noise adjacent to attack traffic.",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "evidence",
+        "source": "network_traffic",
+        "signature": "\"dest_ip\": \"2001:db8::b379\", \"dest_port\": 547",
+        "match": null,
+        "min_hits": 1
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate 2001:db8::b379"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-033",
+    "target": "HOST-LNX-B",
+    "class": "benign",
+    "subclass": "brute-forced-host-no-compromise",
+    "source_slices": [
+      "data/real-vendor/HOST-LNX-B/syslog.log"
+    ],
+    "scenario": "HOST-LNX-B carries 300 pam_unix authentication-failure events from external sources (largest contributors 203.0.113.104 and 203.0.113.161) plus 46 klogind Kerberos failures, alongside benign su/ftpd/named/gdm activity. No successful external logon, no privilege escalation: the host is under active credential attack but not compromised. Correct verdict: IGNORE the host itself while blocking the attacker IPs at the perimeter.",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "attribution",
+        "must_mention": [
+          "203.0.113.104",
+          "203.0.113.161"
+        ]
+      },
+      {
+        "type": "evidence",
+        "source": "endpoint_events",
+        "signature": "rhost=203.0.113.",
+        "match": {
+          "hostname": "HOST-LNX-B"
+        },
+        "min_hits": 300,
+        "note": "all pam_unix failure lines naming external sources"
+      },
+      {
+        "type": "absence",
+        "must_not_claim": [
+          "successful logon",
+          "compromised credentials in use",
+          "host compromised"
+        ]
+      },
+      {
+        "type": "action",
+        "verbs": [
+          "block",
+          "perimeter"
+        ],
+        "reference": [
+          "203.0.113.104",
+          "203.0.113.161"
+        ]
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "isolate HOST-LNX-B"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-034",
+    "target": "203.0.113.178",
+    "class": "benign",
+    "subclass": "auth-noise-low-volume",
+    "source_slices": [
+      "data/real-vendor/HOST-LNX-B/syslog.log"
+    ],
+    "scenario": "5 auth events from this external source on HOST-LNX-B, no success: background credential noise, below any block threshold.",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "evidence",
+        "source": "endpoint_events",
+        "signature": "rhost=203.0.113.178",
+        "match": {
+          "hostname": "HOST-LNX-B"
+        },
+        "min_hits": 5
+      },
+      {
+        "type": "absence",
+        "must_not_claim": [
+          "successful logon",
+          "brute-force campaign"
+        ]
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "block 203.0.113.178"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-035",
+    "target": "203.0.113.182",
+    "class": "benign",
+    "subclass": "auth-noise-low-volume",
+    "source_slices": [
+      "data/real-vendor/HOST-LNX-B/syslog.log"
+    ],
+    "scenario": "4 auth events from this external source on HOST-LNX-B, no success: background credential noise, below any block threshold.",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "evidence",
+        "source": "endpoint_events",
+        "signature": "rhost=203.0.113.182",
+        "match": {
+          "hostname": "HOST-LNX-B"
+        },
+        "min_hits": 4
+      },
+      {
+        "type": "absence",
+        "must_not_claim": [
+          "successful logon",
+          "brute-force campaign"
+        ]
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "block 203.0.113.182"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-036",
+    "target": "203.0.113.154",
+    "class": "benign",
+    "subclass": "ftp-access-noise",
+    "source_slices": [
+      "data/real-vendor/HOST-LNX-B/syslog.log"
+    ],
+    "scenario": "46 plain ftpd 'connection from' events on HOST-LNX-B with zero authentication failures and no other telemetry - routine service access.",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "evidence",
+        "source": "endpoint_events",
+        "signature": "connection from 203.0.113.154",
+        "match": {
+          "hostname": "HOST-LNX-B"
+        },
+        "min_hits": 46
+      },
+      {
+        "type": "absence",
+        "must_not_claim": [
+          "authentication failure",
+          "brute force"
+        ]
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "block 203.0.113.154",
+          "isolate HOST-LNX-B"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "HG-037",
+    "target": "203.0.113.176",
+    "class": "benign",
+    "subclass": "ftp-access-noise",
+    "source_slices": [
+      "data/real-vendor/HOST-LNX-B/syslog.log"
+    ],
+    "scenario": "44 plain ftpd 'connection from' events on HOST-LNX-B with zero authentication failures and no other telemetry - routine service access.",
+    "expected_decision": "IGNORE",
+    "assertions": [
+      {
+        "type": "decision",
+        "expected": "IGNORE",
+        "weight": 2
+      },
+      {
+        "type": "evidence",
+        "source": "endpoint_events",
+        "signature": "connection from 203.0.113.176",
+        "match": {
+          "hostname": "HOST-LNX-B"
+        },
+        "min_hits": 44
+      },
+      {
+        "type": "absence",
+        "must_not_claim": [
+          "authentication failure",
+          "brute force"
+        ]
+      },
+      {
+        "type": "restraint",
+        "forbid": [
+          "block 203.0.113.176",
+          "isolate HOST-LNX-B"
+        ]
+      }
+    ]
+  }
+]

@@ -33,6 +33,15 @@ data/public/cases/*
 eval/recordings/public-*.jsonl
 !eval/recordings/public-ornith-r3-holdout.jsonl
 
+# Stage-4b real-vendor holdout: per-draw recordings and per-draw result files
+# are reproducible from the pinned metadata recorded in the committed report
+# (eval/results/real-vendor-holdout-report.json).
+eval/recordings/real-vendor-holdout-*.jsonl
+eval/results/real-vendor-holdout-r*.json
+eval/results/real-vendor-holdout-r*.txt
+eval/results/real-vendor-holdout-draw0.json
+eval/results/real-vendor-holdout-draw0.txt
+
 # Environment
 .env
 __pycache__/
