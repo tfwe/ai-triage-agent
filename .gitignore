@@ -41,3 +41,6 @@ __pycache__/
 # Virtual Environments
 venv/
 .venv/
+
+# client request sidecar (diagnostics, never committed)
+*.reqlog

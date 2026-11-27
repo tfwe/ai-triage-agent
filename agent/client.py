@@ -17,6 +17,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import time
 from dataclasses import dataclass
 from typing import Any, Protocol, Sequence
 
@@ -91,8 +92,8 @@ class OpenAIClient:
         api_key: str | None = None,
         temperature: float = 0.1,
         seed: int = 7,
-        timeout: float = 300.0,
-        max_tokens: int = 8192,
+        timeout: float = 900.0,
+        max_tokens: int = 5500,
         max_retries: int = 0,
     ) -> None:
         from openai import OpenAI
@@ -126,27 +127,40 @@ class OpenAIClient:
             "seed": self.seed,
             "max_tokens": self.max_tokens,
         }
-        try:
-            response = self._client.chat.completions.create(**request)
-        except Exception as exc:  # surface provider errors to the caller
-            raise ClientError(f"model request failed: {exc}") from exc
-
-        choice = response.choices[0].message
-        calls = tuple(
-            ToolCall(
-                id=call.id,
-                name=call.function.name,
-                arguments=call.function.arguments or "{}",
+        for attempt in range(3):
+            try:
+                response = self._client.chat.completions.create(**request)
+            except Exception as exc:  # surface provider errors to the caller
+                # LM Studio: a crashed generation can unload the model; the
+                # next request usually JIT-reloads it, so back off and retry
+                # instead of failing the whole target run.
+                if "unloaded" in str(exc).lower() and attempt < 2:
+                    time.sleep(15)
+                    continue
+                raise ClientError(f"model request failed: {exc}") from exc
+            choice = response.choices[0].message
+            if not choice.content and not choice.tool_calls and attempt < 2:
+                # ornith occasionally returns a blank completion (server-side
+                # generation crash); an identical immediate retry recovers.
+                # The blank response is never returned, so RecordingClient
+                # only records the recovered one and replay stays consistent.
+                continue
+            calls = tuple(
+                ToolCall(
+                    id=call.id,
+                    name=call.function.name,
+                    arguments=call.function.arguments or "{}",
+                )
+                for call in (choice.tool_calls or ())
             )
-            for call in (choice.tool_calls or ())
-        )
-        usage = getattr(response, "usage", None)
-        return AssistantMessage(
-            content=choice.content,
-            tool_calls=calls,
-            prompt_tokens=getattr(usage, "prompt_tokens", 0) or 0,
-            completion_tokens=getattr(usage, "completion_tokens", 0) or 0,
-        )
+            usage = getattr(response, "usage", None)
+            return AssistantMessage(
+                content=choice.content,
+                tool_calls=calls,
+                prompt_tokens=getattr(usage, "prompt_tokens", 0) or 0,
+                completion_tokens=getattr(usage, "completion_tokens", 0) or 0,
+            )
+        raise ClientError("model request failed: exhausted retries")
 
 
 class RecordingClient:
@@ -164,6 +178,17 @@ class RecordingClient:
     def complete(
         self, messages: Sequence[dict], tools: Sequence[dict]
     ) -> AssistantMessage:
+        # sidecar: log every outgoing request so timed-out requests (which
+        # never reach the recording) are still diagnosable
+        try:
+            with open(self.path + ".reqlog", "a", encoding="utf-8") as dbg:
+                dbg.write(json.dumps({
+                    "key": request_key(self.model, messages, tools)[:16],
+                    "n_msgs": len(messages),
+                    "prompt_chars": sum(len(json.dumps(x)) for x in messages),
+                }) + "\n")
+        except OSError:
+            pass
         response = self.inner.complete(messages, tools)
         record = {
             "key": request_key(self.model, messages, tools),

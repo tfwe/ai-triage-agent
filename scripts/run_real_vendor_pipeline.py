@@ -166,19 +166,20 @@ def db_stats() -> dict:
     return stats
 
 
-def run_agent(target: str) -> dict:
+def run_agent(target: str, mode: str = "record") -> dict:
     env = os.environ.copy()
     # setdefault: caller-provided values win over the runner's defaults.
     for key, value in (
         ("TRIAGE_DB_PATH", DB_PATH),
         ("LLM_PROVIDER", "ollama"),
-        ("LLM_MODE", "record"),
+        ("LLM_MODE", mode),
         ("RECORD_PATH", RECORDING),
+        ("REPLAY_PATH", RECORDING),
     ):
         env.setdefault(key, value)
     try:
         proc = subprocess.run(
-            [sys.executable, "-m", "agent.core", target, "--mode", "record"],
+            [sys.executable, "-m", "agent.core", target, "--mode", mode],
             cwd=REPO_ROOT,
             env=env,
             capture_output=True,
@@ -225,6 +226,8 @@ def main() -> None:
     ap.add_argument("--skip-agents", action="store_true")
     ap.add_argument("--write-results", action="store_true",
                     help="write eval/results/real-vendor-run.json")
+    ap.add_argument("--llm-mode", choices=["live", "record", "replay"], default="record",
+                    help="mode passed through to agent.core (record | live | replay)")
     args = ap.parse_args()
 
     staged = stage_corpus()
@@ -246,7 +249,7 @@ def main() -> None:
     if not args.skip_agents:
         for target in args.targets:
             print(f"agent run: {target}")
-            run_doc["agent_runs"].append(run_agent(target))
+            run_doc["agent_runs"].append(run_agent(target, mode=args.llm_mode))
 
     if args.write_results:
         os.makedirs(os.path.dirname(RESULTS_JSON), exist_ok=True)
